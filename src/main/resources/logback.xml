@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration debug="true">
+    <property name="LOG_HOME" value="logs/"/>
+    <property name="PROJECT_NAME" value="eeds-agent"/>
+    <property name="AGENT_NAME" value="agent"/>
+    <property name="AGENT_THINGS_NAME" value="things"/>
+    <property name="log_pattern_color"
+              value="%green(%d{yyyy-MM-dd HH:mm:ss.SSS}) [%thread] %highlight(%-5level) %cyan(%logger{50}) : %msg%n"/>
+
+    <!--console输出-->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${log_pattern_color}</pattern>
+        </encoder>
+    </appender>
+
+    <!--文件输出info-->
+    <appender name="FILEInfoLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>${LOG_HOME}/${PROJECT_NAME}/info/${PROJECT_NAME}.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <maxFileSize>250MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%level%d{yyyy-MM-dd HH:mm:ss}%c%M%L%thread%m%n</pattern>
+        </encoder>
+        <!--只输出INFO-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!--过滤 INFO-->
+            <level>INFO</level>
+            <!--匹配到就禁止-->
+            <onMatch>ACCEPT</onMatch>
+            <!--没有匹配到就允许-->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!--文件输出debug-->
+    <appender name="FILEDebugLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>${LOG_HOME}/${PROJECT_NAME}/debug/${PROJECT_NAME}.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <maxFileSize>500MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%level%d{yyyy-MM-dd HH:mm:ss}%c%M%L%thread%m</pattern>
+        </encoder>
+        <!--只输出INFO-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!--过滤 DEBUG-->
+            <level>DEBUG</level>
+            <!--匹配到就禁止-->
+            <onMatch>ACCEPT</onMatch>
+            <!--没有匹配到就允许-->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!--文件输出error-->
+    <appender name="FILEErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>${LOG_HOME}/${PROJECT_NAME}/error/${PROJECT_NAME}.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <maxFileSize>500MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%level%d{yyyy-MM-dd HH:mm:ss}%c%M%L%thread%m</pattern>
+        </encoder>
+        <!--只输出INFO-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!--过滤 DEBUG-->
+            <level>ERROR</level>
+            <!--匹配到就禁止-->
+            <onMatch>ACCEPT</onMatch>
+            <!--没有匹配到就允许-->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILEInfoLog"/>
+        <appender-ref ref="FILEDebugLog"/>
+        <appender-ref ref="FILEErrorLog"/>
+    </root>
+
+</configuration>
