@@ -1,31 +1,47 @@
-package com.elco.eeds.agent.sdk.core.common;
+package com.elco.eeds.agent.sdk.core.common.enums;
 
 /**
  * @Description eeds错误异常枚举
  * @Author Administrator
  * @Date 2022/12/3 9:39
  **/
-public enum EedsErrorEnum {
+public enum ErrorEnum {
     /**
      * 客户端本身错误，以CL开头
      */
     CLIENT_START_ERROR("CL0101001", "客户端启动失败"),
+    CLIENT_REGISTER_ERROR("CL0101002", "客户端注册错误"),
+    RESOURCE_OBTAIN_ERROR("CL0101003", "配置文件获取Resource失败"),
     /**
      * 数据源异常，以DE开头
      */
-    CONNECT_MQTT_ERROR("MT0202001", "连接Mqtt失败");
+    CONNECT_MQTT_ERROR("MT0102001", "连接Mqtt失败"),
 
     /**
      * 数据异常，以DA开头
      */
+    WRITE_AGENT_FILE_ERROR("DA0101001", "保存agent.json异常"),
+
 
     /**
      * 同步异常，以SY开头
      */
+
+    /**
+     * 第三方服务或者插件异常，以TP：third-party
+     */
+    HTTP_REQUEST_ERROR("TP0301001", "http请求异常"),
+    NATS_LOAD_ERROR("TP0301002", "加载Nats组件异常");
+
+    /**
+     * 配置类异常, 以PR
+     */
+
+
     private String code;
     private String message;
 
-    EedsErrorEnum(String code, String message) {
+    ErrorEnum(String code, String message) {
         this.code = code;
         this.message = message;
     }
@@ -44,7 +60,7 @@ public enum EedsErrorEnum {
      * @return
      */
     public static String getCode(String value) {
-        for (EedsErrorEnum eu : EedsErrorEnum.values()) {
+        for (ErrorEnum eu : ErrorEnum.values()) {
             if (eu.name().equals(value)) {
                 return eu.code();
             }
@@ -59,7 +75,7 @@ public enum EedsErrorEnum {
      * @return
      */
     public static String getMessage(String code) {
-        for (EedsErrorEnum eu : EedsErrorEnum.values()) {
+        for (ErrorEnum eu : ErrorEnum.values()) {
             if (eu.code().equals(code)) {
                 return eu.message();
             }

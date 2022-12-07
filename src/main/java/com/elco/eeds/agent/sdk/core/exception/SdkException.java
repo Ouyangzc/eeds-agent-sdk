@@ -1,16 +1,16 @@
 package com.elco.eeds.agent.sdk.core.exception;
 
-import com.elco.eeds.agent.sdk.core.common.EedsErrorEnum;
+import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 
 /**
  * @Description SDK异常类
  * @Author ouyang
  * @Date 2022/12/3 9:33
  **/
-public class EedsSdkException extends Exception {
+public class SdkException extends Exception {
     /**
      * 错误码
-     * {@link EedsErrorEnum}
+     * {@link ErrorEnum}
      */
     private String code;
     /**
@@ -23,9 +23,9 @@ public class EedsSdkException extends Exception {
      *
      * @param code
      */
-    public EedsSdkException(String code) {
-        super(EedsErrorEnum.getMessage(code));
-        this.message = EedsErrorEnum.getMessage(code);
+    public SdkException(String code) {
+        super(ErrorEnum.getMessage(code));
+        this.message = ErrorEnum.getMessage(code);
         this.code = code;
     }
 
@@ -36,7 +36,7 @@ public class EedsSdkException extends Exception {
      * @param code    响应状态码
      * @param e       异常对象
      */
-    public EedsSdkException(String code, String message, Throwable e) {
+    public SdkException(String code, String message, Throwable e) {
         super(message, e);
         this.code = code;
         this.message = message;
