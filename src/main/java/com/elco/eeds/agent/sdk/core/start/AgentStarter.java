@@ -21,17 +21,22 @@ public class AgentStarter {
     private AgentConfigYamlReader configReader;
 
     private static void init(AgentStartProperties agentStartProperties) throws Exception {
-        // 注册
-        registerService.register(agentStartProperties.getServerUrl(), agentStartProperties.getName(),
-                agentStartProperties.getPort(), agentStartProperties.getToken());
-        // 加载数据文件
-        // TODO 加载数据文件
-        // 根据协议加载数据源信息
-        // TODO 根据协议加载数据源信息
-        // 加载统计
-        // TODO 加载统计
-        // 统计定时任务
-        // TODO 统计定时任务
+        try {
+            // 注册
+            registerService.register(agentStartProperties.getServerUrl(), agentStartProperties.getName(),
+                    agentStartProperties.getPort(), agentStartProperties.getToken());
+            // 加载数据文件
+            // TODO 加载数据文件
+            // 根据协议加载数据源信息
+            // TODO 根据协议加载数据源信息
+            // 加载统计
+            // TODO 加载统计
+            // 统计定时任务
+            // TODO 统计定时任务
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("客户端注册异常", e);
+        }
 
     }
 

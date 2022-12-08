@@ -2,6 +2,8 @@ package com.elco.eeds.agent.sdk.transfer.handler.agent;
 
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
+import com.elco.eeds.agent.sdk.core.exception.SdkException;
+import com.elco.eeds.agent.sdk.core.util.AgentFileExtendUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.http.request.AgentTokenRequest;
 import com.elco.eeds.agent.sdk.transfer.beans.message.token.AgentTokenMessage;
 import com.elco.eeds.agent.sdk.transfer.handler.IReceiverMessageHandler;
@@ -24,16 +26,20 @@ public class AgentTokenMessageHandler implements IReceiverMessageHandler {
 
     @Override
     public void handleRecData(String topic, String recData) {
-        logger.info("收到客户端token报文：topic: {}, msg: {}", topic, recData);
-        AgentTokenMessage message = JSON.parseObject(recData, AgentTokenMessage.class);
-        // TODO 将token持久化到本地文件（token，config都在agent.json文件）
-
-        // TODO 保存成功后，更新到内存中
-
-        Agent agent = Agent.getInstance();
-        agent.getAgentBaseInfo().setToken(message.getData().getToken());
-        // 调用服务端http接口
-        AgentTokenRequest agentTokenRequest = new AgentTokenRequest(Long.parseLong(agent.getAgentBaseInfo().getAgentId()), message.getData().getToken());
-        agentRequestHttpService.updateAgentEffectTime(agentTokenRequest);
+        try {
+            logger.info("收到客户端token报文：topic: {}, msg: {}", topic, recData);
+            AgentTokenMessage message = JSON.parseObject(recData, AgentTokenMessage.class);
+            // 保存到本地agent.json文件
+            AgentFileExtendUtils.setTokenToLocalAgentFile(message.getData().getToken());
+            // 保存成功后，更新到内存中
+            Agent agent = Agent.getInstance();
+            agent.getAgentBaseInfo().setToken(message.getData().getToken());
+            // 调用服务端http接口
+            AgentTokenRequest agentTokenRequest = new AgentTokenRequest(Long.parseLong(agent.getAgentBaseInfo().getAgentId()), message.getData().getToken());
+            agentRequestHttpService.updateAgentEffectTime(agentTokenRequest);
+        } catch (SdkException e) {
+            logger.error("客户端token报文处理异常", e);
+            e.printStackTrace();
+        }
     }
 }

@@ -21,6 +21,10 @@ public enum ErrorEnum {
      * 数据异常，以DA开头
      */
     WRITE_AGENT_FILE_ERROR("DA0101001", "保存agent.json异常"),
+    SAVE_TOKEN_ERROR("DA0101002", "保存token至agent.json异常"),
+    SAVE_CONFIG_ERROR("DA0101003", "保存config至agent.json异常"),
+    READ_TOKEN_ERROR("DA0101003", "从agent.json读取token信息异常"),
+    READ_CONFIG_ERROR("DA0101003", "从agent.json读取config信息异常"),
 
 
     /**

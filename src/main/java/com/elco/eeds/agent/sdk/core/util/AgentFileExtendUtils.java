@@ -3,6 +3,8 @@ package com.elco.eeds.agent.sdk.core.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
+import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,10 +25,16 @@ public class AgentFileExtendUtils {
      * 从本地agent.json文件中获取token字段
      * @return
      */
-    public static String getTokenFromLocalAgentFile() throws IOException {
-        String content = AgentFileUtils.readLocalAgentFile();
-        JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
-        return jsonObject.get("token").toString();
+    public static String getTokenFromLocalAgentFile() throws SdkException {
+        try {
+            String content = AgentFileUtils.readLocalAgentFile();
+            JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
+            return jsonObject.get("token").toString();
+        } catch (IOException ioException) {
+            logger.debug("从json文件读取token失败");
+            ioException.printStackTrace();
+            throw new SdkException(ErrorEnum.READ_TOKEN_ERROR.code());
+        }
     }
 
     /**
@@ -34,10 +42,17 @@ public class AgentFileExtendUtils {
      * @return
      * @throws IOException
      */
-    public static String getConfigFromLocalAgentFile() throws IOException {
-        String content = AgentFileUtils.readLocalAgentFile();
-        JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
-        return jsonObject.get("config").toString();
+    public static String getConfigFromLocalAgentFile() throws SdkException {
+        try {
+            String content = AgentFileUtils.readLocalAgentFile();
+            JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
+            return jsonObject.get("config").toString();
+        } catch (IOException ioException) {
+            logger.debug("从json文件读取config失败");
+            ioException.printStackTrace();
+            throw new SdkException(ErrorEnum.READ_CONFIG_ERROR.code());
+
+        }
     }
 
     /**
@@ -45,15 +60,21 @@ public class AgentFileExtendUtils {
      * @param token
      * @throws IOException
      */
-    public static void setTokenToLocalAgentFile(String token) throws IOException {
-        String content = AgentFileUtils.readLocalAgentFile();
-        logger.debug("当前agent.json中内容为：{}", content);
-        JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
-        logger.debug("当前文件中token为：" + jsonObject.get("token").toString());
-        jsonObject.put("token", token);
-        // 修改后保存
-        AgentFileUtils.strogeLocalAgentFile(JSON.toJSONString(jsonObject));
-        logger.debug("token保存至json文件成功");
+    public static void setTokenToLocalAgentFile(String token) throws SdkException {
+        try {
+            String content = AgentFileUtils.readLocalAgentFile();
+            logger.debug("当前agent.json中内容为：{}", content);
+            JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
+            logger.debug("当前文件中token为：" + jsonObject.get("token").toString());
+            jsonObject.put("token", token);
+            // 修改后保存
+            AgentFileUtils.strogeLocalAgentFile(JSON.toJSONString(jsonObject));
+            logger.debug("token保存至json文件成功");
+        } catch (IOException ioException) {
+            logger.debug("token保存agent.json失败", ioException);
+            ioException.printStackTrace();
+            throw new SdkException(ErrorEnum.SAVE_TOKEN_ERROR.code());
+        }
     }
 
     /**
@@ -61,15 +82,21 @@ public class AgentFileExtendUtils {
      * @param config
      * @throws IOException
      */
-    public static void setConfigToLocalAgentFile(JSONArray config) throws IOException {
-        String content = AgentFileUtils.readLocalAgentFile();
-        logger.debug("当前agent.json中内容为：{}", content);
-        JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
-        logger.debug("当前文件中config为：" + jsonObject.get("config").toString());
-        jsonObject.put("config", config);
-        // 修改后保存
-        AgentFileUtils.strogeLocalAgentFile(JSON.toJSONString(jsonObject));
-        logger.debug("config保存至json文件成功");
+    public static void setConfigToLocalAgentFile(JSONArray config) throws SdkException {
+        try {
+            String content = AgentFileUtils.readLocalAgentFile();
+            logger.debug("当前agent.json中内容为：{}", content);
+            JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
+            logger.debug("当前文件中config为：" + jsonObject.get("config").toString());
+            jsonObject.put("config", config);
+            // 修改后保存
+            AgentFileUtils.strogeLocalAgentFile(JSON.toJSONString(jsonObject));
+            logger.debug("config保存至json文件成功");
+        } catch (IOException ioException) {
+            logger.debug("config保存agent.json失败", ioException);
+            ioException.printStackTrace();
+            throw new SdkException(ErrorEnum.SAVE_CONFIG_ERROR.code());
+        }
     }
 
 }

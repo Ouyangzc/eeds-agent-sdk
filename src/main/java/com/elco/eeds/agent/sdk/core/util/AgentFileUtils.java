@@ -1,13 +1,12 @@
 package com.elco.eeds.agent.sdk.core.util;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentMqInfo;
 import com.elco.eeds.agent.sdk.core.bean.agent.BaseConfigEntity;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
+import com.elco.eeds.agent.sdk.core.exception.SdkException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -115,7 +114,7 @@ public class AgentFileUtils {
 
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SdkException {
         // TODO 测试，后期删除
         /*JSONObject json = new JSONObject();
 
