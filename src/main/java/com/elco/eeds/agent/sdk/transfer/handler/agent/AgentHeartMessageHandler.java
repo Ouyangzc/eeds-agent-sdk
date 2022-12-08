@@ -22,7 +22,7 @@ public class AgentHeartMessageHandler implements IReceiverMessageHandler {
     public void handleRecData(String topic, String recData) {
         logger.info("收到客户端token报文：topic: {}, msg: {}", topic, recData);
         try {
-            // 序列化
+            // 序列化 判断格式是否正确，抛出异常即不正确
             SubAgentHeartMessage message = JSON.parseObject(recData, SubAgentHeartMessage.class);
             // 收到ping，发送pong
             SubAgentHeartMessage rspMessage = SubAgentHeartMessage.getResponseMessage();

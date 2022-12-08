@@ -19,16 +19,16 @@ public class BaseConfigEntity {
      */
     private String configFieldValue;
 
+    /**
+     * 字段类型（配置的类型：0 全局配置；1 私有配置）
+     */
+    private String configFieldType;
+
     public BaseConfigEntity(String configFieldName, String configFieldValue, String configFieldType) {
         this.configFieldName = configFieldName;
         this.configFieldValue = configFieldValue;
         this.configFieldType = configFieldType;
     }
-
-    /**
-     * 字段类型（配置的类型：0 全局配置；1 私有配置）
-     */
-    private String configFieldType;
 
     public String getConfigFieldName() {
         return configFieldName;

@@ -5,12 +5,15 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.elco.eeds.agent.sdk.core.bean.agent.*;
 import com.elco.eeds.agent.sdk.core.common.constant.http.ConstantHttpApiPath;
-import com.elco.eeds.agent.sdk.core.util.JsonUtil;
+import com.elco.eeds.agent.sdk.core.exception.SdkException;
+import com.elco.eeds.agent.sdk.core.util.*;
 import com.elco.eeds.agent.sdk.core.util.http.HttpClientUtil;
 import com.elco.eeds.agent.sdk.transfer.beans.http.request.AgentRegisterRequest;
 import com.elco.eeds.agent.sdk.transfer.beans.http.request.AgentTokenRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 /**
  * @title: AgentRequestHttpService
@@ -45,6 +48,7 @@ public class AgentRequestHttpService {
             JSONObject result = JSON.parseObject(response, JSONObject.class);
             if ("000000".equals(result.get("code"))) {
                 String data = result.get("data").toString();
+                // 将server-config反馈的data赋值给Agent对象
                 Agent agent = copyFieldToAgent(data);
                 logger.info("rpc register interfaces,result:{}", JSON.toJSONString(agent));
                 return agent;
@@ -66,7 +70,7 @@ public class AgentRequestHttpService {
      * @param data
      * @return
      */
-    public Agent copyFieldToAgent(String data) {
+    public Agent copyFieldToAgent(String data) throws SdkException {
         JSONObject jsonObject = JSON.parseObject(data, JSONObject.class);
         Agent agent = Agent.getInstance();
         if (agent.getAgentMqInfo() == null) {
@@ -103,8 +107,16 @@ public class AgentRequestHttpService {
         agent.getAgentMqInfo().setAuthInfo(agentMqAuthInfo);
         agent.getAgentMqInfo().setMqSecurityInfo(agentMqSecurityInfo);
 
-        // 全局配置，全量更新
-
+        // 新的配置逻辑，server-config把公有变量和私有变量分开传输
+        ConfigBase configGlobal = JSONObject.parseObject(String.valueOf(jsonObject.get("baseConfigCache")), ConfigBase.class);
+        ConfigBase configPrivate = JSONObject.parseObject(String.valueOf(jsonObject.get("privateConfigCache")), ConfigBase.class);
+        // 反射得到Object的属性名和属性值
+        Map mapConfigGlobal = ReflectUtils.reflectObjectToMap(configGlobal);
+        Map mapConfigPrivate = ReflectUtils.reflectObjectToMap(configPrivate);
+        // 遍历map，组装存入agent.json的config字段
+        JSONArray jsonArray = MapUtils.mapToJsonConfig(mapConfigGlobal, mapConfigPrivate);
+        // 将返回的两个json处理后存储至agent.json中
+        AgentFileExtendUtils.setConfigToLocalAgentFile(jsonArray);
 
         return agent;
     }
@@ -142,12 +154,29 @@ public class AgentRequestHttpService {
         // TODO
         return null;
     }*/
-    public static void main(String[] args) {
-        String body = "{\"agentId\":\"1596699157005991936\",\"host\":\"192.168.0.109\",\"name\":\"王林测试0.109\",\"port\":\"8888\",\"token\":\"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE2Njc1MzQxMDcsImV4cCI6NDgyMzIwNzcwNywiaWF0IjoxNjY3NTM0MTA3LCJqdGkiOiIzNzE3OWE2My1hNjg0LTQwYTUtYmFiMC1lY2U3NDYxNzdjNjQifQ.Pw9nB3XkY1KeB20M65XFcjtUFf9crt1D7CBh37dayOs\",\"mqConfig\":{\"mqType\":\"nats\",\"urls\":[\"nats://192.168.60.62:4222\"],\"authType\":\"UserNamePassWord\",\"authInfo\":{\"token\":\"\",\"userName\":\"admin\",\"password\":\"Elco@2022\"},\"tlsInfo\":{\"rootCer\":\"-----BEGIN CERTIFICATE-----\\nMIIDXjCCAkYCCQCAK3YA7XXAwjANBgkqhkiG9w0BAQsFADBxMQswCQYDVQQGEwJ6\\naDELMAkGA1UECAwCdGoxCzAJBgNVBAcMAnRqMQ0wCwYDVQQKDARlbGNvMQ0wCwYD\\nVQQLDARlbGNvMQ0wCwYDVQQDDARlbGNvMRswGQYJKoZIhvcNAQkBFgxlbGNvQGVs\\nY28uY24wHhcNMjIwOTI5MDMxNDQwWhcNMzIwOTI2MDMxNDQwWjBxMQswCQYDVQQG\\nEwJ6aDELMAkGA1UECAwCdGoxCzAJBgNVBAcMAnRqMQ0wCwYDVQQKDARlbGNvMQ0w\\nCwYDVQQLDARlbGNvMQ0wCwYDVQQDDARlbGNvMRswGQYJKoZIhvcNAQkBFgxlbGNv\\nQGVsY28uY24wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDA3ollTTjX\\noav+K9K+reejhsKbteD04jksu5SRJfZCBEVdmF5/IFdeKnvONQHCMazsZ14Y/0Ua\\nzVpMf0TxiVKg2UJgqXoeIep8/Nl1EhG8m59sjFcH8Skvs9VfwkDaAuRp6CSfL2K8\\n8AmunkcUQs+N8RZ5CbR4yIn6/SCwIZiyjNojxjeOYQg8qGsohryG2gidkKjc7aeU\\noj1Z99J9b4ikc8WxdqEKgLRT6zvlYVlqaOzqkdU1d4PyjsYk5F+3vof99vb3qaDU\\n2twce+0QsNfiTjdhJ84+CB8dOoGnmY4jM7JcITn6Yrv3wocxKatatkwMl01b4nFS\\n8GNOtMT7Fv/xAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAKnOx+UvFN7WqEvrVRCr\\n9b4LypDJOHZxLnP6pCgCTpamPHDHWqJGWEtj3q7A2LIS2bNPWoo5fAGBv5ctbjeb\\n25xlSdBhthQpcggd2mBMzrkaeujF2vME8iqgr5SeiB27KbkWpU77aUvDG/VVF8Y6\\nHbURn4QGKZQT2SGwH9yHFbMS2iNQDYD+1MXZz/YRbwlM/29iLe2wV82uSQV7UyQA\\nwAfAnVV0PVLLcZk6CGpzJ5ZYlllwmFid7FBUImj0FeGmkxG8kPi9+bIB9RM90WJ3\\nfIUf8QA+v0TJANqy88kz0w9xYWZpz00Uh1zHBq8SXUyP724WgwQ1pHgvNTt4Om8+\\nPXs=\\n-----END CERTIFICATE-----\\n\",\"keystore\":\"\",\"truststore\":\"\",\"storePassword\":\"\",\"keyPassword\":\"\",\"algorithm\":\"\"}},\"baseConfigCache\":\"{\\\"syncPeriod\\\":\\\"10000\\\",\\\"dataCacheCycle\\\":\\\"7\\\",\\\"dataCacheFileSize\\\":\\\"1\\\",\\\"type\\\":\\\"cache_config\\\"}\"}";
 
-        Agent agent = new AgentRequestHttpService().copyFieldToAgent(body);
+    public static void main(String[] args) throws SdkException {
+        String baseConfigCache = "{\"baseConfigCache\": \"{\\\"type\\\":\\\"cache_config\\\",\\\"dataCacheFileSize\\\":\\\"1\\\",\\\"dataCacheCycle\\\":\\\"7\\\",\\\"syncPeriod\\\":\\\"10000\\\"}\"}";
+        // String baseConfigCache = "{\"baseConfigCache\": \"{\\\"dataCacheFileSize\\\":\\\"1\\\",\\\"dataCacheCycle\\\":\\\"7\\\",\\\"syncPeriod\\\":\\\"10000\\\"}\"}";
+        JSONObject jsonObjectBaseConfigCache = JSONObject.parseObject(baseConfigCache);
+        ConfigBase configGlobal = JSONObject.parseObject(jsonObjectBaseConfigCache.get("baseConfigCache").toString(), ConfigBase.class);
 
-        System.out.println(agent);
+//        String privateConfigCache = "{\"privateConfigCache\": \"{\\\"type\\\":null,\\\"dataCacheFileSize\\\":null,\\\"dataCacheCycle\\\":null,\\\"syncPeriod\\\":\\\"10000\\\"}\"}";
+        String privateConfigCache = "{\"privateConfigCache\": \"{\\\"syncPeriod\\\":\\\"20000\\\"}\"}";
+
+        JSONObject jsonObjectPrivateConfigCache = JSONObject.parseObject(privateConfigCache);
+        ConfigBase configPrivate = JSONObject.parseObject(jsonObjectPrivateConfigCache.get("privateConfigCache").toString(), ConfigBase.class);
+
+        Map mapConfigPrivate = ReflectUtils.reflectObjectToMap(configPrivate);
+        Map mapConfigGlobal = ReflectUtils.reflectObjectToMap(configGlobal);
+        System.out.println(mapConfigGlobal);
+        System.out.println(mapConfigPrivate);
+
+        // 组装
+        JSONObject jsonConfig = new JSONObject();
+        jsonConfig.put("config", MapUtils.mapToJsonConfig(mapConfigGlobal, mapConfigPrivate));
+        System.out.println(jsonConfig);
+        AgentFileExtendUtils.setConfigToLocalAgentFile(MapUtils.mapToJsonConfig(mapConfigGlobal, mapConfigPrivate));
 
     }
 
