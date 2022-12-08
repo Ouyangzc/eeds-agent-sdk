@@ -48,6 +48,7 @@ public class AgentRequestHttpService {
             JSONObject result = JSON.parseObject(response, JSONObject.class);
             if ("000000".equals(result.get("code"))) {
                 String data = result.get("data").toString();
+                logger.info("注册结果返回值为：{}", data);
                 // 将server-config反馈的data赋值给Agent对象
                 Agent agent = copyFieldToAgent(data);
                 logger.info("rpc register interfaces,result:{}", JSON.toJSONString(agent));

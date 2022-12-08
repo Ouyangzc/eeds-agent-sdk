@@ -12,5 +12,9 @@ public class ConstantCommon {
 
     public static final String FAIL = "fail";
 
+    public static final String ZERO = "0";
+
+    public static final String ONE = "1";
+
 
 }

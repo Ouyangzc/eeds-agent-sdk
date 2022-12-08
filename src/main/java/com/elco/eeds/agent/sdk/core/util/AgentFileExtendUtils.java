@@ -48,7 +48,7 @@ public class AgentFileExtendUtils {
             JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
             return jsonObject.get("config").toString();
         } catch (IOException ioException) {
-            logger.debug("从json文件读取config失败");
+            logger.error("从json文件读取config失败");
             ioException.printStackTrace();
             throw new SdkException(ErrorEnum.READ_CONFIG_ERROR.code());
 

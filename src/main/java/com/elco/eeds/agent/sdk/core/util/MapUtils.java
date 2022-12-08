@@ -3,6 +3,7 @@ package com.elco.eeds.agent.sdk.core.util;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.elco.eeds.agent.sdk.core.bean.agent.BaseConfigEntity;
+import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -27,14 +28,14 @@ public class MapUtils {
         while (itGlobal.hasNext()) {
             Map.Entry<String, String> entryGlobal = itGlobal.next();
             if (!mapPrivate.containsKey(entryGlobal.getKey()) || (mapPrivate.containsKey(entryGlobal.getKey()) && mapPrivate.get(entryGlobal.getKey()) == null)) {
-                jsonArrayConfig.add(new BaseConfigEntity(entryGlobal.getKey(), entryGlobal.getValue(), "0"));
+                jsonArrayConfig.add(new BaseConfigEntity(entryGlobal.getKey(), entryGlobal.getValue(), ConstantCommon.ZERO));
             }
         }
         Iterator<Map.Entry<String, String>> itPrivate = mapPrivate.entrySet().iterator();
         while (itPrivate.hasNext()) {
             Map.Entry<String, String> entryPrivate = itPrivate.next();
             if(entryPrivate.getValue() != null) {
-                jsonArrayConfig.add(new BaseConfigEntity(entryPrivate.getKey(), entryPrivate.getValue(), "1"));
+                jsonArrayConfig.add(new BaseConfigEntity(entryPrivate.getKey(), entryPrivate.getValue(), ConstantCommon.ONE));
             }
         }
 

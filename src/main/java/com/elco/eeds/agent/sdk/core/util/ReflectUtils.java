@@ -42,6 +42,23 @@ public class ReflectUtils {
     }
 
     /**
+     * 判断类中是否含有指定的字段
+     * @param o
+     * @param fieldName
+     * @return
+     */
+    public static boolean isContainKey(Object o, String fieldName) {
+        boolean flag = false;
+        try {
+            Field field = o.getClass().getDeclaredField(fieldName);
+            flag = true;
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        return flag;
+    }
+
+    /**
      * java反射bean的get方法
      *
      * @param objectClass objectClass
