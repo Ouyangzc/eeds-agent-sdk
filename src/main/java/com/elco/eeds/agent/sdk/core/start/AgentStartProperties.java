@@ -1,7 +1,5 @@
 package com.elco.eeds.agent.sdk.core.start;
 
-import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
-
 /**
  * @title: AgentStartProperties
  * @Author wl
@@ -10,6 +8,8 @@ import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
  * @Description: 客户端启动参数
  */
 public class AgentStartProperties {
+
+    //TODO 是否需要单例模式
 
     /**
      * server地址

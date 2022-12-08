@@ -20,30 +20,7 @@ public class AgentStarter {
 
     private AgentConfigYamlReader configReader;
 
-    public static void init(AgentStartProperties properties) throws Exception {
-
-    }
-
-    /**
-     * 客户端初始化方法
-     * @param serverUrl     server地址
-     * @param name          客户端名称
-     * @param port          客户端端口
-     * @param token         客户端token
-     * @param baseFolder    存储文件目录
-     * @param ymlPath       配置文件全路径
-     * @throws Exception
-     */
-    public static void init(String serverUrl, String name, String port, String token, String baseFolder, String ymlPath) throws Exception {
-        // TODO 通过baseFolder，读取配置文件，拿到token，然后调用register方法
-        // TODO 为什么调用程序要传token???
-        logger.info("开始初始化方法...");
-        logger.info("传入参数为：服务器地址：{}，客户端名称：{}，客户端端口：{}，token：{}，文件存储路径：{}，配置文件全路径：{}",
-                serverUrl, name, port, token, baseFolder, ymlPath);
-        // 从yml配置文件读取配置，赋值给AgentStartProperties
-        AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
-        AgentStartProperties agentStartProperties = agentConfigYamlReader.parseYaml(ymlPath);
-        logger.info("读取配置文件成功：{}", agentStartProperties.toString());
+    private static void init(AgentStartProperties agentStartProperties) throws Exception {
         // 注册
         registerService.register(agentStartProperties.getServerUrl(), agentStartProperties.getName(),
                 agentStartProperties.getPort(), agentStartProperties.getToken());
@@ -57,11 +34,58 @@ public class AgentStarter {
         // TODO 统计定时任务
 
     }
-    public static void init(String location) throws Exception {
+
+    /**
+     * 客户端手动启动方法
+     * @param serverUrl     server地址
+     * @param name          客户端名称
+     * @param port          客户端端口
+     * @param token         客户端token
+     * @param baseFolder    存储文件目录
+     * @throws Exception
+     */
+    public static void init(String serverUrl, String name, String port, String token, String baseFolder) throws Exception {
+        // TODO 通过baseFolder，读取配置文件，拿到token，然后调用register方法
+        logger.info("开始手动初始化方法...");
+        logger.info("传入参数为：服务器地址：{}，客户端名称：{}，客户端端口：{}，token：{}，文件存储路径：{}",
+                serverUrl, name, port, token, baseFolder);
+        // 封装启动参数类
+        AgentStartProperties agentStartProperties = new AgentStartProperties();
+        agentStartProperties.setServerUrl(serverUrl);
+        agentStartProperties.setName(name);
+        agentStartProperties.setPort(port);
+        agentStartProperties.setToken(token);
+        agentStartProperties.setBaseFolder(baseFolder);
+        // 调用私有init方法
+        init(agentStartProperties);
+    }
+
+    /**
+     * 客户端手动启动方法：一个参数（从给定的路径取yml文件）
+     * @param ymlPath
+     */
+    public static void init(String ymlPath) throws Exception {
+        logger.info("开始手动初始化方法...");
+        logger.info("yml路径参数为：{}", ymlPath);
+        // 从yml配置文件读取配置，赋值给AgentStartProperties
+        AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
+        AgentStartProperties agentStartProperties = agentConfigYamlReader.parseYaml(ymlPath);
+        logger.info("读取配置文件成功：{}", agentStartProperties.toString());
+        // 调用私有init方法
+        init(agentStartProperties);
+    }
+
+    /**
+     * 客户端手动启动方法：空参init方法（从默认的两个位置取yml）
+     */
+    public static void init() {
+        logger.info("开始手动初始化方法...");
+        logger.info("开始从默认的位置读取yml文件...");
+        // TODO 读取后封装成AgentStartProperties对象，再调用init(AgentStartProperties)方法...
+
+        // 调用私有init方法
 
 
     }
-
-
 
 }

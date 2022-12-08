@@ -1,18 +1,18 @@
 package com.elco.eeds.agent.sdk.core.util;
 
-import cn.hutool.json.JSON;
-import cn.hutool.json.JSONObject;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentMqInfo;
+import com.elco.eeds.agent.sdk.core.bean.agent.BaseConfigEntity;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @title: AgentFileUtils
@@ -31,6 +31,17 @@ public class AgentFileUtils {
     public static void strogeLocalAgentFile(String agentData) throws IOException {
         String agentFilePath = getAgentFilePath();
         writeFile(agentFilePath, agentData);
+    }
+
+    /**
+     * 获取该客户端的AgentFile
+     *
+     * @return
+     * @throws IOException
+     */
+    public static String readLocalAgentFile() throws IOException {
+        String agentFilePath = getAgentFilePath();
+        return readFile(agentFilePath);
     }
 
     public static String getAgentFilePath() throws FileNotFoundException {
@@ -63,6 +74,22 @@ public class AgentFileUtils {
     }
 
     /**
+     * 读取文件信息
+     *
+     * @param path
+     * @return
+     * @throws IOException
+     */
+    public static String readFile(String path) throws IOException {
+        File file = new File(path);
+        if (!file.exists()) {
+            return "";
+        }
+        String agentInfo = org.apache.commons.io.FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+        return agentInfo;
+    }
+
+    /**
      * 存储agent注册信息
      *
      * @param path
@@ -90,10 +117,28 @@ public class AgentFileUtils {
 
     public static void main(String[] args) throws IOException {
         // TODO 测试，后期删除
-        JSONObject json = new JSONObject();
-        json.put("token", "1234567890");
+        /*JSONObject json = new JSONObject();
 
-        AgentFileUtils.strogeLocalAgentFile(json.toString());
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.add(new BaseConfigEntity("syncPeriod", "11111", "1"));
+        jsonArray.add(new BaseConfigEntity("dataCacheCycle", "1", "0"));
+        jsonArray.add(new BaseConfigEntity("dataCacheFileSize", "2", "0"));
+        json.put("config", jsonArray);
+        json.put("token", "121212");
+
+        AgentFileUtils.strogeLocalAgentFile(json.toString());*/
+
+        System.out.println("当前json文件中config为：");
+        System.out.println(AgentFileExtendUtils.getConfigFromLocalAgentFile());
+        System.out.println("当前json文件中token为：");
+        System.out.println(AgentFileExtendUtils.getTokenFromLocalAgentFile());
+
+        AgentFileExtendUtils.setTokenToLocalAgentFile("22222222222222");
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.add(new BaseConfigEntity("syncPeriod", "11111", "1"));
+        jsonArray.add(new BaseConfigEntity("dataCacheCycle", "11111", "0"));
+        jsonArray.add(new BaseConfigEntity("dataCacheFileSize", "1111", "0"));
+        AgentFileExtendUtils.setConfigToLocalAgentFile(jsonArray);
 
         // 测试单例
         Agent agent = Agent.getInstance();

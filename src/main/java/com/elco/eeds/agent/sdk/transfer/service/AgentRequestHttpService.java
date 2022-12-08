@@ -3,9 +3,7 @@ package com.elco.eeds.agent.sdk.transfer.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
-import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
-import com.elco.eeds.agent.sdk.core.bean.agent.AgentMqInfo;
+import com.elco.eeds.agent.sdk.core.bean.agent.*;
 import com.elco.eeds.agent.sdk.core.common.constant.http.ConstantHttpApiPath;
 import com.elco.eeds.agent.sdk.core.util.JsonUtil;
 import com.elco.eeds.agent.sdk.core.util.http.HttpClientUtil;
@@ -56,7 +54,7 @@ public class AgentRequestHttpService {
             }
 
         } catch (Exception e) {
-            logger.error("更新客户端TOKEN生效时间接口异常, 形参为：{}", agentRegisterRequest.toString());
+            logger.error("调用server自动注册接口异常, 形参为：{}", JSON.toJSONString(agentRegisterRequest));
             logger.error("请求地址为：{}", requestUrl);
             e.printStackTrace();
         }
@@ -79,22 +77,36 @@ public class AgentRequestHttpService {
             AgentBaseInfo agentBaseInfo = new AgentBaseInfo();
             agent.setAgentBaseInfo(agentBaseInfo);
         }
+        if (agent.getAgentMqInfo().getAuthInfo() == null) {
+            AgentMqAuthInfo agentMqAuthInfo = new AgentMqAuthInfo();
+            agent.getAgentMqInfo().setAuthInfo(agentMqAuthInfo);
+        }
+        if (agent.getAgentMqInfo().getMqSecurityInfo() == null) {
+            AgentMqSecurityInfo agentMqSecurityInfo = new AgentMqSecurityInfo();
+            agent.getAgentMqInfo().setMqSecurityInfo(agentMqSecurityInfo);
+        }
 
         agent.getAgentBaseInfo().setAgentId((String) jsonObject.get("agentId"));
         agent.getAgentBaseInfo().setName((String) jsonObject.get("name"));
         agent.getAgentBaseInfo().setToken((String) jsonObject.get("token"));
         // AgentMqInfo
         JSONObject agentMqInfoJsonObject = JSON.parseObject(String.valueOf(jsonObject.get("mqConfig")), JSONObject.class);
-
         agent.getAgentMqInfo().setMqType((String) agentMqInfoJsonObject.get("mqType"));
 
         JSONArray urls = (JSONArray) agentMqInfoJsonObject.get("urls");
         agent.getAgentMqInfo().setUrls(JsonUtil.jsonArray2StringArray(urls));
 
+        AgentMqAuthInfo agentMqAuthInfo = JSONObject.parseObject(String.valueOf(agentMqInfoJsonObject.get("authInfo")), AgentMqAuthInfo.class);
+        agent.getAgentMqInfo().getAuthInfo().setAuthType((String) agentMqInfoJsonObject.get("authType"));
+        AgentMqSecurityInfo agentMqSecurityInfo = JSONObject.parseObject(String.valueOf(agentMqInfoJsonObject.get("tlsInfo")), AgentMqSecurityInfo.class);
 
-        agent.getAgentMqInfo().getAutoInfo().setAuthType((String) agentMqInfoJsonObject.get("authType"));
-//        agent.getAgentMqInfo()
-        return null;
+        agent.getAgentMqInfo().setAuthInfo(agentMqAuthInfo);
+        agent.getAgentMqInfo().setMqSecurityInfo(agentMqSecurityInfo);
+
+        // 全局配置，全量更新
+
+
+        return agent;
     }
 
     /**
@@ -135,7 +147,7 @@ public class AgentRequestHttpService {
 
         Agent agent = new AgentRequestHttpService().copyFieldToAgent(body);
 
-        System.out.println(1111);
+        System.out.println(agent);
 
     }
 

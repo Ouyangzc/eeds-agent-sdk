@@ -51,6 +51,9 @@ public class AgentRegisterService implements IAgentRegisterService {
             // TODO 如果配置文件中的端口号和使用这调用init方法时传入的端口号不一致时，如何处理？
             // 调用http接口的register方法
             agent = agentRequestHttpService.register(clientIp, port, name, token, ConstantClientType.TYPE_EDGE_GATEWAY);
+            if (agent == null) {
+                throw new SdkException(ErrorEnum.CLIENT_REGISTER_ERROR.code());
+            }
             // 刷新token
             saveAgentFile(agent);
             // 回调更新客户端Token生效时间

@@ -15,7 +15,7 @@ public class AgentMqInfo {
 
     private String[] urls;
 
-    private AgentMqAuthInfo autoInfo;
+    private AgentMqAuthInfo authInfo;
 
     private AgentMqSecurityInfo mqSecurityInfo;
 
@@ -35,12 +35,12 @@ public class AgentMqInfo {
         this.urls = urls;
     }
 
-    public AgentMqAuthInfo getAutoInfo() {
-        return autoInfo;
+    public AgentMqAuthInfo getAuthInfo() {
+        return authInfo;
     }
 
-    public void setAutoInfo(AgentMqAuthInfo autoInfo) {
-        this.autoInfo = autoInfo;
+    public void setAuthInfo(AgentMqAuthInfo authInfo) {
+        this.authInfo = authInfo;
     }
 
     public AgentMqSecurityInfo getMqSecurityInfo() {
@@ -56,7 +56,7 @@ public class AgentMqInfo {
         return "AgentMqInfo{" +
                 "mqType='" + mqType + '\'' +
                 ", urls=" + Arrays.toString(urls) +
-                ", autoInfo=" + autoInfo +
+                ", authInfo=" + authInfo +
                 ", mqSecurityInfo=" + mqSecurityInfo +
                 '}';
     }
