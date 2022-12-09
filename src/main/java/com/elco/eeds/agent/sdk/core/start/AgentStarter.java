@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.core.start;
 
+import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
+import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.AgentConfigYamlReader;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.ResourceLoader;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ public class AgentStarter {
 
     private static void init(AgentStartProperties agentStartProperties) throws Exception {
         try {
+            Agent.getInstance().setAgentBaseInfo(new AgentBaseInfo(agentStartProperties));
             // 注册
             registerService.register(agentStartProperties.getServerUrl(), agentStartProperties.getName(),
                     agentStartProperties.getPort(), agentStartProperties.getToken());

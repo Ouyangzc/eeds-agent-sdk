@@ -59,8 +59,7 @@ public class AgentRegisterService implements IAgentRegisterService {
             // 刷新token
             // saveAgentFile(agent);
             // 回调更新客户端Token生效时间
-            AgentTokenRequest agentTokenRequest = new AgentTokenRequest(Long.parseLong(agent.getAgentBaseInfo().getAgentId()), agent.getAgentBaseInfo().getToken());
-            agentRequestHttpService.updateAgentEffectTime(agentTokenRequest);
+            agentRequestHttpService.updateAgentEffectTime(new AgentTokenRequest(Long.parseLong(agent.getAgentBaseInfo().getAgentId()), agent.getAgentBaseInfo().getToken()));
             // 加载Nats组件
             loadMq(agent.getAgentMqInfo());
             // 数据源同步
