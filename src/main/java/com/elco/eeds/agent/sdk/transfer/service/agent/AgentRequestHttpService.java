@@ -1,4 +1,4 @@
-package com.elco.eeds.agent.sdk.transfer.service;
+package com.elco.eeds.agent.sdk.transfer.service.agent;
 
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
@@ -14,8 +14,8 @@ import com.elco.eeds.agent.sdk.core.util.JsonUtil;
 import com.elco.eeds.agent.sdk.core.util.MapUtils;
 import com.elco.eeds.agent.sdk.core.util.ReflectUtils;
 import com.elco.eeds.agent.sdk.core.util.http.HttpClientUtil;
-import com.elco.eeds.agent.sdk.transfer.beans.http.request.AgentRegisterRequest;
-import com.elco.eeds.agent.sdk.transfer.beans.http.request.AgentTokenRequest;
+import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentRegisterRequest;
+import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentTokenRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

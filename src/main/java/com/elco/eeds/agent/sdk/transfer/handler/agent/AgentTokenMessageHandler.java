@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.core.util.AgentFileExtendUtils;
-import com.elco.eeds.agent.sdk.transfer.beans.http.request.AgentTokenRequest;
+import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentTokenRequest;
 import com.elco.eeds.agent.sdk.transfer.beans.message.token.AgentTokenMessage;
 import com.elco.eeds.agent.sdk.transfer.handler.IReceiverMessageHandler;
-import com.elco.eeds.agent.sdk.transfer.service.AgentRequestHttpService;
+import com.elco.eeds.agent.sdk.transfer.service.agent.AgentRequestHttpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

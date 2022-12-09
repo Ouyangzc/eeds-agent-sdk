@@ -1,4 +1,4 @@
-package com.elco.eeds.agent.sdk.transfer.beans.http.request;
+package com.elco.eeds.agent.sdk.transfer.beans.agent;
 
 /**
  * @title: AgentRegisterRequest
