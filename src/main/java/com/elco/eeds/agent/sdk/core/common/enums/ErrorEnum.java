@@ -12,6 +12,11 @@ public enum ErrorEnum {
     CLIENT_START_ERROR("CL0101001", "客户端启动失败"),
     CLIENT_REGISTER_ERROR("CL0101002", "客户端注册错误"),
     RESOURCE_OBTAIN_ERROR("CL0101003", "配置文件获取Resource失败"),
+    WRITE_AGENT_FILE_ERROR("CL0101004", "保存agent.json异常"),
+    SAVE_TOKEN_ERROR("CL0101005", "保存token至agent.json异常"),
+    SAVE_CONFIG_ERROR("CL0101006", "保存config至agent.json异常"),
+    READ_TOKEN_ERROR("CL0101007", "从agent.json读取token信息异常"),
+    READ_CONFIG_ERROR("CL0101008", "从agent.json读取config信息异常"),
     /**
      * 数据源异常，以DE开头
      */
@@ -20,11 +25,6 @@ public enum ErrorEnum {
     /**
      * 数据异常，以DA开头
      */
-    WRITE_AGENT_FILE_ERROR("DA0101001", "保存agent.json异常"),
-    SAVE_TOKEN_ERROR("DA0101002", "保存token至agent.json异常"),
-    SAVE_CONFIG_ERROR("DA0101003", "保存config至agent.json异常"),
-    READ_TOKEN_ERROR("DA0101003", "从agent.json读取token信息异常"),
-    READ_CONFIG_ERROR("DA0101003", "从agent.json读取config信息异常"),
 
 
     /**
