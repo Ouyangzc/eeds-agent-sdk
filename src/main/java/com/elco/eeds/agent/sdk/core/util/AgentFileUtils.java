@@ -111,6 +111,8 @@ public class AgentFileUtils {
     }
 
     public static void main(String[] args) throws IOException, SdkException {
+
+        readLocalAgentFile();
         // TODO 测试，后期删除
         /*JSONObject json = new JSONObject();
 

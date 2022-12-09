@@ -16,5 +16,6 @@ public class ConstantCommon {
 
     public static final String ONE = "1";
 
+    public static final String TOPIC_SUFFIX_AGENTID = "{agentId}";
 
 }

@@ -108,6 +108,9 @@ public class AgentRequestHttpService {
         agent.getAgentMqInfo().setAuthInfo(agentMqAuthInfo);
         agent.getAgentMqInfo().setMqSecurityInfo(agentMqSecurityInfo);
 
+        // 保存token
+        AgentFileExtendUtils.setTokenToLocalAgentFile(agent.getAgentBaseInfo().getToken().toString());
+
         // 新的配置逻辑，server-config把公有变量和私有变量分开传输
         ConfigBase configGlobal = JSONObject.parseObject(String.valueOf(jsonObject.get("baseConfigCache")), ConfigBase.class);
         ConfigBase configPrivate = JSONObject.parseObject(String.valueOf(jsonObject.get("privateConfigCache")), ConfigBase.class);

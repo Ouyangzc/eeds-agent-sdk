@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.util;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -62,11 +63,16 @@ public class AgentFileExtendUtils {
      */
     public static void setTokenToLocalAgentFile(String token) throws SdkException {
         try {
+            JSONObject jsonObject = new JSONObject();
             String content = AgentFileUtils.readLocalAgentFile();
             logger.debug("当前agent.json中内容为：{}", content);
-            JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
-            logger.debug("当前文件中token为：" + jsonObject.get("token").toString());
-            jsonObject.put("token", token);
+            if(!StrUtil.isEmpty(content)) {
+                jsonObject = JSON.parseObject(content, JSONObject.class);
+                logger.debug("当前文件中token为：" + jsonObject.get("token").toString());
+                jsonObject.put("token", token);
+            }else {
+                jsonObject.put("token", token);
+            }
             // 修改后保存
             AgentFileUtils.strogeLocalAgentFile(JSON.toJSONString(jsonObject));
             logger.debug("token保存至json文件成功");
@@ -84,11 +90,16 @@ public class AgentFileExtendUtils {
      */
     public static void setConfigToLocalAgentFile(JSONArray config) throws SdkException {
         try {
+            JSONObject jsonObject = new JSONObject();
             String content = AgentFileUtils.readLocalAgentFile();
             logger.debug("当前agent.json中内容为：{}", content);
-            JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
-            logger.debug("当前文件中config为：" + jsonObject.get("config").toString());
-            jsonObject.put("config", config);
+            if(!StrUtil.isEmpty(content)) {
+                jsonObject = JSON.parseObject(content, JSONObject.class);
+                logger.debug("当前文件中token为：" + jsonObject.get("config").toString());
+                jsonObject.put("config", config);
+            }else {
+                jsonObject.put("config", config);
+            }
             // 修改后保存
             AgentFileUtils.strogeLocalAgentFile(JSON.toJSONString(jsonObject));
             logger.debug("config保存至json文件成功");
@@ -99,4 +110,7 @@ public class AgentFileExtendUtils {
         }
     }
 
+    public static void main(String[] args) throws SdkException {
+        setTokenToLocalAgentFile("111111111");
+    }
 }
