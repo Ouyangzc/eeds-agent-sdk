@@ -145,7 +145,8 @@ public class AgentRequestHttpService {
     public void updateAgentEffectTime(AgentTokenRequest agentTokenRequest) {
         String requestUrl = agent.getAgentBaseInfo().getServerUrl() + ConstantHttpApiPath.AGENT_TOKEN;
         try {
-            HttpClientUtil.post(requestUrl, agentTokenRequest.getCurrentToken(), JSON.toJSONString(agentTokenRequest));
+            String response = HttpClientUtil.post(requestUrl, agentTokenRequest.getCurrentToken(), JSON.toJSONString(agentTokenRequest));
+            logger.info("调用token接口返回值为：{}", response);
         } catch (Exception e) {
             logger.error("更新客户端TOKEN生效时间接口异常, 形参为：{}", JSON.toJSONString(agentTokenRequest));
             logger.error("请求地址为：{}", requestUrl);

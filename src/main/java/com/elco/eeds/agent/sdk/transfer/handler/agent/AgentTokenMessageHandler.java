@@ -42,4 +42,15 @@ public class AgentTokenMessageHandler implements IReceiverMessageHandler {
             e.printStackTrace();
         }
     }
+
+    public static void main(String[] args) {
+        AgentTokenMessageHandler agentTokenMessageHandler = new AgentTokenMessageHandler();
+
+        String agentId = "1234567890";
+        String topic = "server.agent.config.token.{agentId}";
+        String message = "{\"method\":\"agent_update_token\",\"timestamp\":\"1666349496479\",\"data\":{\"token\":\"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE2Njc1MzQxMDcsImV4cCI6NDgyMzIwNzcwNywiaWF0IjoxNjY3NTM0MTA3LCJqdGkiOiIzNzE3OWE2My1hNjg0LTQwYTUtYmFiMC1lY2U3NDYxNzdjNjQifQ.Pw9nB3XkY1KeB20M65XFcjtUFf9crt1D7CBh37dayOs\"}}";
+        topic = topic.replace("{agentId}", agentId);
+
+        agentTokenMessageHandler.handleRecData(topic, message);
+    }
 }

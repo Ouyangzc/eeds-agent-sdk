@@ -13,6 +13,10 @@ public class Main {
     public static final Logger logger = LoggerFactory.getLogger(Main.class);
     public static void main(String[] args) throws Exception {
         logger.info("sdk start");
-        AgentStarter.init("application-test.yaml");
+        // 给yml的相对路径
+        AgentStarter.init("./yml/application.yaml");
+        // AgentStarter.init("application-test.yaml");
+        // 默认位置读取配置文件
+        // AgentStarter.init();
     }
 }

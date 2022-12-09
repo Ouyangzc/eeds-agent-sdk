@@ -74,7 +74,7 @@ public class AgentStarter {
      */
     public static void init(String ymlPath) throws Exception {
         logger.info("开始手动初始化方法...");
-        logger.info("yml路径参数为：{}", ymlPath);
+        logger.info("yml文件路径参数为：{}", ymlPath);
         // 从yml配置文件读取配置，赋值给AgentStartProperties
         AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
         AgentStartProperties agentStartProperties = agentConfigYamlReader.parseYaml(ymlPath);
@@ -91,16 +91,11 @@ public class AgentStarter {
         logger.info("开始从默认的位置读取yml文件...");
         // 从yml配置文件读取配置，赋值给AgentStartProperties
         AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
-        AgentStartProperties agentStartProperties = agentConfigYamlReader.parseYaml("/application-test.yaml");
+        AgentStartProperties agentStartProperties = agentConfigYamlReader.parseYaml("application.yaml");
         logger.info("读取配置文件成功：{}", agentStartProperties.toString());
         // 调用私有init方法
         init(agentStartProperties);
 
 
     }
-
-    public static void main(String[] args) throws Exception {
-        AgentStarter.init("./elco/yml");
-    }
-
 }

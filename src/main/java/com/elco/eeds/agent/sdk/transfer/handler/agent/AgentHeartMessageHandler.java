@@ -43,6 +43,5 @@ public class AgentHeartMessageHandler implements IReceiverMessageHandler {
         topic = topic.replace("{agentId}", agentId);
 
         agentHeartMessageHandler.handleRecData(topic, message);
-        System.out.println(111);
     }
 }
