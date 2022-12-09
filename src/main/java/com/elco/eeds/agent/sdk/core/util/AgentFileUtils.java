@@ -126,15 +126,15 @@ public class AgentFileUtils {
         AgentFileUtils.strogeLocalAgentFile(json.toString());*/
 
         System.out.println("当前json文件中config为：");
-        System.out.println(AgentFileExtendUtils.getConfigFromLocalAgentFile());
+        //System.out.println(AgentFileExtendUtils.getConfigFromLocalAgentFile());
         System.out.println("当前json文件中token为：");
-        System.out.println(AgentFileExtendUtils.getTokenFromLocalAgentFile());
+        //System.out.println(AgentFileExtendUtils.getTokenFromLocalAgentFile());
 
-        AgentFileExtendUtils.setTokenToLocalAgentFile("22222222222222");
+        AgentFileExtendUtils.setTokenToLocalAgentFile("3333333333333");
         JSONArray jsonArray = new JSONArray();
-        jsonArray.add(new BaseConfigEntity("syncPeriod", "11111", "1"));
-        jsonArray.add(new BaseConfigEntity("dataCacheCycle", "11111", "0"));
-        jsonArray.add(new BaseConfigEntity("dataCacheFileSize", "1111", "0"));
+        jsonArray.add(new BaseConfigEntity("syncPeriod", "222", "1"));
+        jsonArray.add(new BaseConfigEntity("dataCacheCycle", "222", "0"));
+        jsonArray.add(new BaseConfigEntity("dataCacheFileSize", "222", "0"));
         AgentFileExtendUtils.setConfigToLocalAgentFile(jsonArray);
 
         // 测试单例

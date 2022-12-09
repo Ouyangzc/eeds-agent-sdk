@@ -31,9 +31,9 @@ public class AgentFileExtendUtils {
             String content = AgentFileUtils.readLocalAgentFile();
             JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
             return jsonObject.get("token").toString();
-        } catch (IOException ioException) {
+        } catch (Exception e) {
             logger.debug("从json文件读取token失败");
-            ioException.printStackTrace();
+            e.printStackTrace();
             throw new SdkException(ErrorEnum.READ_TOKEN_ERROR.code());
         }
     }
@@ -48,9 +48,9 @@ public class AgentFileExtendUtils {
             String content = AgentFileUtils.readLocalAgentFile();
             JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
             return jsonObject.get("config").toString();
-        } catch (IOException ioException) {
+        } catch (Exception e) {
             logger.error("从json文件读取config失败");
-            ioException.printStackTrace();
+            e.printStackTrace();
             throw new SdkException(ErrorEnum.READ_CONFIG_ERROR.code());
 
         }
@@ -68,11 +68,9 @@ public class AgentFileExtendUtils {
             logger.debug("当前agent.json中内容为：{}", content);
             if(!StrUtil.isEmpty(content)) {
                 jsonObject = JSON.parseObject(content, JSONObject.class);
-                logger.debug("当前文件中token为：" + jsonObject.get("token").toString());
-                jsonObject.put("token", token);
-            }else {
-                jsonObject.put("token", token);
+                logger.debug("当前文件：" + jsonObject);
             }
+            jsonObject.put("token", token);
             // 修改后保存
             AgentFileUtils.strogeLocalAgentFile(JSON.toJSONString(jsonObject));
             logger.debug("token保存至json文件成功");
@@ -95,11 +93,9 @@ public class AgentFileExtendUtils {
             logger.debug("当前agent.json中内容为：{}", content);
             if(!StrUtil.isEmpty(content)) {
                 jsonObject = JSON.parseObject(content, JSONObject.class);
-                logger.debug("当前文件中token为：" + jsonObject.get("config").toString());
-                jsonObject.put("config", config);
-            }else {
-                jsonObject.put("config", config);
+                logger.debug("当前文件：" + jsonObject);
             }
+            jsonObject.put("config", config);
             // 修改后保存
             AgentFileUtils.strogeLocalAgentFile(JSON.toJSONString(jsonObject));
             logger.debug("config保存至json文件成功");
