@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.core.bean.agent;
 
+import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
+
 /**
  * @title: AgentBaseInfo
  * @Author wl
@@ -8,6 +10,18 @@ package com.elco.eeds.agent.sdk.core.bean.agent;
  * @Description: 客户端基础信息类
  */
 public class AgentBaseInfo {
+
+    public AgentBaseInfo(){}
+
+    public AgentBaseInfo(AgentStartProperties startProperties){
+        this.baseFolder = startProperties.getBaseFolder();
+        this.token =startProperties.getToken();
+        this.port = startProperties.getPort();
+        this.serverUrl = startProperties.getServerUrl();
+        this.name = startProperties.getName();
+    }
+
+
 
     // 客户端ID
     private String agentId;
@@ -25,6 +39,19 @@ public class AgentBaseInfo {
     private String dataCacheFileSize;
     // 缓存周期
     private String dataCacheCycle;
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+    }
+
+    /**
+     * 客户端端口
+     */
+    private String port;
 
     public String getAgentId() {
         return agentId;

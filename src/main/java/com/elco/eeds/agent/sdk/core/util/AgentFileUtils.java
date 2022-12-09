@@ -106,10 +106,9 @@ public class AgentFileUtils {
 
     public static String getBaseFolder() {
         Agent agent = Agent.getInstance();
-        // TODO 测试用，需要删除
-        AgentBaseInfo agentBaseInfo = new AgentBaseInfo();
-        agentBaseInfo.setBaseFolder("./elco/eeds");
-        agent.setAgentBaseInfo(agentBaseInfo);
+//        AgentBaseInfo agentBaseInfo = new AgentBaseInfo();
+//        agentBaseInfo.setBaseFolder("./elco/eeds");
+//        agent.setAgentBaseInfo(agentBaseInfo);
         return agent.getAgentBaseInfo().getBaseFolder().isEmpty() ? ConstantFilePath.BASE_FOLDER : agent.getAgentBaseInfo().getBaseFolder();
 
     }
