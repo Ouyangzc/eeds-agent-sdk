@@ -108,7 +108,7 @@ public class AgentRequestHttpService {
         agent.getAgentMqInfo().setUrls(JsonUtil.jsonArray2StringArray(urls));
 
         AgentMqAuthInfo agentMqAuthInfo = JSONObject.parseObject(String.valueOf(agentMqInfoJsonObject.get("authInfo")), AgentMqAuthInfo.class);
-        agent.getAgentMqInfo().getAuthInfo().setAuthType((String) agentMqInfoJsonObject.get("authType"));
+        agent.getAgentMqInfo().setAuthType((String) agentMqInfoJsonObject.get("authType"));
         AgentMqSecurityInfo agentMqSecurityInfo = JSONObject.parseObject(String.valueOf(agentMqInfoJsonObject.get("tlsInfo")), AgentMqSecurityInfo.class);
 
         agent.getAgentMqInfo().setAuthInfo(agentMqAuthInfo);
@@ -127,6 +127,13 @@ public class AgentRequestHttpService {
         JSONArray jsonArray = MapUtils.mapToJsonConfig(mapConfigGlobal, mapConfigPrivate);
         // 将返回的两个json处理后存储至agent.json中
         AgentFileExtendUtils.setConfigToLocalAgentFile(jsonArray);
+        // 反射给agent赋值
+        for (Object o : jsonArray) {
+            BaseConfigEntity baseConfigEntity = (BaseConfigEntity) o;
+            if (ReflectUtils.isContainKey(agent.getAgentBaseInfo(), baseConfigEntity.getConfigFieldName())) {
+                ReflectUtils.invokeSet(agent.getAgentBaseInfo(), baseConfigEntity.getConfigFieldName(), baseConfigEntity.getConfigFieldValue());
+            }
+        }
 
         return agent;
     }

@@ -26,7 +26,7 @@ public class AgentHeartMessageHandler implements IReceiverMessageHandler {
             // 序列化 判断格式是否正确，抛出异常即不正确
             AgentHeartMessage message = JSON.parseObject(recData, AgentHeartMessage.class);
             // 收到ping，发送pong
-            SubAgentHeartMessage rspMessage = SubAgentHeartMessage.getResponseMessage();
+            AgentHeartMessage rspMessage = AgentHeartMessage.getRespMessage();
             this.publishMessage(ConstantTopic.TOPIC_AGENT_HEART_RSP, JSON.toJSONString(rspMessage));
         } catch (Exception e) {
             logger.error("客户端心跳报文处理异常", e);

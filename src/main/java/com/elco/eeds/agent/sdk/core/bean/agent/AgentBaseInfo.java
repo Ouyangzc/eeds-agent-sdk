@@ -128,6 +128,7 @@ public class AgentBaseInfo {
                 ", syncPeriod='" + syncPeriod + '\'' +
                 ", dataCacheFileSize='" + dataCacheFileSize + '\'' +
                 ", dataCacheCycle='" + dataCacheCycle + '\'' +
+                ", port='" + port + '\'' +
                 '}';
     }
 }

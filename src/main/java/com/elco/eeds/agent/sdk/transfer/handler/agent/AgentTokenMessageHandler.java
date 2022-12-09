@@ -22,7 +22,7 @@ public class AgentTokenMessageHandler implements IReceiverMessageHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AgentTokenMessageHandler.class);
 
-    private AgentRequestHttpService agentRequestHttpService = new AgentRequestHttpService();
+    private final AgentRequestHttpService agentRequestHttpService = new AgentRequestHttpService();
 
     @Override
     public void handleRecData(String topic, String recData) {

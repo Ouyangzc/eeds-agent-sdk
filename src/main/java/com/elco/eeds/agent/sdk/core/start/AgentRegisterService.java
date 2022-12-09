@@ -88,6 +88,8 @@ public class AgentRegisterService implements IAgentRegisterService {
             Agent agent = Agent.getInstance();
             String agentId = agent.getAgentBaseInfo().getAgentId();
             String mqInfoStr = JSON.toJSONString(mqInfo);
+            // 将mqSecurityInfo 替换为 tlsInfo
+            mqInfoStr = mqInfoStr.replace("mqSecurityInfo", "tlsInfo");
             // 加载插件
             MQPluginManager.loadPlugins(mqInfoStr);
             // 实例化MQ插件

@@ -9,9 +9,6 @@ package com.elco.eeds.agent.sdk.core.bean.agent;
  */
 public class AgentMqAuthInfo {
 
-    // 认证类型
-    private String authType;
-
     // token
     private String token;
 
@@ -20,14 +17,6 @@ public class AgentMqAuthInfo {
 
     // 密码
     private String password;
-
-    public String getAuthType() {
-        return authType;
-    }
-
-    public void setAuthType(String authType) {
-        this.authType = authType;
-    }
 
     public String getToken() {
         return token;

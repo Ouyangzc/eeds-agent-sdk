@@ -45,6 +45,7 @@ public class AgentConfigYamlReader {
             }
         }catch (Exception e){
             e.printStackTrace();
+            return null;
         }
         Map agent = (Map) map.get("agent");
 
@@ -61,7 +62,7 @@ public class AgentConfigYamlReader {
     }
 
     public static void main(String[] args) {
-        String ymlPath = "application-test.yaml";
+        String ymlPath = "./elco/yml/application-test.yaml";
 //        String ymlPath = "D:\\elco\\agentSdk\\application-test.yaml";
         AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
         AgentStartProperties agentStartProperties = agentConfigYamlReader.parseYaml(ymlPath);

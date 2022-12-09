@@ -86,14 +86,21 @@ public class AgentStarter {
     /**
      * 客户端手动启动方法：空参init方法（从默认的两个位置取yml）
      */
-    public static void init() {
+    public static void init() throws Exception {
         logger.info("开始手动初始化方法...");
         logger.info("开始从默认的位置读取yml文件...");
-        // TODO 读取后封装成AgentStartProperties对象，再调用init(AgentStartProperties)方法...
-
+        // 从yml配置文件读取配置，赋值给AgentStartProperties
+        AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
+        AgentStartProperties agentStartProperties = agentConfigYamlReader.parseYaml("/application-test.yaml");
+        logger.info("读取配置文件成功：{}", agentStartProperties.toString());
         // 调用私有init方法
+        init(agentStartProperties);
 
 
+    }
+
+    public static void main(String[] args) throws Exception {
+        AgentStarter.init("./elco/yml");
     }
 
 }
