@@ -22,6 +22,11 @@ public class AgentStarter {
 
     private static void init(AgentStartProperties agentStartProperties) throws Exception {
         try {
+            // 初始化协议
+//            InitFactory.addConnectPackagePath(agentStartProperties.getProtocolPath());
+//            InitFactory.initConnect();
+
+
             // 注册
             registerService.register(agentStartProperties.getServerUrl(), agentStartProperties.getName(),
                     agentStartProperties.getPort(), agentStartProperties.getToken());

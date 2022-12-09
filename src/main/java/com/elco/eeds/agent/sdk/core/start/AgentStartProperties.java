@@ -36,6 +36,16 @@ public class AgentStartProperties {
      */
     private String baseFolder;
 
+    private String protocolPath;
+
+    public String getProtocolPath() {
+        return protocolPath;
+    }
+
+    public void setProtocolPath(String protocolPath) {
+        this.protocolPath = protocolPath;
+    }
+
     private static volatile AgentStartProperties agentStartProperties;
 
     public static AgentStartProperties getInstance() {
