@@ -106,15 +106,13 @@ public class AgentFileUtils {
 
     public static String getBaseFolder() {
         Agent agent = Agent.getInstance();
-        // TODO 测试用，需要删除
-        AgentBaseInfo agentBaseInfo = new AgentBaseInfo();
-        agentBaseInfo.setBaseFolder("./elco/eeds");
-        agent.setAgentBaseInfo(agentBaseInfo);
         return agent.getAgentBaseInfo().getBaseFolder().isEmpty() ? ConstantFilePath.BASE_FOLDER : agent.getAgentBaseInfo().getBaseFolder();
 
     }
 
     public static void main(String[] args) throws IOException, SdkException {
+
+        readLocalAgentFile();
         // TODO 测试，后期删除
         /*JSONObject json = new JSONObject();
 
@@ -128,15 +126,15 @@ public class AgentFileUtils {
         AgentFileUtils.strogeLocalAgentFile(json.toString());*/
 
         System.out.println("当前json文件中config为：");
-        System.out.println(AgentFileExtendUtils.getConfigFromLocalAgentFile());
+        //System.out.println(AgentFileExtendUtils.getConfigFromLocalAgentFile());
         System.out.println("当前json文件中token为：");
-        System.out.println(AgentFileExtendUtils.getTokenFromLocalAgentFile());
+        //System.out.println(AgentFileExtendUtils.getTokenFromLocalAgentFile());
 
-        AgentFileExtendUtils.setTokenToLocalAgentFile("22222222222222");
+        AgentFileExtendUtils.setTokenToLocalAgentFile("3333333333333");
         JSONArray jsonArray = new JSONArray();
-        jsonArray.add(new BaseConfigEntity("syncPeriod", "11111", "1"));
-        jsonArray.add(new BaseConfigEntity("dataCacheCycle", "11111", "0"));
-        jsonArray.add(new BaseConfigEntity("dataCacheFileSize", "1111", "0"));
+        jsonArray.add(new BaseConfigEntity("syncPeriod", "222", "1"));
+        jsonArray.add(new BaseConfigEntity("dataCacheCycle", "222", "0"));
+        jsonArray.add(new BaseConfigEntity("dataCacheFileSize", "222", "0"));
         AgentFileExtendUtils.setConfigToLocalAgentFile(jsonArray);
 
         // 测试单例

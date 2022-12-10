@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.util;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -30,9 +31,9 @@ public class AgentFileExtendUtils {
             String content = AgentFileUtils.readLocalAgentFile();
             JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
             return jsonObject.get("token").toString();
-        } catch (IOException ioException) {
+        } catch (Exception e) {
             logger.debug("从json文件读取token失败");
-            ioException.printStackTrace();
+            e.printStackTrace();
             throw new SdkException(ErrorEnum.READ_TOKEN_ERROR.code());
         }
     }
@@ -47,9 +48,9 @@ public class AgentFileExtendUtils {
             String content = AgentFileUtils.readLocalAgentFile();
             JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
             return jsonObject.get("config").toString();
-        } catch (IOException ioException) {
+        } catch (Exception e) {
             logger.error("从json文件读取config失败");
-            ioException.printStackTrace();
+            e.printStackTrace();
             throw new SdkException(ErrorEnum.READ_CONFIG_ERROR.code());
 
         }
@@ -62,10 +63,13 @@ public class AgentFileExtendUtils {
      */
     public static void setTokenToLocalAgentFile(String token) throws SdkException {
         try {
+            JSONObject jsonObject = new JSONObject();
             String content = AgentFileUtils.readLocalAgentFile();
             logger.debug("当前agent.json中内容为：{}", content);
-            JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
-            logger.debug("当前文件中token为：" + jsonObject.get("token").toString());
+            if(!StrUtil.isEmpty(content)) {
+                jsonObject = JSON.parseObject(content, JSONObject.class);
+                logger.debug("当前文件：" + jsonObject);
+            }
             jsonObject.put("token", token);
             // 修改后保存
             AgentFileUtils.strogeLocalAgentFile(JSON.toJSONString(jsonObject));
@@ -84,10 +88,13 @@ public class AgentFileExtendUtils {
      */
     public static void setConfigToLocalAgentFile(JSONArray config) throws SdkException {
         try {
+            JSONObject jsonObject = new JSONObject();
             String content = AgentFileUtils.readLocalAgentFile();
             logger.debug("当前agent.json中内容为：{}", content);
-            JSONObject jsonObject = JSON.parseObject(content, JSONObject.class);
-            logger.debug("当前文件中config为：" + jsonObject.get("config").toString());
+            if(!StrUtil.isEmpty(content)) {
+                jsonObject = JSON.parseObject(content, JSONObject.class);
+                logger.debug("当前文件：" + jsonObject);
+            }
             jsonObject.put("config", config);
             // 修改后保存
             AgentFileUtils.strogeLocalAgentFile(JSON.toJSONString(jsonObject));
@@ -99,4 +106,7 @@ public class AgentFileExtendUtils {
         }
     }
 
+    public static void main(String[] args) throws SdkException {
+        setTokenToLocalAgentFile("111111111");
+    }
 }

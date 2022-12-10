@@ -15,6 +15,9 @@ public class AgentMqInfo {
 
     private String[] urls;
 
+    // 认证类型
+    private String authType;
+
     private AgentMqAuthInfo authInfo;
 
     private AgentMqSecurityInfo mqSecurityInfo;
@@ -33,6 +36,14 @@ public class AgentMqInfo {
 
     public void setUrls(String[] urls) {
         this.urls = urls;
+    }
+
+    public String getAuthType() {
+        return authType;
+    }
+
+    public void setAuthType(String authType) {
+        this.authType = authType;
     }
 
     public AgentMqAuthInfo getAuthInfo() {

@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.core.start;
 
+import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
+import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.AgentConfigYamlReader;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.ResourceLoader;
 import org.slf4j.Logger;
@@ -22,11 +24,7 @@ public class AgentStarter {
 
     private static void init(AgentStartProperties agentStartProperties) throws Exception {
         try {
-            // 初始化协议
-//            InitFactory.addConnectPackagePath(agentStartProperties.getProtocolPath());
-//            InitFactory.initConnect();
-
-
+            Agent.getInstance().setAgentBaseInfo(new AgentBaseInfo(agentStartProperties));
             // 注册
             registerService.register(agentStartProperties.getServerUrl(), agentStartProperties.getName(),
                     agentStartProperties.getPort(), agentStartProperties.getToken());
@@ -76,7 +74,7 @@ public class AgentStarter {
      */
     public static void init(String ymlPath) throws Exception {
         logger.info("开始手动初始化方法...");
-        logger.info("yml路径参数为：{}", ymlPath);
+        logger.info("yml文件路径参数为：{}", ymlPath);
         // 从yml配置文件读取配置，赋值给AgentStartProperties
         AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
         AgentStartProperties agentStartProperties = agentConfigYamlReader.parseYaml(ymlPath);
@@ -88,14 +86,16 @@ public class AgentStarter {
     /**
      * 客户端手动启动方法：空参init方法（从默认的两个位置取yml）
      */
-    public static void init() {
+    public static void init() throws Exception {
         logger.info("开始手动初始化方法...");
         logger.info("开始从默认的位置读取yml文件...");
-        // TODO 读取后封装成AgentStartProperties对象，再调用init(AgentStartProperties)方法...
-
+        // 从yml配置文件读取配置，赋值给AgentStartProperties
+        AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
+        AgentStartProperties agentStartProperties = agentConfigYamlReader.parseYaml("application.yaml");
+        logger.info("读取配置文件成功：{}", agentStartProperties.toString());
         // 调用私有init方法
+        init(agentStartProperties);
 
 
     }
-
 }

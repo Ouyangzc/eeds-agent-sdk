@@ -11,7 +11,6 @@ import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.core.util.AgentFileExtendUtils;
 import com.elco.eeds.agent.sdk.core.util.ReflectUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.config.AgentConfigMessage;
-import com.elco.eeds.agent.sdk.transfer.beans.message.config.SubAgentConfigMessage;
 import com.elco.eeds.agent.sdk.transfer.handler.IReceiverMessageHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,36 +76,12 @@ public class AgentConfigGlobalMessageHandler implements IReceiverMessageHandler 
     }
 
     public static void main(String[] args) throws SdkException {
-        SubAgentConfigMessage subAgentConfigMessage = new SubAgentConfigMessage();
-        Agent agent = Agent.getInstance();
-        AgentBaseInfo agentBaseInfo = new AgentBaseInfo();
-        List<BaseConfigEntity> waitWriteJsonList = new ArrayList<>();
+        AgentConfigGlobalMessageHandler agentConfigGlobalMessageHandler = new AgentConfigGlobalMessageHandler();
+        String agentId = "1234567890";
+        String topic = "server.agent.config.localConfig";
+        String message = "{\"method\":\"agent_local_config\",\"timestamp\":\"1666349496479\",\"data\":{\"dataCacheFileSize\":\"20\",\"dataCacheCycle\":\"1\",\"syncPeriod\":\"2200\"}}";
+        topic = topic.replace("{agentId}", agentId);
 
-        String config = AgentFileExtendUtils.getConfigFromLocalAgentFile();
-        JSONArray jsonArray = JSONObject.parseArray(config);
-        List<BaseConfigEntity> list = JSONObject.parseArray(jsonArray.toJSONString(), BaseConfigEntity.class);
-        List<BaseConfigEntity> listTemp = list.stream().filter(e -> ConstantCommon.ZERO.equals(e.getConfigFieldType())).collect(Collectors.toList());
-        listTemp.forEach(e -> {
-            String configFieldName = e.getConfigFieldName();
-            // 通过反射，判断SubAgentConfigMessage类中是否含有同名的Field
-            boolean containKey = ReflectUtils.isContainKey(subAgentConfigMessage, configFieldName);
-            // 有，更新该值
-            if(containKey) {
-                if (ReflectUtils.isContainKey(agentBaseInfo, configFieldName)) {
-                    // 更新
-                    ReflectUtils.invokeSet(agentBaseInfo, configFieldName, e.getConfigFieldValue());
-                    // 准备要写入json的数据
-                    waitWriteJsonList.add(e);
-                }
-            }
-        });
-        agent.setAgentBaseInfo(agentBaseInfo);
-        // 将新的客户端生效的配置，写入agent.json
-        List<BaseConfigEntity> listPrivate = list.stream().filter(e -> ConstantCommon.ONE.equals(e.getConfigFieldType())).collect(Collectors.toList());
-        waitWriteJsonList.addAll(listPrivate);
-        JSONArray writeAgentFileJsonArray = JSONArray.parseArray(JSON.toJSONString(waitWriteJsonList));
-        AgentFileExtendUtils.setConfigToLocalAgentFile(writeAgentFileJsonArray);
-
-        System.out.println(111);
+        agentConfigGlobalMessageHandler.handleRecData(topic, message);
     }
 }

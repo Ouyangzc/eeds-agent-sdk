@@ -75,4 +75,14 @@ public class AgentConfigLocalMessageHandler implements IReceiverMessageHandler {
         }
 
     }
+
+    public static void main(String[] args) {
+        AgentConfigLocalMessageHandler agentConfigLocalMessageHandler = new AgentConfigLocalMessageHandler();
+        String agentId = "1234567890";
+        String topic = "server.agent.config.localConfig.{agentId}";
+        String message = "{\"method\":\"agent_local_config\",\"timestamp\":\"1666349496479\",\"data\":{\"dataCacheFileSize\":\"20\",\"dataCacheCycle\":\"1\",\"syncPeriod\":\"12000\"}}";
+        topic = topic.replace("{agentId}", agentId);
+
+        agentConfigLocalMessageHandler.handleRecData(topic, message);
+    }
 }

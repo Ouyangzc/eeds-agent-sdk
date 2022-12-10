@@ -10,18 +10,17 @@ import com.elco.eeds.agent.sdk.core.common.constant.client.ConstantClientType;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
 import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
-import com.elco.eeds.agent.sdk.core.util.AgentFileUtils;
+import com.elco.eeds.agent.sdk.core.util.AgentFileExtendUtils;
+import com.elco.eeds.agent.sdk.core.util.ReplaceTopicAgentId;
 import com.elco.eeds.agent.sdk.core.util.http.IpUtil;
-import com.elco.eeds.agent.sdk.transfer.beans.http.request.AgentTokenRequest;
+import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentTokenRequest;
 import com.elco.eeds.agent.sdk.transfer.handler.agent.AgentConfigGlobalMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.agent.AgentConfigLocalMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.agent.AgentHeartMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.agent.AgentTokenMessageHandler;
-import com.elco.eeds.agent.sdk.transfer.service.AgentRequestHttpService;
+import com.elco.eeds.agent.sdk.transfer.service.agent.AgentRequestHttpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 /**
  * @title: AgentRegisterService
@@ -54,10 +53,9 @@ public class AgentRegisterService implements IAgentRegisterService {
                 throw new SdkException(ErrorEnum.CLIENT_REGISTER_ERROR.code());
             }
             // 刷新token
-            saveAgentFile(agent);
+            // saveAgentFile(agent);
             // 回调更新客户端Token生效时间
-            AgentTokenRequest agentTokenRequest = new AgentTokenRequest(Long.parseLong(agent.getAgentBaseInfo().getAgentId()), agent.getAgentBaseInfo().getToken());
-            agentRequestHttpService.updateAgentEffectTime(agentTokenRequest);
+            agentRequestHttpService.updateAgentEffectTime(new AgentTokenRequest(Long.parseLong(agent.getAgentBaseInfo().getAgentId()), agent.getAgentBaseInfo().getToken()));
             // 加载Nats组件
             loadMq(agent.getAgentMqInfo());
             // 数据源同步
@@ -67,39 +65,40 @@ public class AgentRegisterService implements IAgentRegisterService {
             return true;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new SdkException(ErrorEnum.CLIENT_REGISTER_ERROR.code());
+            // throw new SdkException(ErrorEnum.CLIENT_REGISTER_ERROR.code());
+            logger.error("客户端注册流程失败！{}", e);
+            this.close(e.getMessage());
+            return false;
         }
     }
 
     @Override
     public void saveAgentFile(Agent agentInfo) throws SdkException {
         // 目前只保存token字段
-        try {
-            AgentFileUtils.strogeLocalAgentFile(agentInfo.getAgentBaseInfo().getToken().toString());
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-            logger.error("保存agent.json异常", ioException);
-            throw new SdkException(ErrorEnum.WRITE_AGENT_FILE_ERROR.code());
-        }
+        AgentFileExtendUtils.setTokenToLocalAgentFile(agentInfo.getAgentBaseInfo().getToken().toString());
     }
 
     @Override
     public void loadMq(AgentMqInfo mqInfo) throws Exception {
         try {
+            Agent agent = Agent.getInstance();
+            String agentId = agent.getAgentBaseInfo().getAgentId();
             String mqInfoStr = JSON.toJSONString(mqInfo);
+            // 将mqSecurityInfo 替换为 tlsInfo
+            mqInfoStr = mqInfoStr.replace("mqSecurityInfo", "tlsInfo");
             // 加载插件
             MQPluginManager.loadPlugins(mqInfoStr);
             // 实例化MQ插件
             MQServicePlugin natsClient = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
             // 订阅 更新token报文topic
             // TODO 需要传入clientId
-            natsClient.syncSub(ConstantTopic.TOPIC_AGENT_TOKEN, agentTokenMessageHandler);
+            natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_AGENT_TOKEN, agentId), agentTokenMessageHandler);
             // 订阅 客户端心跳报文topic
-            natsClient.syncSub(ConstantTopic.TOPIC_AGENT_HEART_REQ, agentHeartMessageHandler);
+            natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_AGENT_HEART_REQ, agentId), agentHeartMessageHandler);
             // 订阅 基础配置修改（全局）topic
-            natsClient.syncSub(ConstantTopic.TOPIC_AGENT_CONFIG_GLOBAL, agentConfigGlobalMessageHandler);
+            natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_AGENT_CONFIG_GLOBAL, agentId), agentConfigGlobalMessageHandler);
             // 订阅 基础配置修改（私有）topic
-            natsClient.syncSub(ConstantTopic.TOPIC_AGENT_CONFIG_LOCAL, agentConfigLocalMessageHandler);
+            natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_AGENT_CONFIG_LOCAL, agentId), agentConfigLocalMessageHandler);
             // 订阅其他topic...
             // 待补充
         } catch (Exception e) {
@@ -107,12 +106,14 @@ public class AgentRegisterService implements IAgentRegisterService {
             logger.error("加载Nats组件异常：{}", e);
             throw new SdkException(ErrorEnum.NATS_LOAD_ERROR.code());
         }
-
     }
 
     @Override
     public void close(String msg) {
-        // TODO 有疑问？？？
+        // 关闭客户端
+        logger.error("客户端即将关闭：{}", msg);
+        //注册失败，退出程序
+        System.exit(500);
 
     }
 }

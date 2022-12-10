@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.core.util.AgentFileExtendUtils;
-import com.elco.eeds.agent.sdk.transfer.beans.http.request.AgentTokenRequest;
+import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentTokenRequest;
 import com.elco.eeds.agent.sdk.transfer.beans.message.token.AgentTokenMessage;
 import com.elco.eeds.agent.sdk.transfer.handler.IReceiverMessageHandler;
-import com.elco.eeds.agent.sdk.transfer.service.AgentRequestHttpService;
+import com.elco.eeds.agent.sdk.transfer.service.agent.AgentRequestHttpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,7 @@ public class AgentTokenMessageHandler implements IReceiverMessageHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AgentTokenMessageHandler.class);
 
-    private AgentRequestHttpService agentRequestHttpService = new AgentRequestHttpService();
+    private final AgentRequestHttpService agentRequestHttpService = new AgentRequestHttpService();
 
     @Override
     public void handleRecData(String topic, String recData) {
@@ -41,5 +41,16 @@ public class AgentTokenMessageHandler implements IReceiverMessageHandler {
             logger.error("客户端token报文处理异常", e);
             e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        AgentTokenMessageHandler agentTokenMessageHandler = new AgentTokenMessageHandler();
+
+        String agentId = "1234567890";
+        String topic = "server.agent.config.token.{agentId}";
+        String message = "{\"method\":\"agent_update_token\",\"timestamp\":\"1666349496479\",\"data\":{\"token\":\"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE2Njc1MzQxMDcsImV4cCI6NDgyMzIwNzcwNywiaWF0IjoxNjY3NTM0MTA3LCJqdGkiOiIzNzE3OWE2My1hNjg0LTQwYTUtYmFiMC1lY2U3NDYxNzdjNjQifQ.Pw9nB3XkY1KeB20M65XFcjtUFf9crt1D7CBh37dayOs\"}}";
+        topic = topic.replace("{agentId}", agentId);
+
+        agentTokenMessageHandler.handleRecData(topic, message);
     }
 }
