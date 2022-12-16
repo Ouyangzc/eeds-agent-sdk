@@ -18,6 +18,8 @@ public class ConstantCommon {
 
     public static final String TOPIC_SUFFIX_AGENTID = "{agentId}";
 
+    public static final String TOPIC_SUFFIX_THINGSID = "{thingsId}";
+
     public static final String YML_FILE_NAME = "application.yml";
 
 }

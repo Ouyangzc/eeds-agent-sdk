@@ -30,5 +30,23 @@ public class ConstantMethod {
     public static final String METHOD_AGENT_TOKEN = "agent_update_token";
 
 
+    /**
+     * 数据--统计--发送统计记录报文
+     */
+    public static final String METHOD_DATA_COUNT_POST = "data_count_post";
+
+    /**
+     * 数据--同步--同步确认
+     */
+    public static final String METHOD_DATA_SYNC_CONFIRM = "data_sync_confirm";
+    /**
+     * 数据--同步--同步数据
+     */
+    public static final String METHOD_DATA_SYNC_DATA = "data_sync_properties";
+
+    /**
+     * 数据--同步--同步完成
+     */
+    public static final String METHOD_DATA_SYNC_FINISH = "data_sync_finish";
 
 }

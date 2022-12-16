@@ -19,6 +19,14 @@ public class ConstantHttpApiPath {
      */
     public static final String AGENT_TOKEN = "/eeds-sys-config/agents/updateAfterFinishToken";
 
+    /**
+     * 数据源启动同步url路径
+     */
+    public static final String THINGS_SETUP_SYNC_API = "/eeds-sys-config/things/getThingsBySync";
+    /**
+     * 数据源增量同步url路径
+     */
+    public static final String THINGS_INCR_SYNC_API = "/eeds-sys-config/things/saveAgentsByConfirm";
 
 
 }

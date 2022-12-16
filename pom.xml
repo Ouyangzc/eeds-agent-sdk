@@ -19,6 +19,7 @@
         <hutools.version>5.1.0</hutools.version>
         <fastjson.version>1.2.76</fastjson.version>
         <httpclient.version>4.5.10</httpclient.version>
+        <quartz.version>2.3.2</quartz.version>
     </properties>
 
     <dependencies>
@@ -68,6 +69,13 @@
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>1.27</version>
+        </dependency>
+
+        <!--quartz定时任务-->
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>${quartz.version}</version>
         </dependency>
 
     </dependencies>

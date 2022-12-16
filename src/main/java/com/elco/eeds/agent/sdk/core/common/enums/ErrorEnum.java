@@ -21,6 +21,7 @@ public enum ErrorEnum {
      * 数据源异常，以DE开头
      */
     CONNECT_MQTT_ERROR("MT0102001", "连接Mqtt失败"),
+    THINGS_SYNC_SETUP_HTTP_ERROR("DE0101001", "数据源同步，发生异常"),
 
     /**
      * 数据异常，以DA开头
