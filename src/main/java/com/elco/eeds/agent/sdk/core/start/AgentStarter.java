@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.core.start;
 
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
+import com.elco.eeds.agent.sdk.core.connect.init.InitConnectFactory;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.AgentConfigYamlReader;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.ResourceLoader;
 import org.slf4j.Logger;
@@ -22,12 +23,19 @@ public class AgentStarter {
 
     private AgentConfigYamlReader configReader;
 
-    private static void init(AgentStartProperties agentStartProperties) throws Exception {
+    private static void init(AgentStartProperties properties) throws Exception {
         try {
-            Agent.getInstance().setAgentBaseInfo(new AgentBaseInfo(agentStartProperties));
+            Agent.getInstance().setAgentBaseInfo(new AgentBaseInfo(properties));
             // 注册
-            registerService.register(agentStartProperties.getServerUrl(), agentStartProperties.getName(),
-                    agentStartProperties.getPort(), agentStartProperties.getToken());
+            registerService.register(properties.getServerUrl(), properties.getName(),
+                    properties.getPort(), properties.getToken());
+            // 将协议初始化进去
+            InitConnectFactory.addConnectPackagePath(properties.getProtocolPackage());
+            InitConnectFactory.initConnect();
+
+
+
+
             // 加载数据文件
             // TODO 加载数据文件
             // 根据协议加载数据源信息

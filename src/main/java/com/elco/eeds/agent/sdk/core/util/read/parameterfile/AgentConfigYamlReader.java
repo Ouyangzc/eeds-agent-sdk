@@ -1,6 +1,5 @@
 package com.elco.eeds.agent.sdk.core.util.read.parameterfile;
 
-import com.elco.eeds.agent.sdk.Main;
 import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
@@ -8,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.FileInputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +28,7 @@ public class AgentConfigYamlReader {
     }
 
     public AgentStartProperties parseYaml(String location) {
-        HashMap<String,Object> map = new HashMap();
+        HashMap<String,Object> map ;
         try{
             Yaml yaml = new Yaml();
             //通过class.getResource来获取yaml的路径
@@ -55,6 +53,7 @@ public class AgentConfigYamlReader {
         agentStartProperties.setPort(agent.get("port").toString());
         agentStartProperties.setToken(agent.get("token").toString());
         agentStartProperties.setBaseFolder(agent.get("baseFolder").toString());
+        agentStartProperties.setProtocolPackage(agent.get("protocolPackage").toString());
         logger.info("从配置文件取出配置成功：serverUrl={}, name={}, port={}, token={}, baseFoloder={}",
                 agent.get("serverUrl").toString(), agent.get("name").toString(), agent.get("port").toString(),
                 agent.get("token").toString(), agent.get("baseFolder").toString());
