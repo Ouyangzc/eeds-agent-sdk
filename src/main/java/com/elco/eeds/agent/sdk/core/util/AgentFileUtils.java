@@ -56,9 +56,8 @@ public class AgentFileUtils {
     /**
      * @param pathName 子文件目录
      * @return
-     * @throws FileNotFoundException
      */
-    public static String getFilePath(String pathName) throws FileNotFoundException {
+    public static String getFilePath(String pathName) {
         //获取根目录
         File path = new File(AgentFileUtils.class.getClassLoader().getResource("").getPath());
 

@@ -31,14 +31,14 @@ import org.slf4j.LoggerFactory;
  */
 public class AgentRegisterService implements IAgentRegisterService {
 
-    private static Logger logger = LoggerFactory.getLogger(AgentRegisterService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AgentRegisterService.class);
 
-    private AgentTokenMessageHandler agentTokenMessageHandler = new AgentTokenMessageHandler();
-    private AgentHeartMessageHandler agentHeartMessageHandler = new AgentHeartMessageHandler();
-    private AgentConfigGlobalMessageHandler agentConfigGlobalMessageHandler = new AgentConfigGlobalMessageHandler();
-    private AgentConfigLocalMessageHandler agentConfigLocalMessageHandler = new AgentConfigLocalMessageHandler();
+    private final AgentTokenMessageHandler agentTokenMessageHandler = new AgentTokenMessageHandler();
+    private final AgentHeartMessageHandler agentHeartMessageHandler = new AgentHeartMessageHandler();
+    private final AgentConfigGlobalMessageHandler agentConfigGlobalMessageHandler = new AgentConfigGlobalMessageHandler();
+    private final AgentConfigLocalMessageHandler agentConfigLocalMessageHandler = new AgentConfigLocalMessageHandler();
 
-    private AgentRequestHttpService agentRequestHttpService = new AgentRequestHttpService();
+    private final AgentRequestHttpService agentRequestHttpService = new AgentRequestHttpService();
 
     @Override
     public boolean register(String serverUrl, String name, String port, String token) throws Exception {
@@ -62,6 +62,7 @@ public class AgentRegisterService implements IAgentRegisterService {
             // TODO 数据源同步
             // 更新配置
             // TODO 更新配置
+            logger.error("客户端注册流程成功！");
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,7 +76,7 @@ public class AgentRegisterService implements IAgentRegisterService {
     @Override
     public void saveAgentFile(Agent agentInfo) throws SdkException {
         // 目前只保存token字段
-        AgentFileExtendUtils.setTokenToLocalAgentFile(agentInfo.getAgentBaseInfo().getToken().toString());
+        AgentFileExtendUtils.setTokenToLocalAgentFile(agentInfo.getAgentBaseInfo().getToken());
     }
 
     @Override

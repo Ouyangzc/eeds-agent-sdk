@@ -20,7 +20,6 @@ public class JsonUtil {
      */
     public static String[] jsonArray2StringArray(JSONArray jsonArray) {
         List<String> list = new ArrayList<>();
-        String[] stringArray;
         for (Object o : jsonArray) {
             list.add((String) o);
         }

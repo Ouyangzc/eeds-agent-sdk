@@ -1,7 +1,6 @@
 package com.elco.eeds.agent.sdk.core.util;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.elco.eeds.agent.sdk.core.bean.agent.BaseConfigEntity;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 

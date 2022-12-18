@@ -4,8 +4,6 @@ import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentMqInfo;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
 
-import java.io.IOException;
-
 /**
  * @title: IAgentRegisterService
  * @Author wl

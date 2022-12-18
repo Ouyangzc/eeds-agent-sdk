@@ -30,7 +30,7 @@ public class AgentConfigYamlReader {
     }
 
     public AgentStartProperties parseYaml(String location) {
-        HashMap<String,Object> map = new HashMap();
+        Map<String,Object> map;
         try{
             Yaml yaml = new Yaml();
             //通过class.getResource来获取yaml的路径
@@ -39,7 +39,7 @@ public class AgentConfigYamlReader {
                 //读取yaml中的数据并且以map集合的形式存储
                 UrlResource urlResource = new UrlResource(resource);
                 map = yaml.load(urlResource.getInputStream());
-                logger.debug("yml内容为：{}", String.valueOf(map));
+                logger.debug("yml内容为：{}", map);
             }else {
                 throw new SdkException(ErrorEnum.RESOURCE_OBTAIN_ERROR.code());
             }
@@ -55,9 +55,9 @@ public class AgentConfigYamlReader {
         agentStartProperties.setPort(agent.get("port").toString());
         agentStartProperties.setToken(agent.get("token").toString());
         agentStartProperties.setBaseFolder(agent.get("baseFolder").toString());
-        logger.info("从配置文件取出配置成功：serverUrl={}, name={}, port={}, token={}, baseFoloder={}",
-                agent.get("serverUrl").toString(), agent.get("name").toString(), agent.get("port").toString(),
-                agent.get("token").toString(), agent.get("baseFolder").toString());
+        logger.info("从配置文件取出配置成功：serverUrl={}, name={}, port={}, token={}, baseFolder={}",
+                agent.get("serverUrl"), agent.get("name"), agent.get("port"),
+                agent.get("token"), agent.get("baseFolder"));
         return agentStartProperties;
     }
 
@@ -66,7 +66,6 @@ public class AgentConfigYamlReader {
 //        String ymlPath = "D:\\elco\\agentSdk\\application-test.yaml";
         AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
         AgentStartProperties agentStartProperties = agentConfigYamlReader.parseYaml(ymlPath);
-        System.out.println(agentStartProperties.toString());
     }
 
 }

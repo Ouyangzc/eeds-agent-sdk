@@ -16,4 +16,6 @@ public class ConstantFilePath {
 
     public static final String AGENT_FILE_PATH =  File.separator + "agent.json";
 
+    public static final String YML_NAME = "/agent-sdk-config.yaml";
+
 }

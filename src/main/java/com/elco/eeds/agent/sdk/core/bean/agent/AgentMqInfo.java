@@ -15,7 +15,9 @@ public class AgentMqInfo {
 
     private String[] urls;
 
-    // 认证类型
+    /**
+     * 认证类型
+     */
     private String authType;
 
     private AgentMqAuthInfo authInfo;
