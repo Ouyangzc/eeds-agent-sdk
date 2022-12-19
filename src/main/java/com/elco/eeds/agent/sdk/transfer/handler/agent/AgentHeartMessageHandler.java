@@ -1,9 +1,9 @@
 package com.elco.eeds.agent.sdk.transfer.handler.agent;
 
 import com.alibaba.fastjson.JSON;
+import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
 import com.elco.eeds.agent.sdk.transfer.beans.message.heart.AgentHeartMessage;
-import com.elco.eeds.agent.sdk.transfer.beans.message.heart.SubAgentHeartMessage;
 import com.elco.eeds.agent.sdk.transfer.handler.IReceiverMessageHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +19,8 @@ public class AgentHeartMessageHandler implements IReceiverMessageHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AgentHeartMessageHandler.class);
 
+    private Agent agent = Agent.getInstance();
+
     @Override
     public void handleRecData(String topic, String recData) {
         logger.info("收到客户端心跳报文：topic: {}, msg: {}", topic, recData);
@@ -27,7 +29,8 @@ public class AgentHeartMessageHandler implements IReceiverMessageHandler {
             AgentHeartMessage message = JSON.parseObject(recData, AgentHeartMessage.class);
             // 收到ping，发送pong
             AgentHeartMessage rspMessage = AgentHeartMessage.getRespMessage();
-            this.publishMessage(ConstantTopic.TOPIC_AGENT_HEART_RSP, JSON.toJSONString(rspMessage));
+            String rspTopic = ConstantTopic.TOPIC_AGENT_HEART_RSP.replace("{agentId}", agent.getAgentBaseInfo().getAgentId());
+            this.publishMessage(rspTopic, JSON.toJSONString(rspMessage));
         } catch (Exception e) {
             logger.error("客户端心跳报文处理异常", e);
             e.printStackTrace();

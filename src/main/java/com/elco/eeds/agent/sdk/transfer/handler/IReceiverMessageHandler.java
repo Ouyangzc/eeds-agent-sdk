@@ -27,7 +27,7 @@ public interface IReceiverMessageHandler extends ReceiverMessagerHandler {
     default void publishMessage(String topic, String messageJson) {
         MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
         String msg = JSON.toJSONString(messageJson);
-        logger.debug("发送报文：topic:{}, msg:{}", topic, msg);
+        logger.info("发送报文：topic:{}, msg:{}", topic, msg);
         mqPlugin.publish(topic, msg, null);
     }
 
