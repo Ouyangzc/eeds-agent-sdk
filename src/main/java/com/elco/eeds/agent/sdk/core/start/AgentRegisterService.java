@@ -38,14 +38,14 @@ public class AgentRegisterService implements IAgentRegisterService {
     private final AgentRequestHttpService agentRequestHttpService = new AgentRequestHttpService();
 
     @Override
-    public boolean register(String serverUrl, String name, String port, String token) throws Exception {
+    public boolean register(String serverUrl, String name, String port, String token, String clientType) throws Exception {
         try {
             // 获取IP
             String clientIp = IpUtil.getLocalIpAddress();
             // TODO 待完成
             Agent agent = Agent.getInstance();
             // 调用http接口的register方法
-            agent = agentRequestHttpService.register(clientIp, port, name, token, ConstantClientType.TYPE_EDGE_GATEWAY);
+            agent = agentRequestHttpService.register(clientIp, port, name, token, clientType);
             if (agent == null) {
                 throw new SdkException(ErrorEnum.CLIENT_REGISTER_ERROR.code());
             }
