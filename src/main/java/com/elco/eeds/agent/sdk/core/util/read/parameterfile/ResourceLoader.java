@@ -12,7 +12,5 @@ public class ResourceLoader {
 
     public URL getResource(String location) {
         return this.getClass().getClassLoader().getResource(location);
-//        return this.getClass().getClassLoader().getSystemResource(location);
-
     }
 }

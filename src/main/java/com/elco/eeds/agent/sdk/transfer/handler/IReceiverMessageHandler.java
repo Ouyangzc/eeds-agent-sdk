@@ -21,21 +21,21 @@ public interface IReceiverMessageHandler extends ReceiverMessagerHandler {
 
     /**
      * 推送消息
-     * @param topic
-     * @param messageJson
+     * @param topic        主题
+     * @param messageJson  消息体
      */
     default void publishMessage(String topic, String messageJson) {
         MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
         String msg = JSON.toJSONString(messageJson);
-        logger.debug("发送报文：topic:{}, msg:{}", topic, msg);
+        logger.info("发送报文：topic:{}, msg:{}", topic, msg);
         mqPlugin.publish(topic, msg, null);
     }
 
     /**
      * 日志打印
-     * @param messageType
-     * @param topic
-     * @param msg
+     * @param messageType   消息类型
+     * @param topic         topic
+     * @param msg           消息
      */
     default void printLog(String messageType, String topic, String msg) {
         logger.info("topic:{}, messageType:{}, msg:{}", topic, messageType, msg);

@@ -32,7 +32,7 @@ import java.net.URL;
  */
 public class HttpClientUtil {
 
-    private static Logger logger = LoggerFactory.getLogger(HttpClientUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpClientUtil.class);
 
     private static final String APPLICATION_JSON = "application/json";
     private static final String CHARSET_UTF_8 = "UTF-8";

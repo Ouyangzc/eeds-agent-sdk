@@ -68,7 +68,7 @@ public class AgentFileExtendUtils {
             logger.debug("当前agent.json中内容为：{}", content);
             if(!StrUtil.isEmpty(content)) {
                 jsonObject = JSON.parseObject(content, JSONObject.class);
-                logger.debug("当前文件：" + jsonObject);
+                logger.debug("当前文件：{}", jsonObject);
             }
             jsonObject.put("token", token);
             // 修改后保存
@@ -93,7 +93,7 @@ public class AgentFileExtendUtils {
             logger.debug("当前agent.json中内容为：{}", content);
             if(!StrUtil.isEmpty(content)) {
                 jsonObject = JSON.parseObject(content, JSONObject.class);
-                logger.debug("当前文件：" + jsonObject);
+                logger.debug("当前文件：{}", jsonObject);
             }
             jsonObject.put("config", config);
             // 修改后保存

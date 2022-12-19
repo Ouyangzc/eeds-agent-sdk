@@ -2,13 +2,9 @@ package com.elco.eeds.agent.sdk.core.start;
 
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
-import com.elco.eeds.agent.sdk.core.connect.init.InitConnectFactory;
+import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.AgentConfigYamlReader;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.ResourceLoader;
-import com.elco.eeds.agent.sdk.transfer.service.things.ThingsService;
-import com.elco.eeds.agent.sdk.transfer.service.things.ThingsServiceImpl;
-import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncService;
-import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,26 +19,16 @@ public class AgentStarter {
 
     private static Logger logger = LoggerFactory.getLogger(AgentStarter.class);
 
-    private static ThingsServiceImpl thingsService = new ThingsServiceImpl();
-    private static ThingsSyncService thingsSyncService = new ThingsSyncServiceImpl(thingsService);
-
-    private static AgentRegisterService registerService = new AgentRegisterService(thingsSyncService);
+    private static AgentRegisterService registerService = new AgentRegisterService();
 
     private AgentConfigYamlReader configReader;
 
-    private static void init(AgentStartProperties properties) throws Exception {
+    private static void init(AgentStartProperties agentStartProperties) throws Exception {
         try {
-            Agent.getInstance().setAgentBaseInfo(new AgentBaseInfo(properties));
+            Agent.getInstance().setAgentBaseInfo(new AgentBaseInfo(agentStartProperties));
             // 注册
-            registerService.register(properties.getServerUrl(), properties.getName(),
-                    properties.getPort(), properties.getToken());
-            // 将协议初始化进去
-            InitConnectFactory.addConnectPackagePath(properties.getProtocolPackage());
-            InitConnectFactory.initConnect();
-
-
-
-
+            registerService.register(agentStartProperties.getServerUrl(), agentStartProperties.getName(),
+                    agentStartProperties.getPort(), agentStartProperties.getToken(), agentStartProperties.getAgentClientType());
             // 加载数据文件
             // TODO 加载数据文件
             // 根据协议加载数据源信息
@@ -67,8 +53,7 @@ public class AgentStarter {
      * @param baseFolder    存储文件目录
      * @throws Exception
      */
-    public static void init(String serverUrl, String name, String port, String token, String baseFolder) throws Exception {
-        // TODO 通过baseFolder，读取配置文件，拿到token，然后调用register方法
+    public static void init(String serverUrl, String name, String port, String token, String baseFolder, String clientType) throws Exception {
         logger.info("开始手动初始化方法...");
         logger.info("传入参数为：服务器地址：{}，客户端名称：{}，客户端端口：{}，token：{}，文件存储路径：{}",
                 serverUrl, name, port, token, baseFolder);
@@ -79,20 +64,21 @@ public class AgentStarter {
         agentStartProperties.setPort(port);
         agentStartProperties.setToken(token);
         agentStartProperties.setBaseFolder(baseFolder);
+        agentStartProperties.setAgentClientType(clientType);
         // 调用私有init方法
         init(agentStartProperties);
     }
 
     /**
      * 客户端手动启动方法：一个参数（从给定的路径取yml文件）
-     * @param ymlPath
+     * @param ymlPath agent-sdk-config.yaml的相对路径
      */
     public static void init(String ymlPath) throws Exception {
         logger.info("开始手动初始化方法...");
         logger.info("yml文件路径参数为：{}", ymlPath);
         // 从yml配置文件读取配置，赋值给AgentStartProperties
         AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
-        AgentStartProperties agentStartProperties = agentConfigYamlReader.parseYaml(ymlPath);
+        AgentStartProperties agentStartProperties = agentConfigYamlReader.parseYaml(ymlPath + ConstantFilePath.YML_NAME);
         logger.info("读取配置文件成功：{}", agentStartProperties.toString());
         // 调用私有init方法
         init(agentStartProperties);
@@ -106,7 +92,7 @@ public class AgentStarter {
         logger.info("开始从默认的位置读取yml文件...");
         // 从yml配置文件读取配置，赋值给AgentStartProperties
         AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
-        AgentStartProperties agentStartProperties = agentConfigYamlReader.parseYaml("application.yaml");
+        AgentStartProperties agentStartProperties = agentConfigYamlReader.parseYaml(ConstantFilePath.YML_NAME);
         logger.info("读取配置文件成功：{}", agentStartProperties.toString());
         // 调用私有init方法
         init(agentStartProperties);

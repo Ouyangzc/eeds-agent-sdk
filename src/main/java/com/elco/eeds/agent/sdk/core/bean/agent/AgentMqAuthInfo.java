@@ -9,13 +9,19 @@ package com.elco.eeds.agent.sdk.core.bean.agent;
  */
 public class AgentMqAuthInfo {
 
-    // token
+    /**
+     * token
+     */
     private String token;
 
-    // 用户名
+    /**
+     * 用户名
+     */
     private String userName;
 
-    // 密码
+    /**
+     * 密码
+     */
     private String password;
 
     public String getToken() {

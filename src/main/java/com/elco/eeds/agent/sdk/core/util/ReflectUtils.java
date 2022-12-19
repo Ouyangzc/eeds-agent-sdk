@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class ReflectUtils {
 
-    private static Logger logger = LoggerFactory.getLogger(ReflectUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReflectUtils.class);
 
     private ReflectUtils(){}
 
@@ -53,7 +53,7 @@ public class ReflectUtils {
             Field field = o.getClass().getDeclaredField(fieldName);
             flag = true;
         } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+            logger.debug("{}没有{}字段", o.getClass().getName(), fieldName);
         }
         return flag;
     }

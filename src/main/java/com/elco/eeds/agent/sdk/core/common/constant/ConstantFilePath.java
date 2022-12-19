@@ -39,4 +39,6 @@ public class ConstantFilePath {
      */
     public static final String DATA_COUNT_DONE_PATH = File.separator + "/done/count.txt";
 
+    public static final String YML_NAME = "/agent-sdk-config.yaml";
+
 }

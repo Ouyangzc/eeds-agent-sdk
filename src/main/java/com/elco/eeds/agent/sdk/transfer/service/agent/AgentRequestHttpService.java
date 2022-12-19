@@ -39,14 +39,13 @@ public class AgentRequestHttpService {
 
     /**
      * （注册方法）
-     * @param host
-     * @param port
-     * @param name
-     * @param token
-     * @return
+     * @param host  主机IP
+     * @param port  主机端口
+     * @param name  客户端名称
+     * @param token token
+     * @return      返回agent对象
      */
     public Agent register(String host, String port, String name, String token, String clientType) {
-        // TODO
         AgentRegisterRequest agentRegisterRequest = new AgentRegisterRequest(name, host, port, token, clientType);
         String requestUrl = agent.getAgentBaseInfo().getServerUrl() + ConstantHttpApiPath.AGENT_REGISTER;
         try {
@@ -57,7 +56,7 @@ public class AgentRequestHttpService {
             ResponseResult responseResult = JSONUtil.toBean(response, ResponseResult.class);
             if(SysCodeEnum.SUCCESS.getCode().equals(responseResult.getCode())){
                 // 将server-config反馈的data赋值给Agent对象
-                Agent agent = copyFieldToAgent(JSONUtil.toJsonStr(responseResult.getData()));
+                agent = copyFieldToAgent(JSONUtil.toJsonStr(responseResult.getData()));
                 logger.info("rpc register interfaces,result:{}", JSON.toJSONString(response));
                 return agent;
             }else{
@@ -72,14 +71,8 @@ public class AgentRequestHttpService {
         return null;
     }
 
-    /**
-     * 将调用注册接口之后，将返回值赋值到Agent对象中
-     * @param data
-     * @return
-     */
-    public Agent copyFieldToAgent(String data) throws SdkException {
-        JSONObject jsonObject = JSON.parseObject(data, JSONObject.class);
-        Agent agent = Agent.getInstance();
+    private void initializeAgent() {
+        this.agent = Agent.getInstance();
         if (agent.getAgentMqInfo() == null) {
             AgentMqInfo agentMqInfo = new AgentMqInfo();
             agent.setAgentMqInfo(agentMqInfo);
@@ -96,33 +89,61 @@ public class AgentRequestHttpService {
             AgentMqSecurityInfo agentMqSecurityInfo = new AgentMqSecurityInfo();
             agent.getAgentMqInfo().setMqSecurityInfo(agentMqSecurityInfo);
         }
+    }
 
-        agent.getAgentBaseInfo().setAgentId((String) jsonObject.get("agentId"));
-        agent.getAgentBaseInfo().setName((String) jsonObject.get("name"));
-        agent.getAgentBaseInfo().setToken((String) jsonObject.get("token"));
-        // AgentMqInfo
-        JSONObject agentMqInfoJsonObject = JSON.parseObject(String.valueOf(jsonObject.get("mqConfig")), JSONObject.class);
-        agent.getAgentMqInfo().setMqType((String) agentMqInfoJsonObject.get("mqType"));
+    /**
+     * 将调用注册接口之后，将返回值赋值到Agent对象中
+     * @param data
+     * @return
+     */
+    public Agent copyFieldToAgent(String data) throws SdkException {
+        initializeAgent();
+        this.agent = Agent.getInstance();
+        AgentBaseInfo agentBaseInfo = this.agent.getAgentBaseInfo();
+        AgentMqInfo agentMqInfo = this.agent.getAgentMqInfo();
+        AgentMqAuthInfo agentMqAuthInfo;
+        AgentMqSecurityInfo agentMqSecurityInfo;
+        ConfigBase configGlobal = null;
+        ConfigBase configPrivate = null;
+        Map<String, Object> map = (Map<String, Object>) JSON.parse(data);
 
-        JSONArray urls = (JSONArray) agentMqInfoJsonObject.get("urls");
-        agent.getAgentMqInfo().setUrls(JsonUtil.jsonArray2StringArray(urls));
-
-        AgentMqAuthInfo agentMqAuthInfo = JSONObject.parseObject(String.valueOf(agentMqInfoJsonObject.get("authInfo")), AgentMqAuthInfo.class);
-        agent.getAgentMqInfo().setAuthType((String) agentMqInfoJsonObject.get("authType"));
-        AgentMqSecurityInfo agentMqSecurityInfo = JSONObject.parseObject(String.valueOf(agentMqInfoJsonObject.get("tlsInfo")), AgentMqSecurityInfo.class);
-
-        agent.getAgentMqInfo().setAuthInfo(agentMqAuthInfo);
-        agent.getAgentMqInfo().setMqSecurityInfo(agentMqSecurityInfo);
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            logger.debug("key={},value={}", entry.getKey(), entry.getValue());
+            // 反射赋值
+            if (ReflectUtils.isContainKey(agentBaseInfo, entry.getKey())) {
+                ReflectUtils.invokeSet(agentBaseInfo, entry.getKey(), entry.getValue());
+            } else if ("mqConfig".equals(entry.getKey())) {
+                Map<String, Object> mapMqConfig = JSON.parseObject(entry.getValue().toString(), Map.class);
+                for (Map.Entry<String, Object> entryMqConfig : mapMqConfig.entrySet()) {
+                    if (ReflectUtils.isContainKey(agentMqInfo, entryMqConfig.getKey()) && !"authInfo".equals(entryMqConfig.getKey())) {
+                        if ("urls".equals(entryMqConfig.getKey())) {
+                            ReflectUtils.invokeSet(agentMqInfo, entryMqConfig.getKey(), JsonUtil.jsonArray2StringArray((JSONArray) entryMqConfig.getValue()));
+                        } else {
+                            ReflectUtils.invokeSet(agentMqInfo, entryMqConfig.getKey(), entryMqConfig.getValue());
+                        }
+                    } else if ("authInfo".equals(entryMqConfig.getKey())) {
+                        agentMqAuthInfo = JSON.parseObject(String.valueOf(entryMqConfig.getValue()), AgentMqAuthInfo.class);
+                        this.agent.getAgentMqInfo().setAuthInfo(agentMqAuthInfo);
+                    } else if ("tlsInfo".equals(entryMqConfig.getKey())) {
+                        agentMqSecurityInfo = JSON.parseObject(String.valueOf(entryMqConfig.getValue()), AgentMqSecurityInfo.class);
+                        this.agent.getAgentMqInfo().setMqSecurityInfo(agentMqSecurityInfo);
+                    }
+                }
+            } else if ("baseConfigCache".equals(entry.getKey())) {
+                configGlobal = JSON.parseObject(String.valueOf(entry.getValue()), ConfigBase.class);
+            } else if ("privateConfigCache".equals(entry.getKey())) {
+                configPrivate = JSON.parseObject(String.valueOf(entry.getValue()), ConfigBase.class);
+            }
+        }
 
         // 保存token
-        AgentFileExtendUtils.setTokenToLocalAgentFile(agent.getAgentBaseInfo().getToken().toString());
+        AgentFileExtendUtils.setTokenToLocalAgentFile(this.agent.getAgentBaseInfo().getToken());
 
-        // 新的配置逻辑，server-config把公有变量和私有变量分开传输
-        ConfigBase configGlobal = JSONObject.parseObject(String.valueOf(jsonObject.get("baseConfigCache")), ConfigBase.class);
-        ConfigBase configPrivate = JSONObject.parseObject(String.valueOf(jsonObject.get("privateConfigCache")), ConfigBase.class);
         // 反射得到Object的属性名和属性值
-        Map mapConfigGlobal = ReflectUtils.reflectObjectToMap(configGlobal);
-        Map mapConfigPrivate = ReflectUtils.reflectObjectToMap(configPrivate);
+        assert configGlobal != null;
+        Map<String, String> mapConfigGlobal = ReflectUtils.reflectObjectToMap(configGlobal);
+        assert configPrivate != null;
+        Map<String, String> mapConfigPrivate = ReflectUtils.reflectObjectToMap(configPrivate);
         // 遍历map，组装存入agent.json的config字段
         JSONArray jsonArray = MapUtils.mapToJsonConfig(mapConfigGlobal, mapConfigPrivate);
         // 将返回的两个json处理后存储至agent.json中
@@ -130,20 +151,20 @@ public class AgentRequestHttpService {
         // 反射给agent赋值
         for (Object o : jsonArray) {
             BaseConfigEntity baseConfigEntity = (BaseConfigEntity) o;
-            if (ReflectUtils.isContainKey(agent.getAgentBaseInfo(), baseConfigEntity.getConfigFieldName())) {
-                ReflectUtils.invokeSet(agent.getAgentBaseInfo(), baseConfigEntity.getConfigFieldName(), baseConfigEntity.getConfigFieldValue());
+            if (ReflectUtils.isContainKey(this.agent.getAgentBaseInfo(), baseConfigEntity.getConfigFieldName())) {
+                ReflectUtils.invokeSet(this.agent.getAgentBaseInfo(), baseConfigEntity.getConfigFieldName(), baseConfigEntity.getConfigFieldValue());
             }
         }
 
-        return agent;
+        return this.agent;
     }
 
     /**
      * 更新客户端TOKEN生效时间
-     * @param agentTokenRequest
+     * @param agentTokenRequest 客户端请求对象
      */
     public void updateAgentEffectTime(AgentTokenRequest agentTokenRequest) {
-        String requestUrl = agent.getAgentBaseInfo().getServerUrl() + ConstantHttpApiPath.AGENT_TOKEN;
+        String requestUrl = this.agent.getAgentBaseInfo().getServerUrl() + ConstantHttpApiPath.AGENT_TOKEN;
         try {
             String response = HttpClientUtil.post(requestUrl, agentTokenRequest.getCurrentToken(), JSON.toJSONString(agentTokenRequest));
             logger.info("调用token接口返回值为：{}", response);
@@ -172,30 +193,5 @@ public class AgentRequestHttpService {
         // TODO
         return null;
     }*/
-
-    public static void main(String[] args) throws SdkException {
-        String baseConfigCache = "{\"baseConfigCache\": \"{\\\"type\\\":\\\"cache_config\\\",\\\"dataCacheFileSize\\\":\\\"1\\\",\\\"dataCacheCycle\\\":\\\"7\\\",\\\"syncPeriod\\\":\\\"10000\\\"}\"}";
-        // String baseConfigCache = "{\"baseConfigCache\": \"{\\\"dataCacheFileSize\\\":\\\"1\\\",\\\"dataCacheCycle\\\":\\\"7\\\",\\\"syncPeriod\\\":\\\"10000\\\"}\"}";
-        JSONObject jsonObjectBaseConfigCache = JSONObject.parseObject(baseConfigCache);
-        ConfigBase configGlobal = JSONObject.parseObject(jsonObjectBaseConfigCache.get("baseConfigCache").toString(), ConfigBase.class);
-
-//        String privateConfigCache = "{\"privateConfigCache\": \"{\\\"type\\\":null,\\\"dataCacheFileSize\\\":null,\\\"dataCacheCycle\\\":null,\\\"syncPeriod\\\":\\\"10000\\\"}\"}";
-        String privateConfigCache = "{\"privateConfigCache\": \"{\\\"syncPeriod\\\":\\\"20000\\\"}\"}";
-
-        JSONObject jsonObjectPrivateConfigCache = JSONObject.parseObject(privateConfigCache);
-        ConfigBase configPrivate = JSONObject.parseObject(jsonObjectPrivateConfigCache.get("privateConfigCache").toString(), ConfigBase.class);
-
-        Map mapConfigPrivate = ReflectUtils.reflectObjectToMap(configPrivate);
-        Map mapConfigGlobal = ReflectUtils.reflectObjectToMap(configGlobal);
-        System.out.println(mapConfigGlobal);
-        System.out.println(mapConfigPrivate);
-
-        // 组装
-        JSONObject jsonConfig = new JSONObject();
-        jsonConfig.put("config", MapUtils.mapToJsonConfig(mapConfigGlobal, mapConfigPrivate));
-        System.out.println(jsonConfig);
-        AgentFileExtendUtils.setConfigToLocalAgentFile(MapUtils.mapToJsonConfig(mapConfigGlobal, mapConfigPrivate));
-
-    }
 
 }

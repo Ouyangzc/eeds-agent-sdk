@@ -4,8 +4,6 @@ import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentMqInfo;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
 
-import java.io.IOException;
-
 /**
  * @title: IAgentRegisterService
  * @Author wl
@@ -23,7 +21,7 @@ public interface IAgentRegisterService {
      * @return
      * @throws Exception
      */
-    boolean register(String url,String name,String port, String token) throws Exception;
+    boolean register(String url,String name,String port, String token, String clientType) throws Exception;
 
     /**
      * 存储客户端文件

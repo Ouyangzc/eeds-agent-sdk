@@ -31,25 +31,15 @@ public class AgentStartProperties {
      */
     private String token;
 
-    public String getProtocolPackage() {
-        return protocolPackage;
-    }
-
-    public void setProtocolPackage(String protocolPackage) {
-        this.protocolPackage = protocolPackage;
-    }
-
-    /**
-     * 协议包路径
-     */
-    private String protocolPackage;
-
-
     /**
      * 存储文件目录
      */
     private String baseFolder;
 
+    /**
+     * 客户端类型
+     */
+    private String agentClientType;
 
     private static volatile AgentStartProperties agentStartProperties;
 
@@ -112,6 +102,14 @@ public class AgentStartProperties {
         this.baseFolder = baseFolder;
     }
 
+    public String getAgentClientType() {
+        return agentClientType;
+    }
+
+    public void setAgentClientType(String agentClientType) {
+        this.agentClientType = agentClientType;
+    }
+
     @Override
     public String toString() {
         return "AgentStartProperties{" +
@@ -120,6 +118,7 @@ public class AgentStartProperties {
                 ", port='" + port + '\'' +
                 ", token='" + token + '\'' +
                 ", baseFolder='" + baseFolder + '\'' +
+                ", agentClientType='" + agentClientType + '\'' +
                 '}';
     }
 }
