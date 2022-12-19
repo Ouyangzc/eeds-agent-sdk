@@ -1,16 +1,18 @@
 package com.elco.eeds.agent.sdk.transfer.service.things;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
+import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
+import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantThings;
 import com.elco.eeds.agent.sdk.core.common.constant.http.ConstantHttpApiPath;
 import com.elco.eeds.agent.sdk.core.util.ThingsFileUtils;
+import com.elco.eeds.agent.sdk.transfer.beans.message.things.SubThingsSyncIncrMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsThings;
+import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsSyncRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * @ClassName ThingsSyncServiceImpl
- * @Description TODO
+ * @Description 数据源同步逻辑类
  * @Author OUYANG
  * @Date 2022/12/16 13:27
  */
@@ -35,7 +36,76 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 
     public static final Map<String, List<PropertiesContext>> CONTEXTS_MAP = new ConcurrentHashMap<>();
 
+    public static final Map<String, PropertiesContext> PROPERTIES_CONTEXT_MAP = new ConcurrentHashMap<>();
+    public static final Map<String, ThingsDriverContext> THINGS_DRIVER_CONTEXT_MAP = new ConcurrentHashMap<>();
+
+    private ThingsServiceImpl thingsService;
+
+    public ThingsSyncServiceImpl(ThingsServiceImpl thingsService) {
+        this.thingsService = thingsService;
+    }
+
     @Override
+    public void setupSyncThings() {
+        Long thingsChangeTime = thingsService.getThingsChangeTime();
+        AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
+        String agentId = agentBaseInfo.getAgentId();
+        String token = agentBaseInfo.getToken();
+        ThingsSyncRequest thingsRequest = new ThingsSyncRequest();
+        thingsRequest.setAgentId(Long.valueOf(agentId));
+        thingsRequest.setLastTime(thingsChangeTime);
+        List<EedsThings> setupSyncData = this.getSetupSyncData(thingsRequest, token);
+        List<PropertiesContext> propertiesContextList = this.convertData(setupSyncData);
+        this.handleSyncThingsData(setupSyncData, propertiesContextList);
+        //重新加载数据源文件
+        this.loadThingDriver();
+    }
+
+    @Override
+    public void incrSyncThings(SubThingsSyncIncrMessage message) {
+        Long thingsChangeTime = thingsService.getThingsChangeTime();
+        AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
+        String agentId = agentBaseInfo.getAgentId();
+        String token = agentBaseInfo.getToken();
+        ThingsSyncRequest thingsRequest = new ThingsSyncRequest();
+        thingsRequest.setTaskId(message.getTaskId());
+        thingsRequest.setTableSearch(message.getTableSearch());
+        thingsRequest.setAgentId(Long.valueOf(agentId));
+        thingsRequest.setLastTime(thingsChangeTime);
+        List<EedsThings> setupSyncData = this.getSetupSyncData(thingsRequest, token);
+        List<PropertiesContext> propertiesContextList = this.convertData(setupSyncData);
+        this.handleSyncThingsData(setupSyncData, propertiesContextList);
+        if ("1".equals(message.getTableSearch())) {
+            for (EedsThings eedsThings : setupSyncData) {
+                String thingsId = eedsThings.getThingsId();
+                boolean addResult = eedsThings.getProperties().stream().allMatch(things -> things.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_ADD));
+                if (addResult) {
+                    //增量新增数据源
+                    ThingsDriverContext driverContext = new ThingsDriverContext();
+                    BeanUtil.copyProperties(eedsThings, driverContext);
+                    THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
+                    //todo 加载数据源连接
+                }
+                boolean delResult = eedsThings.getProperties().stream().allMatch(things -> things.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_DEL));
+                if (delResult) {
+                    //增量新增数据源
+                    ThingsDriverContext driverContext = new ThingsDriverContext();
+                    BeanUtil.copyProperties(eedsThings, driverContext);
+                    THINGS_DRIVER_CONTEXT_MAP.remove(thingsId);
+                    //todo 断开数据源连接
+                }
+                boolean editResult = eedsThings.getProperties().stream().allMatch(things -> things.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_EDIT));
+                if (editResult) {
+                    ThingsDriverContext driverContext = new ThingsDriverContext();
+                    BeanUtil.copyProperties(eedsThings, driverContext);
+                    THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
+                    //todo 数据源重新连接
+                }
+            }
+        }
+    }
+
+
     public List<EedsThings> getSetupSyncData(ThingsSyncRequest request, String token) {
         String datas = ThingsRequestHttpService.getThingsSyncData(request, token, ConstantHttpApiPath.THINGS_SETUP_SYNC_API);
         if (datas != null) {
@@ -45,7 +115,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
         return null;
     }
 
-    @Override
+
     public List<EedsThings> getSyncData(ThingsSyncRequest request, String token) {
         String datas = ThingsRequestHttpService.getThingsSyncData(request, token, ConstantHttpApiPath.THINGS_INCR_SYNC_API);
         if (datas != null) {
@@ -55,7 +125,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
         return null;
     }
 
-    @Override
+
     public List<PropertiesContext> convertData(List<EedsThings> convertData) {
         List<PropertiesContext> propertiesContextList = new ArrayList<>();
         for (EedsThings edgeThings : convertData) {
@@ -69,68 +139,65 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                 propertiesContext.setThingsId(thingsId);
                 propertiesContext.setThingsType(edgeThings.getThingsType());
                 propertiesContextList.add(propertiesContext);
+                PROPERTIES_CONTEXT_MAP.put(p.getPropertiesId(), propertiesContext);
             }
         }
         return propertiesContextList;
     }
 
-    @Override
-    public boolean saveToLocalFile(String thingsData) throws Exception {
 
+    public boolean saveToLocalFile(String thingsData) throws Exception {
         ThingsFileUtils.saveThingsFileToLocal(thingsData);
         return true;
     }
 
-    @Override
-    public String getLocalThings() throws IOException {
 
+    public String getLocalThings() throws IOException {
         return ThingsFileUtils.readLocalThingsFile();
     }
 
-    @Override
-    public boolean handleSyncThingsData(List<PropertiesContext> propertiesContexts) {
+    public boolean handleSyncThingsData(List<EedsThings> syncThingsList, List<PropertiesContext> propertiesContexts) {
         List<PropertiesContext> addList = propertiesContexts.stream().filter(p -> p.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_ADD)).collect(Collectors.toList());
         List<PropertiesContext> editList = propertiesContexts.stream().filter(p -> p.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_EDIT)).collect(Collectors.toList());
         List<PropertiesContext> delList = propertiesContexts.stream().filter(p -> p.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_DEL)).collect(Collectors.toList());
-
         try {
             String localThings = getLocalThings();
             if (StrUtil.isEmpty(localThings)) {
                 //暂无本地文件，所有数据都是新增
-                List<PropertiesContext> propertiesContextList = new ArrayList<>();
-                propertiesContextList.addAll(addList);
-                propertiesContextList.addAll(editList);
-                Map<String, PropertiesContext> propertiesMap = propertiesContextList.stream().collect(Collectors.toMap(PropertiesContext::getPropertiesId, Function.identity()));
-                if (propertiesMap.size() > 0) {
-                    saveToLocalFile(JSON.toJSONString(propertiesMap));
-                    //根据协议进行缓存
-                    groupThingsByProtocol(propertiesContextList, ConstantThings.P_OPERATOR_TYPE_ADD);
+                ArrayList<EedsThings> result = new ArrayList<>();
+                //存储数据源，并添加缓存
+                if (!addList.isEmpty()) {
+                    List<EedsThings> addThings = this.getSyncThings(syncThingsList, addList);
+                    result.addAll(addThings);
+                }
+                if (!editList.isEmpty()) {
+                    List<EedsThings> editThings = getSyncThings(syncThingsList, editList);
+                    result.addAll(editThings);
+                }
+                if (!result.isEmpty()) {
+                    saveToLocalFile(JSON.toJSONString(result));
                 }
             } else {
                 //有本地数据
-                Map<String, PropertiesContext> propertiesMap = JSON.parseObject(localThings, new TypeReference<Map<String, PropertiesContext>>() {
-                });
+                List<EedsThings> localThingsList = JSON.parseArray(localThings, EedsThings.class);
                 //处理删除点位
                 for (PropertiesContext delProperties : delList) {
-                    String propertiesId = delProperties.getPropertiesId();
-                    propertiesMap.remove(propertiesId);
-                    groupThingsByProtocol(delList, ConstantThings.P_OPERATOR_TYPE_DEL);
+                    //删除
+                    PROPERTIES_CONTEXT_MAP.remove(delProperties.getPropertiesId());
+                    EedsProperties eedsProperties = getEedsProperties(localThingsList, delProperties);
+                    thingsService.delProperties(delProperties.getThingsId(), eedsProperties);
                 }
                 for (PropertiesContext editProperties : editList) {
-                    String propertiesId = editProperties.getPropertiesId();
-                    propertiesMap.remove(propertiesId);
-                    propertiesMap.put(propertiesId, editProperties);
-                    groupThingsByProtocol(editList, ConstantThings.P_OPERATOR_TYPE_EDIT);
+                    //编辑
+                    PROPERTIES_CONTEXT_MAP.put(editProperties.getPropertiesId(), editProperties);
+                    EedsProperties eedsProperties = getEedsProperties(localThingsList, editProperties);
+                    thingsService.editProperties(editProperties.getThingsId(), eedsProperties);
                 }
                 for (PropertiesContext addProperties : addList) {
-                    String propertiesId = addProperties.getPropertiesId();
-                    propertiesMap.put(propertiesId, addProperties);
-                    groupThingsByProtocol(addList, ConstantThings.P_OPERATOR_TYPE_ADD);
-                }
-                if (propertiesMap.size() > 0) {
-                    ThingsFileUtils.saveThingsFileToLocal(JSON.toJSONString(propertiesMap));
-                } else {
-                    ThingsFileUtils.saveThingsFileToLocal("");
+                    //新增
+                    PROPERTIES_CONTEXT_MAP.put(addProperties.getPropertiesId(), addProperties);
+                    EedsProperties eedsProperties = getEedsProperties(syncThingsList, addProperties);
+                    thingsService.addProperties(addProperties.getThingsId(), eedsProperties);
                 }
             }
         } catch (Exception e) {
@@ -140,47 +207,52 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
         return true;
     }
 
-    /**
-     * 根据协议进行缓存处理
-     *
-     * @param propertiesContextList
-     */
-    private void groupThingsByProtocol(List<PropertiesContext> propertiesContextList, String operatorType) {
-        //根据协议划划分
-        Map<String, List<PropertiesContext>> protocolMap = propertiesContextList.stream().collect(Collectors.groupingBy(PropertiesContext::getThingsType));
-        //新增处理
-        if (operatorType.equals(ConstantThings.P_OPERATOR_TYPE_ADD)) {
-            handleAddProperties(protocolMap);
+    private List<EedsThings> getSyncThings(List<EedsThings> syncThingsList, List<PropertiesContext> propertiesContextList) {
+        //根据数据源id进行分组
+        Map<String, List<PropertiesContext>> thingsIdMap = propertiesContextList.stream().collect(Collectors.groupingBy(PropertiesContext::getThingsId));
+        for (String thingsId : thingsIdMap.keySet()) {
+            //获取该数据源原始数据
+            EedsThings things = syncThingsList.stream().filter(syncThings -> syncThings.getThingsId().equals(thingsId)).findFirst().get();
+            //获取所有要新增得点位
+            List<String> propertiesIdList = thingsIdMap.get(thingsId).stream().map(PropertiesContext::getPropertiesId).collect(Collectors.toList());
+            List<EedsProperties> properties = things.getProperties();
+            List<EedsProperties> eedsProperties = properties.stream().filter(p -> propertiesIdList.contains(p.getPropertiesId())).collect(Collectors.toList());
+            things.setProperties(eedsProperties);
         }
-        //删除处理
-        if (operatorType.equals(ConstantThings.P_OPERATOR_TYPE_DEL)) {
-            handleDelProperties(protocolMap);
-        }
-        //修改处理
-        if (operatorType.equals(ConstantThings.P_OPERATOR_TYPE_EDIT)) {
-            //先删除再修改
-            handleDelProperties(protocolMap);
-
-            handleAddProperties(protocolMap);
-        }
-
+        return syncThingsList;
     }
 
-    private void handleAddProperties(Map<String, List<PropertiesContext>> protocolMap) {
-        CONTEXTS_MAP.putAll(protocolMap);
+    private EedsProperties getEedsProperties(List<EedsThings> localThingsList, PropertiesContext delProperties) {
+        String thingsId = delProperties.getThingsId();
+        EedsThings things = localThingsList.stream().filter(syncThings -> syncThings.getThingsId().equals(thingsId)).findFirst().get();
+        EedsProperties properties = things.getProperties().stream().filter(eedsProperties -> eedsProperties.getPropertiesId().equals(delProperties.getPropertiesId())).findFirst().get();
+        return properties;
     }
 
-    private void handleDelProperties(Map<String, List<PropertiesContext>> protocolMap) {
-        for (String protocolKey : protocolMap.keySet()) {
-            //取出删除协议变量集合
-            List<PropertiesContext> delProperties = protocolMap.get(protocolKey);
-            //取出该协议缓存变量集合
-            List<PropertiesContext> cacheProperties = CONTEXTS_MAP.get(protocolKey);
-            if (!CollectionUtil.isEmpty(cacheProperties) && !CollectionUtil.isEmpty(delProperties)) {
-                //取差集
-                List<PropertiesContext> diffPropertiesCtx = cacheProperties.stream().filter((item) -> !delProperties.stream().map((item2) -> item2.getPropertiesId()).collect(Collectors.toList()).contains(item.getPropertiesId())).collect(Collectors.toList());
-                CONTEXTS_MAP.put(protocolKey, diffPropertiesCtx);
+    private void loadThingDriver() {
+        try {
+            String localThings = getLocalThings();
+            List<EedsThings> eedsThings = JSON.parseArray(localThings, EedsThings.class);
+            for (EedsThings things : eedsThings) {
+                ThingsDriverContext driverContext = new ThingsDriverContext();
+                BeanUtil.copyProperties(things, driverContext);
+                String agentId = things.getAgentId();
+                String thingsId = things.getThingsId();
+                THINGS_DRIVER_CONTEXT_MAP.put(things.getThingsId(), driverContext);
+                //todo 调用数据源连接
+                List<EedsProperties> properties = things.getProperties();
+                for (EedsProperties p : properties) {
+                    PropertiesContext propertiesContext = new PropertiesContext();
+                    BeanUtil.copyProperties(p, propertiesContext);
+                    propertiesContext.setAgentId(agentId);
+                    propertiesContext.setThingsId(thingsId);
+                    propertiesContext.setThingsType(things.getThingsType());
+                    PROPERTIES_CONTEXT_MAP.put(p.getPropertiesId(), propertiesContext);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 }
