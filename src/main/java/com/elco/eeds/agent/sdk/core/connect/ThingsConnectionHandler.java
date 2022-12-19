@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.core.connect;
 
 
 import com.elco.eeds.agent.sdk.core.parsing.DataParsing;
+import com.elco.eeds.agent.sdk.transfer.beans.things.EedsThings;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 
 import java.lang.reflect.ParameterizedType;
@@ -95,15 +96,15 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
         return 0;
     }
 
-    public void command(String topic,String command){
-        this.write(topic,this.parsing.parsingCommand(command));
+    public void command(EedsThings things,String command){
+        this.write(things,this.parsing.parsingCommand(command));
     }
 
 
     public abstract void read();
 
 
-    public abstract void write(String topic,String msg);
+    public abstract void write(EedsThings things,String msg);
 
 
 
