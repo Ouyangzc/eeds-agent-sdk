@@ -4,6 +4,10 @@ import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.AgentConfigYamlReader;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.ResourceLoader;
+import com.elco.eeds.agent.sdk.transfer.service.things.ThingsService;
+import com.elco.eeds.agent.sdk.transfer.service.things.ThingsServiceImpl;
+import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncService;
+import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +22,10 @@ public class AgentStarter {
 
     private static Logger logger = LoggerFactory.getLogger(AgentStarter.class);
 
-    private static AgentRegisterService registerService = new AgentRegisterService();
+    private static ThingsServiceImpl thingsService = new ThingsServiceImpl();
+    private static ThingsSyncService thingsSyncService = new ThingsSyncServiceImpl(thingsService);
+
+    private static AgentRegisterService registerService = new AgentRegisterService(thingsSyncService);
 
     private AgentConfigYamlReader configReader;
 

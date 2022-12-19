@@ -18,7 +18,10 @@ import com.elco.eeds.agent.sdk.transfer.handler.agent.AgentConfigGlobalMessageHa
 import com.elco.eeds.agent.sdk.transfer.handler.agent.AgentConfigLocalMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.agent.AgentHeartMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.agent.AgentTokenMessageHandler;
+import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsSyncIncrMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.service.agent.AgentRequestHttpService;
+import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncService;
+import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +40,14 @@ public class AgentRegisterService implements IAgentRegisterService {
     private AgentHeartMessageHandler agentHeartMessageHandler = new AgentHeartMessageHandler();
     private AgentConfigGlobalMessageHandler agentConfigGlobalMessageHandler = new AgentConfigGlobalMessageHandler();
     private AgentConfigLocalMessageHandler agentConfigLocalMessageHandler = new AgentConfigLocalMessageHandler();
-
+    private ThingsSyncService thingsSyncService;
+    private ThingsSyncIncrMessageHandler thingsSyncIncrMessageHandler = new ThingsSyncIncrMessageHandler(thingsSyncService);
     private AgentRequestHttpService agentRequestHttpService = new AgentRequestHttpService();
+
+
+    public AgentRegisterService(ThingsSyncService thingsSyncService) {
+        this.thingsSyncService = thingsSyncService;
+    }
 
     @Override
     public boolean register(String serverUrl, String name, String port, String token) throws Exception {
@@ -59,6 +68,7 @@ public class AgentRegisterService implements IAgentRegisterService {
             // 加载Nats组件
             loadMq(agent.getAgentMqInfo());
             // 数据源同步
+            thingsSyncService.setupSyncThings();
             // TODO 数据源同步
             // 更新配置
             // TODO 更新配置
@@ -99,6 +109,9 @@ public class AgentRegisterService implements IAgentRegisterService {
             natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_AGENT_CONFIG_GLOBAL, agentId), agentConfigGlobalMessageHandler);
             // 订阅 基础配置修改（私有）topic
             natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_AGENT_CONFIG_LOCAL, agentId), agentConfigLocalMessageHandler);
+
+            //数据源--增量同步
+            natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_REC_THINGS_SYNC_INCR, agentId), thingsSyncIncrMessageHandler);
             // 订阅其他topic...
             // 待补充
         } catch (Exception e) {

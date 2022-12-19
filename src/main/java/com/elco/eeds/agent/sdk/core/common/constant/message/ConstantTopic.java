@@ -56,4 +56,10 @@ public class ConstantTopic {
      * 数据--同步--同步数据--同步完成
      */
     public static final String TOPIC_SED_DATA_SYNC_FINISH = "agent.data.syncData.respond.{agentId}";
+
+
+    /**
+     * 数据源--同步--增量同步
+     */
+    public static final String TOPIC_REC_THINGS_SYNC_INCR = "server.things.sync.incr.{agentId}";
 }
