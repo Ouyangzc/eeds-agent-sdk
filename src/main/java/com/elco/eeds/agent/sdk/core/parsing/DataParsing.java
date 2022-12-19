@@ -6,5 +6,12 @@ package com.elco.eeds.agent.sdk.core.parsing;
  * @description：
  */
 public abstract class DataParsing {
-   public  abstract   void parsing();
+    public abstract void parsing();
+
+    public String parsingCommand(String original){
+        return original;
+    }
+
+
+
 }

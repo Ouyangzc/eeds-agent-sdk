@@ -95,7 +95,9 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
         return 0;
     }
 
-    ;
+    public void command(String topic,String command){
+        this.write(topic,this.parsing.parsingCommand(command));
+    }
 
 
     public abstract void read();
