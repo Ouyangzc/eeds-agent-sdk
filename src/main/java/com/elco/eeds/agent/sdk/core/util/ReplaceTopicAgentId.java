@@ -12,7 +12,7 @@ import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 public class ReplaceTopicAgentId {
 
     public static String getTopicWithRealAgentId(String topic, String agentId) {
-        return topic.replace(ConstantCommon.TOPIC_SUFFIX_AGENT_ID, agentId);
+        return topic.replace(ConstantCommon.TOPIC_SUFFIX_AGENTID, agentId);
     }
 
 }
