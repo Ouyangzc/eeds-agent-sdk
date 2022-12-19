@@ -32,7 +32,7 @@ public class AgentConfigGlobalMessageHandler implements IReceiverMessageHandler 
 
     @Override
     public void handleRecData(String topic, String recData) {
-        logger.info("收到客户端token报文：topic: {}, msg: {}", topic, recData);
+        logger.info("收到客户端全局配置报文：topic: {}, msg: {}", topic, recData);
         AgentConfigMessage message = JSON.parseObject(recData, AgentConfigMessage.class);
         Agent agent = Agent.getInstance();
         AgentBaseInfo agentBaseInfo = agent.getAgentBaseInfo();
