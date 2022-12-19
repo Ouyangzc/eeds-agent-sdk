@@ -53,7 +53,7 @@ public class AgentStarter {
      * @param baseFolder    存储文件目录
      * @throws Exception
      */
-    public static void init(String serverUrl, String name, String port, String token, String baseFolder) throws Exception {
+    public static void init(String serverUrl, String name, String port, String token, String baseFolder, String clientType) throws Exception {
         logger.info("开始手动初始化方法...");
         logger.info("传入参数为：服务器地址：{}，客户端名称：{}，客户端端口：{}，token：{}，文件存储路径：{}",
                 serverUrl, name, port, token, baseFolder);
@@ -64,6 +64,7 @@ public class AgentStarter {
         agentStartProperties.setPort(port);
         agentStartProperties.setToken(token);
         agentStartProperties.setBaseFolder(baseFolder);
+        agentStartProperties.setAgentClientType(clientType);
         // 调用私有init方法
         init(agentStartProperties);
     }
