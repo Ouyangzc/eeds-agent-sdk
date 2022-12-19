@@ -15,7 +15,7 @@ public class Main {
         logger.info("sdk start");
         // 给yml的相对路径
         AgentStarter.init("./yml");
-        // AgentStarter.init("application-test.yaml");
+        // AgentStarter.init("agent-sdk-config.yaml");
         // 默认位置读取配置文件
         // AgentStarter.init();
     }

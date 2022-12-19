@@ -28,7 +28,7 @@ public class AgentStarter {
             Agent.getInstance().setAgentBaseInfo(new AgentBaseInfo(agentStartProperties));
             // 注册
             registerService.register(agentStartProperties.getServerUrl(), agentStartProperties.getName(),
-                    agentStartProperties.getPort(), agentStartProperties.getToken());
+                    agentStartProperties.getPort(), agentStartProperties.getToken(), agentStartProperties.getAgentClientType());
             // 加载数据文件
             // TODO 加载数据文件
             // 根据协议加载数据源信息

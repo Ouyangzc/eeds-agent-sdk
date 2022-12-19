@@ -36,6 +36,11 @@ public class AgentStartProperties {
      */
     private String baseFolder;
 
+    /**
+     * 客户端类型
+     */
+    private String agentClientType;
+
     private static volatile AgentStartProperties agentStartProperties;
 
     public static AgentStartProperties getInstance() {
@@ -97,6 +102,14 @@ public class AgentStartProperties {
         this.baseFolder = baseFolder;
     }
 
+    public String getAgentClientType() {
+        return agentClientType;
+    }
+
+    public void setAgentClientType(String agentClientType) {
+        this.agentClientType = agentClientType;
+    }
+
     @Override
     public String toString() {
         return "AgentStartProperties{" +
@@ -105,6 +118,7 @@ public class AgentStartProperties {
                 ", port='" + port + '\'' +
                 ", token='" + token + '\'' +
                 ", baseFolder='" + baseFolder + '\'' +
+                ", agentClientType='" + agentClientType + '\'' +
                 '}';
     }
 }

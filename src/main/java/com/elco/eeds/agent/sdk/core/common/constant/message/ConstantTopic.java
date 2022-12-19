@@ -28,8 +28,10 @@ public class ConstantTopic {
      * 客户端token
      */
     public static final String TOPIC_AGENT_TOKEN = "server.agent.config.token.{agentId}";
-
-
+    /**
+     * 客户端链接测试
+     */
+    public static final String TOPIC_AGENT_LINK_TEST = "server.agent.linkTest.request.{agentId}";
 
 
 }

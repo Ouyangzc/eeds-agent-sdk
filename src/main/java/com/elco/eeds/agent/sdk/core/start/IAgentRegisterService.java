@@ -21,7 +21,7 @@ public interface IAgentRegisterService {
      * @return
      * @throws Exception
      */
-    boolean register(String url,String name,String port, String token) throws Exception;
+    boolean register(String url,String name,String port, String token, String clientType) throws Exception;
 
     /**
      * 存储客户端文件

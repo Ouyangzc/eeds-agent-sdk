@@ -55,6 +55,8 @@ public class AgentConfigYamlReader {
         agentStartProperties.setPort(agent.get("port").toString());
         agentStartProperties.setToken(agent.get("token").toString());
         agentStartProperties.setBaseFolder(agent.get("baseFolder").toString());
+        agentStartProperties.setAgentClientType(agent.get("clientType").toString());
+
         logger.info("从配置文件取出配置成功：serverUrl={}, name={}, port={}, token={}, baseFolder={}",
                 agent.get("serverUrl"), agent.get("name"), agent.get("port"),
                 agent.get("token"), agent.get("baseFolder"));
@@ -62,8 +64,8 @@ public class AgentConfigYamlReader {
     }
 
     public static void main(String[] args) {
-        String ymlPath = "./elco/yml/application-test.yaml";
-//        String ymlPath = "D:\\elco\\agentSdk\\application-test.yaml";
+        String ymlPath = "./elco/yml/agent-sdk-config.yaml";
+//        String ymlPath = "D:\\elco\\agentSdk\\agent-sdk-config.yaml";
         AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
         AgentStartProperties agentStartProperties = agentConfigYamlReader.parseYaml(ymlPath);
     }
