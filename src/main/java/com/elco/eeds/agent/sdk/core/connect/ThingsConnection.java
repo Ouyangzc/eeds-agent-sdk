@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.core.connect;
 
 import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
+import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 
 /**
  * @author ：ytl
