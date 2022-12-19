@@ -31,20 +31,25 @@ public class AgentStartProperties {
      */
     private String token;
 
+    public String getProtocolPackage() {
+        return protocolPackage;
+    }
+
+    public void setProtocolPackage(String protocolPackage) {
+        this.protocolPackage = protocolPackage;
+    }
+
+    /**
+     * 协议包路径
+     */
+    private String protocolPackage;
+
+
     /**
      * 存储文件目录
      */
     private String baseFolder;
 
-    private String protocolPath;
-
-    public String getProtocolPath() {
-        return protocolPath;
-    }
-
-    public void setProtocolPath(String protocolPath) {
-        this.protocolPath = protocolPath;
-    }
 
     private static volatile AgentStartProperties agentStartProperties;
 

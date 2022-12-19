@@ -3,6 +3,7 @@ package com.elco.eeds.agent.sdk.core.connect.init;
 import cn.hutool.core.util.ReflectUtil;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
+import com.elco.eeds.agent.sdk.core.connect.proxy.ConnectProxy;
 import com.elco.eeds.agent.sdk.core.util.CreatorUtils;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.TreeSet;
  * @date ：Created in 2022/12/4 15:03
  * @description：
  */
-public class InitFactory {
+public class InitConnectFactory {
 
 
     private static TreeSet<String> CONNECT_PACKAGE_PATH =new TreeSet<>();
@@ -22,7 +23,9 @@ public class InitFactory {
     public static void initConnect(){
         List<Class> connectClassList = CreatorUtils.getAllInterfaceAchieveClass(ThingsConnection.class, CONNECT_PACKAGE_PATH);
         connectClassList.stream().forEach(t->{
-            ThingsConnection connect =(ThingsConnection) ReflectUtil.newInstance(t);
+
+            ThingsConnection connect = (ThingsConnection) new ConnectProxy(ReflectUtil.newInstance(t)).getProxyInstance();
+//            ThingsConnection connect =(ThingsConnection) ReflectUtil.newInstance(t);
             ConnectManager.addConnection(connect.protocolName(),connect);
         });
 
