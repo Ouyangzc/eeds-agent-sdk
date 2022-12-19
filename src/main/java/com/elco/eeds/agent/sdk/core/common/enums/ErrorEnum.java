@@ -17,6 +17,8 @@ public enum ErrorEnum {
     SAVE_CONFIG_ERROR("CL0101006", "保存config至agent.json异常"),
     READ_TOKEN_ERROR("CL0101007", "从agent.json读取token信息异常"),
     READ_CONFIG_ERROR("CL0101008", "从agent.json读取config信息异常"),
+    CONFIG_FILE_ERROR("CL0101009", "配置文件内容异常，请检查配置文件"),
+    READ_CONFIG_FILE_ERROR("CL0101010", "读取配置文件失败，请检查"),
     /**
      * 数据源异常，以DE开头
      */

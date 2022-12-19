@@ -27,11 +27,10 @@ public class AgentConfigYamlReader {
         this.resourceLoader = resourceLoader;
     }
 
-    public AgentStartProperties parseYaml(String location) {
+    public AgentStartProperties parseYaml(String location) throws SdkException {
         Map<String,Object> map;
         try{
             Yaml yaml = new Yaml();
-            //通过class.getResource来获取yaml的路径
             URL resource = resourceLoader.getResource(location);
             if (resource != null){
                 //读取yaml中的数据并且以map集合的形式存储
@@ -42,31 +41,31 @@ public class AgentConfigYamlReader {
                 throw new SdkException(ErrorEnum.RESOURCE_OBTAIN_ERROR.code());
             }
         }catch (Exception e){
+            logger.error("{}路径读取配置文件失败，没有此文件");
             e.printStackTrace();
             return null;
         }
-        Map agent = (Map) map.get("agent");
+        Map agent = null;
+        AgentStartProperties agentStartProperties = null;
+        try {
+            agent = (Map) map.get("agent");
 
-        AgentStartProperties agentStartProperties = AgentStartProperties.getInstance();
-        agentStartProperties.setServerUrl(agent.get("serverUrl").toString());
-        agentStartProperties.setName(agent.get("name").toString());
-        agentStartProperties.setPort(agent.get("port").toString());
-        agentStartProperties.setToken(agent.get("token").toString());
-        agentStartProperties.setBaseFolder(agent.get("baseFolder").toString());
-        agentStartProperties.setAgentClientType(agent.get("clientType").toString());
+            agentStartProperties = AgentStartProperties.getInstance();
+            agentStartProperties.setServerUrl(agent.get("serverUrl").toString());
+            agentStartProperties.setName(agent.get("name").toString());
+            agentStartProperties.setPort(agent.get("port").toString());
+            agentStartProperties.setToken(agent.get("token").toString());
+            agentStartProperties.setBaseFolder(agent.get("baseFolder").toString());
+            agentStartProperties.setAgentClientType(agent.get("clientType").toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("配置文件中字段错误，请检查");
+            throw new SdkException(ErrorEnum.CONFIG_FILE_ERROR.code());
+        }
 
         logger.info("从配置文件取出配置成功：serverUrl={}, name={}, port={}, token={}, baseFolder={}",
                 agent.get("serverUrl"), agent.get("name"), agent.get("port"),
                 agent.get("token"), agent.get("baseFolder"));
         return agentStartProperties;
     }
-
-    public static void main(String[] args) {
-        String ymlPath = "./elco/yml/agent-sdk-config.yaml";
-//        String ymlPath = "D:\\elco\\agentSdk\\agent-sdk-config.yaml";
-        AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
-        AgentStartProperties agentStartProperties = agentConfigYamlReader.parseYaml(ymlPath);
-        System.out.println(agentStartProperties.toString());
-    }
-
 }
