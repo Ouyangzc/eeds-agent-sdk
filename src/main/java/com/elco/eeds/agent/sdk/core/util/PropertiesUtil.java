@@ -1,6 +1,8 @@
 package com.elco.eeds.agent.sdk.core.util;
 
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Properties;
@@ -17,9 +19,30 @@ public class PropertiesUtil {
      */
     private static final Properties PROPERTIES = new Properties();
     private static final String FILE_NAME = ConstantFilePath.YML_NAME;
-    static{
-        initProperties();
+    private static final Logger logger = LoggerFactory.getLogger(PropertiesUtil.class);
+
+    /**
+     * 判断文件是否存在
+     * @return
+     */
+    public static boolean isExistFile() {
+        //获取当前目录
+        String property = System.getProperty("user.dir");
+        //默认是linux os
+        String fileName = "/" + FILE_NAME;
+        //判断是否是windows os
+        if(System.getProperty ("os.name").contains("Windows")) {
+            fileName = "\\" + FILE_NAME;
+        }
+        // 读取当前目录下conf配置文件
+        File file = new File(property + fileName);
+        if(!file.exists()) {
+            logger.error("{}文件不存在", property + fileName);
+            return false;
+        }
+        return true;
     }
+
     /**
      * @param key
      * @param defaultValue
@@ -39,7 +62,7 @@ public class PropertiesUtil {
     public static String get(String key) {
         return get(key, "");
     }
-    private static void initProperties() {
+    public static void initProperties() {
         InputStream is = null;
         try {
             //获取当前目录

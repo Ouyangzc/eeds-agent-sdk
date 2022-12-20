@@ -1,6 +1,8 @@
 package com.elco.eeds.agent.sdk.core.util;
 
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Properties;
@@ -17,6 +19,21 @@ public class PropertiesAbsoluteUtil {
      */
     private static final Properties PROPERTIES = new Properties();
     private static final String FILE_NAME = ConstantFilePath.YML_NAME;
+    public static final Logger logger = LoggerFactory.getLogger(PropertiesAbsoluteUtil.class);
+
+    /**
+     * 判断文件是否存在
+     * @return
+     */
+    public static boolean isExistFile(String fullPath) {
+        // 读取当前目录下conf配置文件
+        File file = new File(fullPath);
+        if(!file.exists()) {
+            logger.error("{}文件不存在", fullPath);
+            return false;
+        }
+        return true;
+    }
 
     /**
      * @param key
