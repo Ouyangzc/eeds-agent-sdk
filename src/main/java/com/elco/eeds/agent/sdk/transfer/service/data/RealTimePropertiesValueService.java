@@ -12,13 +12,12 @@ import java.util.List;
  */
 public class RealTimePropertiesValueService {
 
-
     /**
-     *
-     * @param message 原始报文
+     * @param message             原始报文
      * @param propertiesValueList 解析数据
      */
-    public void recRealTimePropertiesValue(String message, List<PropertiesValue> propertiesValueList){
+    public static void recRealTimePropertiesValue(String message, List<PropertiesValue> propertiesValueList) {
+        //存储原始数据，并推送，调用统计接口
 
     }
 
