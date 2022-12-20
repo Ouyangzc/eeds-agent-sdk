@@ -124,11 +124,16 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
     public abstract void write(EedsThings things,String msg);
 
 
-
-    public void execute(String thingsId,String msg){
+    /**
+     * 执行模板方法
+     * @param thingsId
+     * @param msg
+     * @param collectTime
+     */
+    public void execute(String thingsId,String msg,Long collectTime){
         List<PropertiesValue> valueList = this.getParsing()
                 .parsing(ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId), msg);
-        RealTimePropertiesValueService.recRealTimePropertiesValue(msg,thingsId,valueList);
+        RealTimePropertiesValueService.recRealTimePropertiesValue(msg,thingsId,collectTime,valueList);
     }
 
 //    public void execute(String clientId,String thingsId,String topic ,String msg){
