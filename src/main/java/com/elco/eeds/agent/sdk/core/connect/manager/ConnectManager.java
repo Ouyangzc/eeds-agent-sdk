@@ -1,8 +1,12 @@
 package com.elco.eeds.agent.sdk.core.connect.manager;
 
 
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
+import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @description： 连接管理员
  */
 public class ConnectManager {
-
+    public static final Logger logger = LoggerFactory.getLogger(ConnectManager.class);
     private static ConcurrentHashMap<String, ThingsConnection> CONNECTION_MAP = new ConcurrentHashMap<String, ThingsConnection>(16);
 
 
@@ -24,11 +28,11 @@ public class ConnectManager {
     /**
      * 添加数据源连接实例
      *
-     * @param key     数据源ID
      * @param handler
      */
-    public static void addHandler(String key, ThingsConnectionHandler handler) {
-        CONNECTION_HANDLER_MAP.put(key, handler);
+    public static void addHandler(ThingsConnectionHandler handler) {
+
+        CONNECTION_HANDLER_MAP.put(handler.getThingsId(), handler);
     }
 
 
@@ -77,5 +81,33 @@ public class ConnectManager {
     public static void delConnection(String key) {
         CONNECTION_MAP.get(key).disconnect();
         CONNECTION_MAP.remove(key);
+    }
+
+    /**
+     * 创建连接并实现handler
+     *
+     * @param driverContext
+     */
+    public static void create(ThingsDriverContext driverContext, String connectKey) {
+        logger.debug("开始创建连接，连接信息：{}", JSONUtil.toJsonStr(driverContext));
+        ThingsConnection connection = ConnectManager.getConnection(connectKey);
+        connection.connect(driverContext);
+        ThingsConnectionHandler handler = (ThingsConnectionHandler) connection;
+        handler.setContext(driverContext);
+        handler.setThingsConnection(connection);
+        handler.setThingsId(driverContext.getThingsId());
+        ConnectManager.addHandler(handler);
+        logger.debug("创建连接成功，连接信息：{}", JSONUtil.toJsonStr(driverContext));
+    }
+
+
+    /**
+     * 创建连接并实现handler
+     *
+     * @param driverContext
+     */
+    public static void destroy(ThingsDriverContext driverContext) {
+        ThingsConnectionHandler handler = ConnectManager.getHandler(driverContext.getThingsId());
+        handler.getThingsConnection().disconnect();
     }
 }

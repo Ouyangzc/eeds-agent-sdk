@@ -89,8 +89,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                     BeanUtil.copyProperties(eedsThings, driverContext);
                     THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
                     //todo 加载数据源连接
-                    ThingsConnection connection = ConnectManager.getConnection("10312");
-                    connection.connect(driverContext);
+                    ConnectManager.create(driverContext,"10312");
 
                 }
                 boolean delResult = eedsThings.getProperties().stream().allMatch(things -> things.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_DEL));
@@ -256,8 +255,8 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                     String thingsId = things.getThingsId();
                     THINGS_DRIVER_CONTEXT_MAP.put(things.getThingsId(), driverContext);
                     //todo 调用数据源连接
-                    ThingsConnection connection = ConnectManager.getConnection("10312");
-                    connection.connect(driverContext);
+                    ConnectManager.create(driverContext,"10312");
+
 
                     List<EedsProperties> properties = things.getProperties();
                     for (EedsProperties p : properties) {
@@ -276,4 +275,15 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
         }
 
     }
+
+    /**
+     * 根据数据源id,获取点位信息
+     * @param thingsId 数据源ID
+     * @return
+     */
+    public static List<PropertiesContext> getThingsPropertiesContextList(String thingsId) {
+        Map<String, List<PropertiesContext>> thingsPropertiesMap = PROPERTIES_CONTEXT_MAP.values().stream().collect(Collectors.groupingBy(PropertiesContext::getThingsId));
+        return thingsPropertiesMap.get(thingsId);
+    }
+
 }
