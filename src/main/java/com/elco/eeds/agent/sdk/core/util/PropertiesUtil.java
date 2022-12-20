@@ -37,7 +37,6 @@ public class PropertiesUtil {
         // 读取当前目录下conf配置文件
         File file = new File(property + fileName);
         if(!file.exists()) {
-            logger.error("{}文件不存在", property + fileName);
             return false;
         }
         return true;

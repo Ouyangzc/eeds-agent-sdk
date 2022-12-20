@@ -29,7 +29,6 @@ public class PropertiesAbsoluteUtil {
         // 读取当前目录下conf配置文件
         File file = new File(fullPath);
         if(!file.exists()) {
-            logger.error("{}文件不存在", fullPath);
             return false;
         }
         return true;
