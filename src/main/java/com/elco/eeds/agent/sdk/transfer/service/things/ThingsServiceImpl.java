@@ -1,9 +1,8 @@
 package com.elco.eeds.agent.sdk.transfer.service.things;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
-import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.util.ThingsFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsThings;
@@ -13,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -87,9 +85,17 @@ public class ThingsServiceImpl implements ThingsService {
                         propertiesIterators.remove();
                     }
                 }
+                if (ObjectUtil.isEmpty(propertiesIterators)) {
+                    thingsIterators.remove();
+                }
             }
         }
-        saveThingsFile(JSON.toJSONString(currentThingsList));
+        if (currentThingsList.size() > 0) {
+            saveThingsFile(JSON.toJSONString(currentThingsList));
+        } else {
+            saveThingsFile("");
+        }
+
     }
 
     @Override

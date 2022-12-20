@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.service.things;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -168,7 +170,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
         List<PropertiesContext> editList = propertiesContexts.stream().filter(p -> p.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_EDIT)).collect(Collectors.toList());
         List<PropertiesContext> delList = propertiesContexts.stream().filter(p -> p.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_DEL)).collect(Collectors.toList());
         try {
-            String localThings = getLocalThings();
+            String localThings = thingsService.getThingsFile();
             if (StrUtil.isEmpty(localThings)) {
                 //暂无本地文件，所有数据都是新增
                 ArrayList<EedsThings> result = new ArrayList<>();
@@ -190,9 +192,11 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                 //处理删除点位
                 for (PropertiesContext delProperties : delList) {
                     //删除
-                    PROPERTIES_CONTEXT_MAP.remove(delProperties.getPropertiesId());
                     EedsProperties eedsProperties = getEedsProperties(localThingsList, delProperties);
-                    thingsService.delProperties(delProperties.getThingsId(), eedsProperties);
+                    if (!ObjectUtil.isEmpty(eedsProperties)) {
+                        PROPERTIES_CONTEXT_MAP.remove(delProperties.getPropertiesId());
+                        thingsService.delProperties(delProperties.getThingsId(), eedsProperties);
+                    }
                 }
                 for (PropertiesContext editProperties : editList) {
                     //编辑
@@ -231,9 +235,13 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 
     private EedsProperties getEedsProperties(List<EedsThings> localThingsList, PropertiesContext delProperties) {
         String thingsId = delProperties.getThingsId();
-        EedsThings things = localThingsList.stream().filter(syncThings -> syncThings.getThingsId().equals(thingsId)).findFirst().get();
-        EedsProperties properties = things.getProperties().stream().filter(eedsProperties -> eedsProperties.getPropertiesId().equals(delProperties.getPropertiesId())).findFirst().get();
-        return properties;
+        Optional<EedsThings> optional = localThingsList.stream().filter(syncThings -> syncThings.getThingsId().equals(thingsId)).findFirst();
+        if (optional.isPresent()) {
+            EedsThings things = optional.get();
+            EedsProperties properties = things.getProperties().stream().filter(eedsProperties -> eedsProperties.getPropertiesId().equals(delProperties.getPropertiesId())).findFirst().get();
+            return properties;
+        }
+        return null;
     }
 
     private void loadThingDriver() {
