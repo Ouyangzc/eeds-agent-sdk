@@ -4,6 +4,7 @@ import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
 import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
+import com.elco.eeds.agent.sdk.core.connect.init.InitConnectFactory;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.core.util.PropertiesAbsoluteUtil;
 import com.elco.eeds.agent.sdk.core.util.PropertiesUtil;
@@ -38,6 +39,11 @@ public class AgentStarter {
 
     private static void init(AgentStartProperties agentStartProperties) throws Exception {
         try {
+            // 将协议注入
+            InitConnectFactory.addConnectPackagePath(agentStartProperties.getProtocolPackage());
+            InitConnectFactory.initConnect();
+
+
             Agent.getInstance().setAgentBaseInfo(new AgentBaseInfo(agentStartProperties));
             // 注册
             registerService.register(agentStartProperties.getServerUrl(), agentStartProperties.getName(),
@@ -104,6 +110,8 @@ public class AgentStarter {
             agentStartProperties.setToken(PropertiesAbsoluteUtil.get("token"));
             agentStartProperties.setBaseFolder(PropertiesAbsoluteUtil.get("baseFolder"));
             agentStartProperties.setAgentClientType(PropertiesAbsoluteUtil.get("clientType"));
+            agentStartProperties.setProtocolPackage(PropertiesAbsoluteUtil.get("protocolPackage"));
+
             logger.debug("读取配置文件成功：{}", agentStartProperties.toString());
         } catch (Exception e) {
             logger.error("读取指定路径的配置文件失败", e);
@@ -135,6 +143,7 @@ public class AgentStarter {
                 agentStartProperties.setToken(PropertiesUtil.get("token"));
                 agentStartProperties.setBaseFolder(PropertiesUtil.get("baseFolder"));
                 agentStartProperties.setAgentClientType(PropertiesUtil.get("clientType"));
+                agentStartProperties.setProtocolPackage(PropertiesAbsoluteUtil.get("protocolPackage"));
                 logger.debug("jar包同级路径配置文件读取成功");
                 logger.info("读取配置文件成功：{}", agentStartProperties.toString());
             }catch (Exception e) {

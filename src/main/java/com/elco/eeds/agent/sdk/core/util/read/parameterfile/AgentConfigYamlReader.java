@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -57,6 +56,7 @@ public class AgentConfigYamlReader {
             agentStartProperties.setToken(agent.get("token").toString());
             agentStartProperties.setBaseFolder(agent.get("baseFolder").toString());
             agentStartProperties.setAgentClientType(agent.get("clientType").toString());
+            agentStartProperties.setProtocolPackage(agent.get("protocolPackage").toString());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("配置文件中字段错误，请检查");

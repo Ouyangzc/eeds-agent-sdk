@@ -36,6 +36,19 @@ public class AgentStartProperties {
      */
     private String baseFolder;
 
+    public String getProtocolPackage() {
+        return protocolPackage;
+    }
+
+    public void setProtocolPackage(String protocolPackage) {
+        this.protocolPackage = protocolPackage;
+    }
+
+    /**
+     * 协议包路径
+     */
+    private String protocolPackage;
+
     /**
      * 客户端类型
      */
