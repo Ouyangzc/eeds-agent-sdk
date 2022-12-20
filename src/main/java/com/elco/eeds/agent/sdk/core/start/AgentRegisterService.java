@@ -59,7 +59,7 @@ public class AgentRegisterService implements IAgentRegisterService {
             // TODO 数据源同步
             // 更新配置
             // TODO 更新配置
-            logger.debug("客户端注册流程成功！");
+            logger.info("客户端注册流程成功！");
             return true;
         } catch (Exception e) {
             e.printStackTrace();
