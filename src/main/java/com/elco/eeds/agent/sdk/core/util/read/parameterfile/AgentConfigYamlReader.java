@@ -26,11 +26,25 @@ public class AgentConfigYamlReader {
         this.resourceLoader = resourceLoader;
     }
 
+    public boolean isAbsolutePath(String path) {
+        if (path.startsWith("/") || path.indexOf(":") > 0) {
+            return true;
+        }
+        return false;
+
+    }
+
     public AgentStartProperties parseYaml(String location) throws SdkException {
         Map<String,Object> map;
         try{
             Yaml yaml = new Yaml();
-            URL resource = resourceLoader.getResource(location);
+            URL resource;
+            if (this.isAbsolutePath(location)) {
+                resource = resourceLoader.getResourceByAbsolutePath(location);
+            }else {
+                resource = resourceLoader.getResource(location);
+            }
+
             if (resource != null){
                 //读取yaml中的数据并且以map集合的形式存储
                 UrlResource urlResource = new UrlResource(resource);
