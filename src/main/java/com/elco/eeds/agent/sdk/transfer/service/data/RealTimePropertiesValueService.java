@@ -16,9 +16,10 @@ public class RealTimePropertiesValueService {
      *
      * @param message 原始报文
      * @param thingsId 数据源ID
+     * @param collectTime 采集时间戳
      * @param propertiesValueList 解析数据
      */
-    public static void recRealTimePropertiesValue(String message, String thingsId, List<PropertiesValue> propertiesValueList) {
+    public static void recRealTimePropertiesValue(String message, String thingsId,Long collectTime, List<PropertiesValue> propertiesValueList) {
         //存储原始数据，并推送，调用统计接口
         System.out.println(1111);
     }
