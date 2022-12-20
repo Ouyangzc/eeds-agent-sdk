@@ -32,7 +32,7 @@ public class AgentConfigLocalMessageHandler implements IReceiverMessageHandler {
 
     @Override
     public void handleRecData(String topic, String recData) {
-        logger.debug("收到客户端私有配置报文：topic: {}, msg: {}", topic, recData);
+        logger.info("收到客户端私有配置报文：topic: {}, msg: {}", topic, recData);
         AgentConfigMessage message = JSON.parseObject(recData, AgentConfigMessage.class);
         Agent agent = Agent.getInstance();
         AgentBaseInfo agentBaseInfo = agent.getAgentBaseInfo();

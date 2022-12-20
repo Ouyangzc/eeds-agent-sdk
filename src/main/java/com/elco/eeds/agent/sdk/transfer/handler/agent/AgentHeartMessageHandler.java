@@ -23,7 +23,7 @@ public class AgentHeartMessageHandler implements IReceiverMessageHandler {
 
     @Override
     public void handleRecData(String topic, String recData) {
-        logger.debug("收到客户端心跳报文：topic: {}, msg: {}", topic, recData);
+        logger.info("收到客户端心跳报文：topic: {}, msg: {}", topic, recData);
         try {
             // 序列化 判断格式是否正确，抛出异常即不正确
             AgentHeartMessage message = JSON.parseObject(recData, AgentHeartMessage.class);

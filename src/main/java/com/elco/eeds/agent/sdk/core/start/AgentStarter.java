@@ -1,13 +1,11 @@
 package com.elco.eeds.agent.sdk.core.start;
 
+import cn.hutool.core.io.FileUtil;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
 import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
-import com.elco.eeds.agent.sdk.core.connect.init.InitConnectFactory;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
-import com.elco.eeds.agent.sdk.core.util.PropertiesAbsoluteUtil;
-import com.elco.eeds.agent.sdk.core.util.PropertiesUtil;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.AgentConfigYamlReader;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.ResourceLoader;
 import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsSyncIncrMessageHandler;
@@ -16,6 +14,8 @@ import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 /**
  * @title: AgentStarter
@@ -39,11 +39,6 @@ public class AgentStarter {
 
     private static void init(AgentStartProperties agentStartProperties) throws Exception {
         try {
-            // 将协议注入
-            InitConnectFactory.addConnectPackagePath(agentStartProperties.getProtocolPackage());
-            InitConnectFactory.initConnect();
-
-
             Agent.getInstance().setAgentBaseInfo(new AgentBaseInfo(agentStartProperties));
             // 注册
             registerService.register(agentStartProperties.getServerUrl(), agentStartProperties.getName(),
@@ -98,25 +93,9 @@ public class AgentStarter {
         logger.debug("yml文件全路径参数为：{}", ymlPath);
         // 从yml配置文件读取配置，赋值给AgentStartProperties
         AgentStartProperties agentStartProperties = AgentStartProperties.getInstance();
-        if (!PropertiesAbsoluteUtil.isExistFile(ymlPath)) {
-            logger.error("{}配置文件不存在", ymlPath);
-            return;
-        }
-        try {
-            PropertiesAbsoluteUtil.initProperties(ymlPath);
-            agentStartProperties.setServerUrl(PropertiesAbsoluteUtil.get("serverUrl"));
-            agentStartProperties.setName(PropertiesAbsoluteUtil.get("name"));
-            agentStartProperties.setPort(PropertiesAbsoluteUtil.get("port"));
-            agentStartProperties.setToken(PropertiesAbsoluteUtil.get("token"));
-            agentStartProperties.setBaseFolder(PropertiesAbsoluteUtil.get("baseFolder"));
-            agentStartProperties.setAgentClientType(PropertiesAbsoluteUtil.get("clientType"));
-            agentStartProperties.setProtocolPackage(PropertiesAbsoluteUtil.get("protocolPackage"));
-
-            logger.debug("读取配置文件成功：{}", agentStartProperties.toString());
-        } catch (Exception e) {
-            logger.error("读取指定路径的配置文件失败", e);
-            throw new SdkException(ErrorEnum.READ_CONFIG_FILE_ERROR.code());
-        }
+        AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
+        agentStartProperties = agentConfigYamlReader.parseYaml(ymlPath);
+        logger.info("读取配置文件成功：{}", agentStartProperties.toString());
         // 调用私有init方法
         init(agentStartProperties);
     }
@@ -129,30 +108,17 @@ public class AgentStarter {
         logger.debug("开始从默认的位置读取yml文件...");
         // 从yml配置文件读取配置，赋值给AgentStartProperties
         AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
-        //通过class.getResource来获取yaml的路径
-        // 默认在jar包相同路径下读取agent-sdk-config.yaml或者jar包中resource文件下的agent-sdk-config.yaml
-        // 1.jar包相同路径下读取agent-sdk-config.yaml
-        AgentStartProperties agentStartProperties;
-        agentStartProperties = AgentStartProperties.getInstance();
-        if (PropertiesUtil.isExistFile()) {
-            try {
-                PropertiesUtil.initProperties();
-                agentStartProperties.setServerUrl(PropertiesUtil.get("serverUrl"));
-                agentStartProperties.setName(PropertiesUtil.get("name"));
-                agentStartProperties.setPort(PropertiesUtil.get("port"));
-                agentStartProperties.setToken(PropertiesUtil.get("token"));
-                agentStartProperties.setBaseFolder(PropertiesUtil.get("baseFolder"));
-                agentStartProperties.setAgentClientType(PropertiesUtil.get("clientType"));
-                agentStartProperties.setProtocolPackage(PropertiesAbsoluteUtil.get("protocolPackage"));
-                logger.debug("jar包同级路径配置文件读取成功");
-                logger.info("读取配置文件成功：{}", agentStartProperties.toString());
-            }catch (Exception e) {
-                logger.error("读取指定路径的配置文件失败", e);
-                throw new SdkException(ErrorEnum.READ_CONFIG_FILE_ERROR.code());
-            }
+        AgentStartProperties agentStartProperties = AgentStartProperties.getInstance();
+
+        String fileName = getJarSamePathYml();
+        if(FileUtil.exist(new File(fileName))) {
+            // 默认在jar包相同路径下读取agent-sdk-config.yaml
+            agentStartProperties = agentConfigYamlReader.parseYaml(fileName);
+            logger.debug("jar包同级路径配置文件读取成功");
+            logger.info("读取配置文件成功：{}", agentStartProperties.toString());
         }else {
+            // jar包中resource文件下的agent-sdk-config.yaml
             logger.debug("jar包同级路径配置文件不存在，即将开始读取jar包中resource文件下的配置文件");
-            // 2.jar包中resource文件下的agent-sdk-config.yaml（/target/classes）
             agentStartProperties = agentConfigYamlReader.parseYaml("./" + ConstantFilePath.YML_NAME);
             if (agentStartProperties == null) {
                 logger.debug("读取配置文件失败");
@@ -163,5 +129,22 @@ public class AgentStarter {
         }
         // 调用私有init方法
         init(agentStartProperties);
+    }
+
+    /**
+     * 获取jar包同路径下的规定名称的配置文件
+     * @return
+     */
+    private static String getJarSamePathYml() {
+        //获取当前目录
+        String property = System.getProperty("user.dir");
+        //默认是linux os
+        String fileName = "/" + ConstantFilePath.YML_NAME;
+        //判断是否是windows os
+        if(System.getProperty ("os.name").contains("Windows")) {
+            fileName = "\\" + ConstantFilePath.YML_NAME;
+        }
+        // 读取当前目录下conf配置文件
+        return property + fileName;
     }
 }
