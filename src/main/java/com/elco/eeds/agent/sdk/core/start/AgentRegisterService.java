@@ -40,13 +40,14 @@ public class AgentRegisterService implements IAgentRegisterService {
     private AgentHeartMessageHandler agentHeartMessageHandler = new AgentHeartMessageHandler();
     private AgentConfigGlobalMessageHandler agentConfigGlobalMessageHandler = new AgentConfigGlobalMessageHandler();
     private AgentConfigLocalMessageHandler agentConfigLocalMessageHandler = new AgentConfigLocalMessageHandler();
-    private ThingsSyncService thingsSyncService;
-    private ThingsSyncIncrMessageHandler thingsSyncIncrMessageHandler = new ThingsSyncIncrMessageHandler(thingsSyncService);
     private AgentRequestHttpService agentRequestHttpService = new AgentRequestHttpService();
+    private ThingsSyncService thingsSyncService;
 
+    private ThingsSyncIncrMessageHandler thingsSyncIncrMessageHandler;
 
-    public AgentRegisterService(ThingsSyncService thingsSyncService) {
+    public AgentRegisterService(ThingsSyncService thingsSyncService, ThingsSyncIncrMessageHandler thingsSyncIncrMessageHandler) {
         this.thingsSyncService = thingsSyncService;
+        this.thingsSyncIncrMessageHandler = thingsSyncIncrMessageHandler;
     }
 
     @Override

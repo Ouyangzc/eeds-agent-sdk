@@ -4,6 +4,7 @@ import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.AgentConfigYamlReader;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.ResourceLoader;
+import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsSyncIncrMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsServiceImpl;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncService;
@@ -25,7 +26,9 @@ public class AgentStarter {
     private static ThingsServiceImpl thingsService = new ThingsServiceImpl();
     private static ThingsSyncService thingsSyncService = new ThingsSyncServiceImpl(thingsService);
 
-    private static AgentRegisterService registerService = new AgentRegisterService(thingsSyncService);
+    private static ThingsSyncIncrMessageHandler thingsSyncIncrMessageHandler = new ThingsSyncIncrMessageHandler(thingsSyncService);
+
+    private static AgentRegisterService registerService = new AgentRegisterService(thingsSyncService,thingsSyncIncrMessageHandler);
 
     private AgentConfigYamlReader configReader;
 
