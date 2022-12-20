@@ -1,12 +1,16 @@
 package com.elco.eeds.agent.sdk.core.connect;
 
 
+import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.parsing.DataParsing;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsThings;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
+import com.elco.eeds.agent.sdk.transfer.service.data.RealTimePropertiesValueService;
+import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * @author ：ytl
@@ -14,6 +18,17 @@ import java.lang.reflect.Type;
  * @description：
  */
 public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
+
+
+    private ThingsConnection thingsConnection;
+
+    public ThingsConnection getThingsConnection() {
+        return thingsConnection;
+    }
+
+    public void setThingsConnection(ThingsConnection thingsConnection) {
+        this.thingsConnection = thingsConnection;
+    }
 
     public ThingsConnectionHandler(){
         attach();
@@ -40,7 +55,15 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
 
 
 
-    private  String tingsId;
+    private  String thingsId;
+
+    public String getThingsId() {
+        return thingsId;
+    }
+
+    public void setThingsId(String thingsId) {
+        this.thingsId = thingsId;
+    }
 
     private ThingsDriverContext context;
 
@@ -52,13 +75,7 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
         this.context = context;
     }
 
-    public String getTingsId() {
-        return tingsId;
-    }
 
-    public void setTingsId(String tingsId) {
-        this.tingsId = tingsId;
-    }
 
     private String handlerName;
 
@@ -108,38 +125,27 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
 
 
 
-    public void execute(String msg){
-
-
-
-// parseMsg(Map<String,List<PropertiesContext>> propertiesContexts,String message);
-        // 执行数据解析
-        // get 数据源ID的点位  return List<PropertiesContext>
-
-        this.getParsing().parsing(msg);
-        //   parseMsg(List<PropertiesContext> propertiesContexts,String message)  return List<PropertiesValue>
-        // 执行本地缓存
-        // local.save(msg)
-        // 执行统计以及数据上报
-            //report(List<PropertiesValue> )
-
+    public void execute(String thingsId,String msg){
+        List<PropertiesValue> valueList = this.getParsing()
+                .parsing(ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId), msg);
+        RealTimePropertiesValueService.recRealTimePropertiesValue(msg,thingsId,valueList);
     }
 
-    public void execute(String clientId,String topic ,String msg){
-
-
-
-// parseMsg(Map<String,List<PropertiesContext>> propertiesContexts,String message);
-        // 执行数据解析
-        // get 数据源ID的点位  return List<PropertiesContext>
-
-        this.getParsing().parsing(msg);
-        //   parseMsg(List<PropertiesContext> propertiesContexts,String message)  return List<PropertiesValue>
-        // 执行本地缓存
-        // local.save(msg)
-        // 执行统计以及数据上报
-        //report(List<PropertiesValue> )
-
-    }
+//    public void execute(String clientId,String thingsId,String topic ,String msg){
+//
+//
+//
+//// parseMsg(Map<String,List<PropertiesContext>> propertiesContexts,String message);
+//        // 执行数据解析
+//        // get 数据源ID的点位  return List<PropertiesContext>
+//
+//        this.getParsing().parsing(ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId),msg);
+//        //   parseMsg(List<PropertiesContext> propertiesContexts,String message)  return List<PropertiesValue>
+//        // 执行本地缓存
+//        // local.save(msg)
+//        // 执行统计以及数据上报
+//        //report(List<PropertiesValue> )
+//
+//    }
 
 }

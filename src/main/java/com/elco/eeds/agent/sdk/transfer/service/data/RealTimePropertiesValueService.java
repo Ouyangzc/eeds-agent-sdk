@@ -20,7 +20,7 @@ public class RealTimePropertiesValueService {
      */
     public static void recRealTimePropertiesValue(String message, String thingsId, List<PropertiesValue> propertiesValueList) {
         //存储原始数据，并推送，调用统计接口
-
+        System.out.println(1111);
     }
 
 }
