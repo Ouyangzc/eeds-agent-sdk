@@ -273,4 +273,15 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
         }
 
     }
+
+    /**
+     * 根据数据源id,获取点位信息
+     * @param thingsId 数据源ID
+     * @return
+     */
+    public static List<PropertiesContext> getThingsPropertiesContextList(String thingsId) {
+        Map<String, List<PropertiesContext>> thingsPropertiesMap = PROPERTIES_CONTEXT_MAP.values().stream().collect(Collectors.groupingBy(PropertiesContext::getThingsId));
+        return thingsPropertiesMap.get(thingsId);
+    }
+
 }
