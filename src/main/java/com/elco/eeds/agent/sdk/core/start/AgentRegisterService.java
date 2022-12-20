@@ -14,10 +14,7 @@ import com.elco.eeds.agent.sdk.core.util.AgentFileExtendUtils;
 import com.elco.eeds.agent.sdk.core.util.ReplaceTopicAgentId;
 import com.elco.eeds.agent.sdk.core.util.http.IpUtil;
 import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentTokenRequest;
-import com.elco.eeds.agent.sdk.transfer.handler.agent.AgentConfigGlobalMessageHandler;
-import com.elco.eeds.agent.sdk.transfer.handler.agent.AgentConfigLocalMessageHandler;
-import com.elco.eeds.agent.sdk.transfer.handler.agent.AgentHeartMessageHandler;
-import com.elco.eeds.agent.sdk.transfer.handler.agent.AgentTokenMessageHandler;
+import com.elco.eeds.agent.sdk.transfer.handler.agent.*;
 import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsSyncIncrMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.service.agent.AgentRequestHttpService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncService;
@@ -39,6 +36,7 @@ public class AgentRegisterService implements IAgentRegisterService {
     private AgentHeartMessageHandler agentHeartMessageHandler = new AgentHeartMessageHandler();
     private AgentConfigGlobalMessageHandler agentConfigGlobalMessageHandler = new AgentConfigGlobalMessageHandler();
     private AgentConfigLocalMessageHandler agentConfigLocalMessageHandler = new AgentConfigLocalMessageHandler();
+    private AgentLinkTestMessageHandler agentLinkTestMessageHandler = new AgentLinkTestMessageHandler();
     private AgentRequestHttpService agentRequestHttpService = new AgentRequestHttpService();
     private ThingsSyncService thingsSyncService;
 
@@ -109,6 +107,7 @@ public class AgentRegisterService implements IAgentRegisterService {
             natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_AGENT_CONFIG_GLOBAL, agentId), agentConfigGlobalMessageHandler);
             // 订阅 基础配置修改（私有）topic
             natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_AGENT_CONFIG_LOCAL, agentId), agentConfigLocalMessageHandler);
+            natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_AGENT_LINK_TEST_REQ, agentId), agentLinkTestMessageHandler);
 
             //数据源--增量同步
             natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_REC_THINGS_SYNC_INCR, agentId), thingsSyncIncrMessageHandler);

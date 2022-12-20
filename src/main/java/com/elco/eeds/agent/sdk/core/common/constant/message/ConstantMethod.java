@@ -28,7 +28,10 @@ public class ConstantMethod {
      * 客户端token
      */
     public static final String METHOD_AGENT_TOKEN = "agent_update_token";
-
+    /**
+     * 客户端链接测试
+     */
+    public static final String METHOD_AGENT_LINK_TEST = "agent_test_respond";
 
     /**
      * 数据--统计--发送统计记录报文
