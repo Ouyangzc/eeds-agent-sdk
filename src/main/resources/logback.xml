@@ -81,6 +81,13 @@
         </filter>
     </appender>
 
+    <if condition='p("profile").equals("dev")'>
+        <then>
+            <logger name="com.elco" level="debug" additivity="false">
+                <appender-ref ref="STDOUT"/>
+            </logger>
+        </then>
+    </if>
 
     <root level="info">
         <appender-ref ref="STDOUT"/>
@@ -88,5 +95,7 @@
         <appender-ref ref="FILEDebugLog"/>
         <appender-ref ref="FILEErrorLog"/>
     </root>
+
+
 
 </configuration>
