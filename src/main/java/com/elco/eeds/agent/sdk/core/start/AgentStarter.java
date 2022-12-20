@@ -50,6 +50,7 @@ public class AgentStarter {
             // TODO 加载统计
             // 统计定时任务
             // TODO 统计定时任务
+            logger.info(Logo.logo);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("客户端注册异常", e);

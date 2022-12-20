@@ -1,10 +1,13 @@
 package com.elco.eeds.agent.sdk.core.util;
 
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -88,6 +91,47 @@ public class PropertiesUtil {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+
+    /**
+     * 创建properties文件
+     *
+     * @param filePath
+     * @param properties
+     * @throws IOException
+     */
+    public static void store(String filePath, Map<String, String> properties) throws IOException {
+        if (StrUtil.isEmpty(filePath) || MapUtil.isEmpty(properties)) {
+            logger.error("filePath or properties isNullOrEmpty");
+            return;
+        }
+        Properties p = new Properties();
+        try (FileWriter fw = new FileWriter(filePath)) {
+            for (String key : properties.keySet()) {
+                p.setProperty(key, properties.get(key));
+            }
+            p.store(fw, "");
+        }
+
+    }
+
+    /**
+     * 查询指定的value
+     * @param filePath
+     * @param key
+     * @return
+     */
+    public static String getValue(String filePath, String key) throws IOException {
+        if (StrUtil.isEmpty(filePath) || StrUtil.isEmpty(key)) {
+            logger.error("filePath or key isNullOrEmpty");
+            return "";
+        }
+        try (FileReader fr = new FileReader(filePath)) {
+            Properties p = new Properties();
+            p.load(fr);
+            return p.getProperty(key);
         }
     }
     public static void main(String[] args) {
