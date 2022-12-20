@@ -58,8 +58,8 @@ public class AgentStarter {
      * @throws Exception
      */
     public static void init(String serverUrl, String name, String port, String token, String baseFolder, String clientType) throws Exception {
-        logger.info("开始手动初始化方法...");
-        logger.info("传入参数为：服务器地址：{}，客户端名称：{}，客户端端口：{}，token：{}，文件存储路径：{}",
+        logger.debug("开始手动初始化方法...");
+        logger.debug("传入参数为：服务器地址：{}，客户端名称：{}，客户端端口：{}，token：{}，文件存储路径：{}",
                 serverUrl, name, port, token, baseFolder);
         // 封装启动参数类
         AgentStartProperties agentStartProperties = new AgentStartProperties();
@@ -78,8 +78,8 @@ public class AgentStarter {
      * @param ymlPath yml的绝对路径
      */
     public static void init(String ymlPath) throws Exception {
-        logger.info("开始手动初始化方法...");
-        logger.info("yml文件全路径参数为：{}", ymlPath);
+        logger.debug("开始手动初始化方法...");
+        logger.debug("yml文件全路径参数为：{}", ymlPath);
         // 从yml配置文件读取配置，赋值给AgentStartProperties
         AgentStartProperties agentStartProperties = AgentStartProperties.getInstance();
         if (!PropertiesAbsoluteUtil.isExistFile(ymlPath)) {
@@ -94,7 +94,7 @@ public class AgentStarter {
             agentStartProperties.setToken(PropertiesAbsoluteUtil.get("token"));
             agentStartProperties.setBaseFolder(PropertiesAbsoluteUtil.get("baseFolder"));
             agentStartProperties.setAgentClientType(PropertiesAbsoluteUtil.get("clientType"));
-            logger.info("读取配置文件成功：{}", agentStartProperties.toString());
+            logger.debug("读取配置文件成功：{}", agentStartProperties.toString());
         } catch (Exception e) {
             logger.info("读取指定路径的配置文件失败", e);
             throw new SdkException(ErrorEnum.READ_CONFIG_FILE_ERROR.code());
@@ -107,8 +107,8 @@ public class AgentStarter {
      * 客户端手动启动方法：空参init方法（从默认的两个位置取yml）
      */
     public static void init() throws Exception {
-        logger.info("开始手动初始化方法...");
-        logger.info("开始从默认的位置读取yml文件...");
+        logger.debug("开始手动初始化方法...");
+        logger.debug("开始从默认的位置读取yml文件...");
         // 从yml配置文件读取配置，赋值给AgentStartProperties
         AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
         //通过class.getResource来获取yaml的路径
@@ -125,22 +125,22 @@ public class AgentStarter {
                 agentStartProperties.setToken(PropertiesUtil.get("token"));
                 agentStartProperties.setBaseFolder(PropertiesUtil.get("baseFolder"));
                 agentStartProperties.setAgentClientType(PropertiesUtil.get("clientType"));
-                logger.info("jar包同级路径配置文件读取成功");
-                logger.info("读取配置文件成功：{}", agentStartProperties.toString());
+                logger.debug("jar包同级路径配置文件读取成功");
+                logger.debug("读取配置文件成功：{}", agentStartProperties.toString());
             }catch (Exception e) {
                 logger.info("读取指定路径的配置文件失败", e);
                 throw new SdkException(ErrorEnum.READ_CONFIG_FILE_ERROR.code());
             }
         }else {
-            logger.info("jar包同级路径配置文件不存在，即将开始读取jar包中resource文件下的配置文件");
+            logger.debug("jar包同级路径配置文件不存在，即将开始读取jar包中resource文件下的配置文件");
             // 2.jar包中resource文件下的agent-sdk-config.yaml（/target/classes）
             agentStartProperties = agentConfigYamlReader.parseYaml("./" + ConstantFilePath.YML_NAME);
             if (agentStartProperties == null) {
-                logger.info("读取配置文件失败");
+                logger.debug("读取配置文件失败");
                 throw new SdkException(ErrorEnum.READ_CONFIG_FILE_ERROR.code());
             }
-            logger.info("jar包中resource文件下的配置文件读取成功");
-            logger.info("读取配置文件成功：{}", agentStartProperties.toString());
+            logger.debug("jar包中resource文件下的配置文件读取成功");
+            logger.debug("读取配置文件成功：{}", agentStartProperties.toString());
         }
         // 调用私有init方法
         init(agentStartProperties);

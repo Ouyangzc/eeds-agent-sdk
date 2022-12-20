@@ -19,6 +19,5 @@ public class AgentLinkTestMessageHandler implements IReceiverMessageHandler {
     public void handleRecData(String topic, String recData) {
         logger.info("收到客户端链接测试报文：topic: {}, msg: {}", topic, recData);
 
-
     }
 }

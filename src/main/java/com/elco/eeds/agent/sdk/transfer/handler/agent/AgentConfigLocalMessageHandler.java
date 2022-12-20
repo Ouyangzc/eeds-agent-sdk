@@ -32,7 +32,7 @@ public class AgentConfigLocalMessageHandler implements IReceiverMessageHandler {
 
     @Override
     public void handleRecData(String topic, String recData) {
-        logger.info("收到客户端私有配置报文：topic: {}, msg: {}", topic, recData);
+        logger.debug("收到客户端私有配置报文：topic: {}, msg: {}", topic, recData);
         AgentConfigMessage message = JSON.parseObject(recData, AgentConfigMessage.class);
         Agent agent = Agent.getInstance();
         AgentBaseInfo agentBaseInfo = agent.getAgentBaseInfo();
@@ -68,7 +68,7 @@ public class AgentConfigLocalMessageHandler implements IReceiverMessageHandler {
             waitWriteJsonList.addAll(listPrivate);
             JSONArray writeAgentFileJsonArray = JSONArray.parseArray(JSON.toJSONString(waitWriteJsonList));
             AgentFileExtendUtils.setConfigToLocalAgentFile(writeAgentFileJsonArray);
-            logger.info("客户端更新全局配置成功，新的客户端配置为：{}", agent.getAgentBaseInfo().toString());
+            logger.debug("客户端更新全局配置成功，新的客户端配置为：{}", agent.getAgentBaseInfo().toString());
         } catch (SdkException e) {
             logger.error("客户端token报文处理异常：{}", e);
             e.printStackTrace();

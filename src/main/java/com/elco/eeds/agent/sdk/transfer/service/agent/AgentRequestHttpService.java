@@ -3,7 +3,6 @@ package com.elco.eeds.agent.sdk.transfer.service.agent;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.elco.eeds.agent.sdk.common.entity.ResponseResult;
 import com.elco.eeds.agent.sdk.common.enums.SysCodeEnum;
 import com.elco.eeds.agent.sdk.core.bean.agent.*;
@@ -167,7 +166,7 @@ public class AgentRequestHttpService {
         String requestUrl = this.agent.getAgentBaseInfo().getServerUrl() + ConstantHttpApiPath.AGENT_TOKEN;
         try {
             String response = HttpClientUtil.post(requestUrl, agentTokenRequest.getCurrentToken(), JSON.toJSONString(agentTokenRequest));
-            logger.info("调用token接口返回值为：{}", response);
+            logger.debug("调用token接口返回值为：{}", response);
         } catch (Exception e) {
             logger.error("更新客户端TOKEN生效时间接口异常, 形参为：{}", JSON.toJSONString(agentTokenRequest));
             logger.error("请求地址为：{}", requestUrl);

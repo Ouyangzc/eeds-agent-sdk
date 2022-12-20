@@ -34,7 +34,7 @@ public class ConnectProxy {
                         if("connect".equals(method.getName())){
                             Boolean bool = (Boolean)invoke;
                             if(bool){
-                                logger.info("创建连接成功：{}",method.getName());
+                                logger.debug("创建连接成功：{}",method.getName());
                                 ThingsStatusMessage.sendConnectMsg("1","2");
                             }
                         }

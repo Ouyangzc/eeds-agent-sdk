@@ -214,7 +214,7 @@ public class DataCountServiceImpl implements DataCountService {
                     if (nowTimestamp > countEndTime) {
                         postDataCount.setStatus(ConstantCount.STATUS_UN_SENT);
                         try {
-                            logger.info("统计记录--生成--追加写到文件，信息:{}", JSON.toJSONString(postDataCount));
+                            logger.debug("统计记录--生成--追加写到文件，信息:{}", JSON.toJSONString(postDataCount));
                             countDataHolder.countDataAppendToFile(postDataCount);
                         } catch (IOException e) {
                             logger.error("统计记录--未发送--追加写到文件,发生异常，信息:{}", e);
