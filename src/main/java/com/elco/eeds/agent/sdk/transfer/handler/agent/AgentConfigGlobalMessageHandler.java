@@ -70,7 +70,7 @@ public class AgentConfigGlobalMessageHandler implements IReceiverMessageHandler 
             AgentFileExtendUtils.setConfigToLocalAgentFile(writeAgentFileJsonArray);
             logger.debug("客户端更新全局配置成功，新的客户端配置为：{}", agent.getAgentBaseInfo().toString());
         } catch (SdkException e) {
-            logger.error("客户端token报文处理异常：{}", e);
+            logger.error("客户端更新全局配置报文处理异常：{}", e);
             e.printStackTrace();
         }
     }
