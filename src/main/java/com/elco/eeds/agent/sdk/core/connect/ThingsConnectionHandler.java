@@ -116,7 +116,7 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
         // 执行数据解析
         // get 数据源ID的点位  return List<PropertiesContext>
 
-        this.getParsing().parsing();
+        this.getParsing().parsing(msg);
         //   parseMsg(List<PropertiesContext> propertiesContexts,String message)  return List<PropertiesValue>
         // 执行本地缓存
         // local.save(msg)
@@ -133,7 +133,7 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
         // 执行数据解析
         // get 数据源ID的点位  return List<PropertiesContext>
 
-        this.getParsing().parsing();
+        this.getParsing().parsing(msg);
         //   parseMsg(List<PropertiesContext> propertiesContexts,String message)  return List<PropertiesValue>
         // 执行本地缓存
         // local.save(msg)
