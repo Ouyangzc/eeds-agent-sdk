@@ -34,7 +34,7 @@ public class ReflectUtils {
         for (Field item : fields) {
             String name = item.getName();
             String typeName = item.getGenericType().getTypeName();
-            logger.debug("属性名：{}， 类型：{}", name, typeName);
+            // logger.debug("属性名：{}， 类型：{}", name, typeName);
             String value = (String) ReflectUtils.invokeGet(o, name);
             map.put(name, value);
         }
@@ -53,7 +53,7 @@ public class ReflectUtils {
             Field field = o.getClass().getDeclaredField(fieldName);
             flag = true;
         } catch (NoSuchFieldException e) {
-            logger.debug("{}没有{}字段", o.getClass().getName(), fieldName);
+            // logger.debug("{}没有{}字段", o.getClass().getName(), fieldName);
         }
         return flag;
     }

@@ -50,15 +50,4 @@ public class ConfigBase {
                 '}';
     }
 
-    public static void main(String[] args) {
-        //可以使用getDeclaredFields()方法获取对象的所有属性
-        ConfigBase configBase = new ConfigBase();		// 先初始化一个类
-        Field[] fields = configBase.getClass().getDeclaredFields();	// 获取对象的所有属性
-        for (Field item : fields) {
-            String name = item.getName();	// 获取对象属性名
-            String typeName = item.getGenericType().getTypeName();	// 获取对象属性的类型
-            System.out.printf("属性名：%s,类型：%s\n", name, typeName);
-        }
-
-    }
 }

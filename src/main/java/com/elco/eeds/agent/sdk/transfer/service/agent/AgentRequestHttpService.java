@@ -107,7 +107,7 @@ public class AgentRequestHttpService {
         Map<String, Object> map = (Map<String, Object>) JSON.parse(data);
 
         for (Map.Entry<String, Object> entry : map.entrySet()) {
-            logger.debug("key={},value={}", entry.getKey(), entry.getValue());
+            // logger.debug("key={},value={}", entry.getKey(), entry.getValue());
             // 反射赋值
             if (ReflectUtils.isContainKey(agentBaseInfo, entry.getKey())) {
                 ReflectUtils.invokeSet(agentBaseInfo, entry.getKey(), entry.getValue());

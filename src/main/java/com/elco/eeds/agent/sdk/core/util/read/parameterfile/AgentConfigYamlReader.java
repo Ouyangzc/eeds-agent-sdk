@@ -49,7 +49,7 @@ public class AgentConfigYamlReader {
                 //读取yaml中的数据并且以map集合的形式存储
                 UrlResource urlResource = new UrlResource(resource);
                 map = yaml.load(urlResource.getInputStream());
-                logger.debug("yml内容为：{}", map);
+                // logger.debug("yml内容为：{}", map);
             }else {
                 throw new SdkException(ErrorEnum.RESOURCE_OBTAIN_ERROR.code());
             }
@@ -77,9 +77,9 @@ public class AgentConfigYamlReader {
             throw new SdkException(ErrorEnum.CONFIG_FILE_ERROR.code());
         }
 
-        logger.info("从配置文件取出配置成功：serverUrl={}, name={}, port={}, token={}, baseFolder={}",
-                agent.get("serverUrl"), agent.get("name"), agent.get("port"),
-                agent.get("token"), agent.get("baseFolder"));
+//        logger.info("从配置文件取出配置成功：serverUrl={}, name={}, port={}, token={}, baseFolder={}",
+//                agent.get("serverUrl"), agent.get("name"), agent.get("port"),
+//                agent.get("token"), agent.get("baseFolder"));
         return agentStartProperties;
     }
 }

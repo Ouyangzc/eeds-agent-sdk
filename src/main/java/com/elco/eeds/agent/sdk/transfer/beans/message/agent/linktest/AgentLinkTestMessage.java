@@ -10,4 +10,7 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
  * @Description: 客户端链路测试
  */
 public class AgentLinkTestMessage extends BaseMessage<SubAgentLinkTestMessage> {
+
+
+
 }

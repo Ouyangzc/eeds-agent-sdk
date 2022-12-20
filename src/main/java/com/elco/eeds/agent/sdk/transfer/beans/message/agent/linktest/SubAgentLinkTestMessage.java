@@ -9,6 +9,29 @@ package com.elco.eeds.agent.sdk.transfer.beans.message.agent.linktest;
  */
 public class SubAgentLinkTestMessage {
 
+    /**
+     * 用户ID
+     */
+    private String pkUser;
 
+    /**
+     * websocket链接ID
+     */
+    private String socketId;
 
+    public String getPkUser() {
+        return pkUser;
+    }
+
+    public void setPkUser(String pkUser) {
+        this.pkUser = pkUser;
+    }
+
+    public String getSocketId() {
+        return socketId;
+    }
+
+    public void setSocketId(String socketId) {
+        this.socketId = socketId;
+    }
 }
