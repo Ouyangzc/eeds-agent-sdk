@@ -61,6 +61,10 @@ public class ThingsDriverContext {
      * {@link }
      */
     private String operatorType;
+    /**
+     * 是否支持监控
+     */
+    private String isMonitoring;
 
     /**
      * 扩展map
@@ -169,5 +173,13 @@ public class ThingsDriverContext {
 
     public void setExtraMap(Map<String, String> extraMap) {
         this.extraMap = extraMap;
+    }
+
+    public String getIsMonitoring() {
+        return isMonitoring;
+    }
+
+    public void setIsMonitoring(String isMonitoring) {
+        this.isMonitoring = isMonitoring;
     }
 }
