@@ -1,7 +1,15 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.data.realTime;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson.JSON;
+import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
+import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
+import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
+import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
+import com.elco.eeds.agent.sdk.core.util.DateUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,4 +19,23 @@ import java.util.List;
  * @Date 2022/12/9 14:26
  */
 public class DataRealTimePropertiesMessage extends BaseMessage<List<SubDataRealTimePropertiesMessage>> {
+
+    public static String getMessage(List<PropertiesValue> propertiesValueList) {
+        DataRealTimePropertiesMessage message = new DataRealTimePropertiesMessage();
+        message.setMethod(ConstantMethod.METHOD_DATA_REALTIME_PROPERTIES);
+        message.setTimestamp(DateUtils.getTimestamp());
+        List<SubDataRealTimePropertiesMessage> subMsgs = new ArrayList<>();
+        for (PropertiesValue pv : propertiesValueList) {
+            SubDataRealTimePropertiesMessage subMsg = new SubDataRealTimePropertiesMessage();
+            BeanUtil.copyProperties(pv, subMsg);
+            subMsgs.add(subMsg);
+        }
+        message.setData(subMsgs);
+        return JSON.toJSONString(message);
+    }
+
+    public static String getTopic(String agentId,String thingsId) {
+        return ConstantTopic.TOPIC_SED_DATA_REALTIME_PROPERTIES.replace(ConstantCommon.TOPIC_SUFFIX_AGENTID,agentId).replace(ConstantCommon.TOPIC_SUFFIX_THINGSID,thingsId);
+    }
+
 }

@@ -62,6 +62,10 @@ public class ConstantTopic {
      */
     public static final String TOPIC_SED_DATA_SYNC_FINISH = "agent.data.syncData.respond.{agentId}";
 
+    /**
+     * 数据--实时--变量值
+     */
+    public static final String TOPIC_SED_DATA_REALTIME_PROPERTIES = "agent.data.realTime.value.{agentId}.{thingsId}";
 
     /**
      * 数据源--同步--增量同步

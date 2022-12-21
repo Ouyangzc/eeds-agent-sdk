@@ -49,4 +49,9 @@ public class ConstantMethod {
      */
     public static final String METHOD_DATA_SYNC_FINISH = "data_sync_finish";
 
+    /**
+     * 数据--实时--变量
+     */
+    public static final String METHOD_DATA_REALTIME_PROPERTIES = "data_realTime_properties";
+
 }
