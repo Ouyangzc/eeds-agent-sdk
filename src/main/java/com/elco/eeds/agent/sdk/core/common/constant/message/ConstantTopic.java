@@ -71,4 +71,18 @@ public class ConstantTopic {
      * 数据源--同步--增量同步
      */
     public static final String TOPIC_REC_THINGS_SYNC_INCR = "server.things.sync.incr.{agentId}";
+
+
+    /**
+     * 数据源健康状态（心跳）
+     * agent.things.heartBeat.request.{thingsId}
+     */
+    public static final String TOPIC_THINGS_HEARTBEAT_REQUEST = "agent.things.heartBeat.request.";
+
+    /**
+     * 数据源连接状态
+     * agent.things.connectStatus.request.{thingsId}
+     */
+    public static final String TOPIC_THINGS_CONNECTSTATUS_REQUEST = "agent.things.connectStatus.request.";
+
 }

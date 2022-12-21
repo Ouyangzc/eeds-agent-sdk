@@ -124,7 +124,6 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
 
     public abstract void write(EedsThings things,String msg);
 
-
     /**
      * 执行模板方法
      * @param thingsId
@@ -133,25 +132,13 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
      */
     public void execute(String thingsId,String msg,Long collectTime){
         List<PropertiesValue> valueList = this.getParsing()
-                .parsing(ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId), msg);
+                .parsing(this.context,ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId), msg);
         RealTimePropertiesValueService.recRealTimePropertiesValue(msg,thingsId,collectTime,valueList);
     }
 
-//    public void execute(String clientId,String thingsId,String topic ,String msg){
-//
-//
-//
-//// parseMsg(Map<String,List<PropertiesContext>> propertiesContexts,String message);
-//        // 执行数据解析
-//        // get 数据源ID的点位  return List<PropertiesContext>
-//
-//        this.getParsing().parsing(ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId),msg);
-//        //   parseMsg(List<PropertiesContext> propertiesContexts,String message)  return List<PropertiesValue>
-//        // 执行本地缓存
-//        // local.save(msg)
-//        // 执行统计以及数据上报
-//        //report(List<PropertiesValue> )
-//
-//    }
+
+
+
+
 
 }

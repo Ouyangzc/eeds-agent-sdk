@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.core.parsing;
 
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
+import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * @description：
  */
 public abstract class DataParsing {
-    public abstract List<PropertiesValue> parsing(List<PropertiesContext> properties, String msg);
+    public abstract List<PropertiesValue> parsing(ThingsDriverContext context,List<PropertiesContext> properties, String msg);
 
     public String parsingCommand(String original){
         return original;

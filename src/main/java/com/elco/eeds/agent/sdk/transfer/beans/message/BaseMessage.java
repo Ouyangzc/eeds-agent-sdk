@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message;
 
+import cn.hutool.json.JSONUtil;
+
 /**
  * @title: BaseMessage
  * @Author wl
@@ -44,5 +46,10 @@ public class BaseMessage<T> {
 
     public void setData(T data) {
         this.data = data;
+    }
+
+
+    public String toJson() {
+        return JSONUtil.toJsonStr(this);
     }
 }
