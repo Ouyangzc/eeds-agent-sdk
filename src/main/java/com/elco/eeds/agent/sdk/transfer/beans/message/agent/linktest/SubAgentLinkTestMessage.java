@@ -19,6 +19,8 @@ public class SubAgentLinkTestMessage {
      */
     private String socketId;
 
+    private SubAgentLinkTestData data;
+
     public String getPkUser() {
         return pkUser;
     }
@@ -33,5 +35,13 @@ public class SubAgentLinkTestMessage {
 
     public void setSocketId(String socketId) {
         this.socketId = socketId;
+    }
+
+    public SubAgentLinkTestData getData() {
+        return data;
+    }
+
+    public void setData(SubAgentLinkTestData data) {
+        this.data = data;
     }
 }

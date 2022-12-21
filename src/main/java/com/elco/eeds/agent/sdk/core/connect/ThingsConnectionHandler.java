@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.core.connect;
 
 
+import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.parsing.DataParsing;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsThings;
@@ -118,7 +119,7 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
     }
 
 
-    public abstract void read();
+    public abstract void read(List<PropertiesContext> properties);
 
 
     public abstract void write(EedsThings things,String msg);

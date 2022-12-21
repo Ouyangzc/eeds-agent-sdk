@@ -32,8 +32,8 @@ public class ConstantTopic {
     /**
      * 客户端链接测试
      */
-    public static final String TOPIC_AGENT_LINK_TEST = "server.agent.linkTest.request.{agentId}";
-
+    public static final String TOPIC_AGENT_LINK_TEST_REQ = "server.agent.linkTest.request.{agentId}";
+    public static final String TOPIC_AGENT_LINK_TEST_RSP = "agent.agent.linkTest.respond.{agentId}";
 
     /**
      * 接收--数据统计确认报文
