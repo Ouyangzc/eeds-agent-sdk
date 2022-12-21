@@ -33,7 +33,7 @@ public class RealTimePropertiesValueService {
         String postMsg = DataRealTimePropertiesMessage.getMessage(propertiesValueList);
         String agentId = Agent.getInstance().getAgentBaseInfo().getAgentId();
         String topic = DataRealTimePropertiesMessage.getTopic(agentId, thingsId);
-        logger.debug("实时数据推送：topic:{}, msg:{}", topic, postMsg);
+        logger.info("实时数据推送：topic:{}, msg:{}", topic, postMsg);
         mqPlugin.publish(topic, postMsg, null);
     }
 
