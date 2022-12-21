@@ -1,4 +1,4 @@
-package com.elco.eeds.agent.sdk.common.enums;
+package common.enums;
 
 import java.text.MessageFormat;
 

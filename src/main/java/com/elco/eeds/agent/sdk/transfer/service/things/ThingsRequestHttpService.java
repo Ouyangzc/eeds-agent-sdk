@@ -2,16 +2,14 @@ package com.elco.eeds.agent.sdk.transfer.service.things;
 
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
-import com.elco.eeds.agent.sdk.common.entity.ResponseResult;
-import com.elco.eeds.agent.sdk.common.enums.SysCodeEnum;
+import common.entity.ResponseResult;
+import common.enums.SysCodeEnum;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
-import com.elco.eeds.agent.sdk.core.common.constant.http.ConstantHttpApiPath;
 import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.core.util.http.HttpClientUtil;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsSyncRequest;
-import com.elco.eeds.agent.sdk.transfer.service.agent.AgentRequestHttpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

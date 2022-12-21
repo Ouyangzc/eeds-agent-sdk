@@ -2,12 +2,16 @@ package com.elco.eeds.agent.sdk.transfer.service.data.count;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
+import com.elco.eeds.agent.mq.nats.plugin.NatsPlugin;
+import com.elco.eeds.agent.mq.plugin.MQPluginManager;
+import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCount;
 import com.elco.eeds.agent.sdk.core.util.DateUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.data.count.PostDataCount;
 import com.elco.eeds.agent.sdk.transfer.beans.data.count.ThingsDataCount;
+import com.elco.eeds.agent.sdk.transfer.beans.message.data.count.post.DataCountMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,14 +30,13 @@ import java.util.stream.Collectors;
 public class DataCountServiceImpl implements DataCountService {
     public static final Logger logger = LoggerFactory.getLogger(DataCountServiceImpl.class);
 
-    private static CountDataHolder countDataHolder;
+    private static CountDataHolder countDataHolder = new CountDataHolder();
 
     public static Map<Long, PostDataCount> thingsDataCountMap = new ConcurrentHashMap<>();
 
     public static Long endTime = 0L;
 
-    @Override
-    public CountDataHolder getCountFile() {
+    public static CountDataHolder getCountFile() {
         try {
             List<PostDataCount> fileData = countDataHolder.getCountDataFormFile();
             if (fileData == null) {
@@ -60,8 +63,8 @@ public class DataCountServiceImpl implements DataCountService {
         return null;
     }
 
-    @Override
-    public void recRealTimeData(String agentId, Long collectTime, ThingsDataCount thingsDataCount) {
+
+    public static void recRealTimeData(String agentId, Long collectTime, ThingsDataCount thingsDataCount) {
         String thingsId = thingsDataCount.getThingsId();
         Set<Long> keySet = thingsDataCountMap.keySet();
         Boolean flag = true;
@@ -127,12 +130,22 @@ public class DataCountServiceImpl implements DataCountService {
             logger.error("统计记录--发送--状态变更存储文件异常，信息:{}", e);
         }
         if (null != doPostData) {
-            // TODO: 2022/12/9
+            String agentId = Agent.getInstance().getAgentBaseInfo().getAgentId();
+            String topic = DataCountMessage.getTopic(agentId);
+            String msg = DataCountMessage.getMsg(doPostData);
+            MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
+            logger.info("发送统计报文，主题:{}，消息内容:{}", topic, msg);
+            mqPlugin.publish(topic, msg, null);
         }
     }
 
-    @Override
-    public void saveDoneCountData(PostDataCount doneData) {
+    /**
+     * 保存统计数据
+     *
+     * @param doneData 统计记录
+     */
+
+    public static void saveDoneCountData(PostDataCount doneData) {
         //将完成统计移动到统计完成文件中
         countDataHolder.moveCountDataToDoneFile(doneData);
         //移除当前，并设置下一个等待统计为要发送状态
@@ -140,8 +153,11 @@ public class DataCountServiceImpl implements DataCountService {
         countDataHolder.setDoPostData(lastPostData);
     }
 
-    @Override
-    public void setUp() {
+
+    /**
+     * 初始化
+     */
+    public static void setUp() {
         CountDataHolder countDataHolder = getCountFile();
         if (null != countDataHolder) {
             PostDataCount doPostData = countDataHolder.getDoPostData();
@@ -153,8 +169,12 @@ public class DataCountServiceImpl implements DataCountService {
         }
     }
 
-    @Override
-    public void recConfirmMsg(String countId) {
+    /**
+     * 收到确认报文
+     *
+     * @param countId
+     */
+    public static void recConfirmMsg(String countId) {
         PostDataCount postData = countDataHolder.getDoPostData();
         if (null != postData) {
             if (countId.equals(postData.getCountId())) {
@@ -187,7 +207,6 @@ public class DataCountServiceImpl implements DataCountService {
             String countId = localAgentId + System.currentTimeMillis();
             count.setAgentId(Long.valueOf(localAgentId));
             count.setCountId(countId);
-            count.setAgentId(Long.valueOf(localAgentId));
             count.setStartTime(countStartTime);
             count.setEndTime(countEndTime);
             count.setThingsCountList(null);

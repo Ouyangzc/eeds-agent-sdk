@@ -10,6 +10,8 @@ import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.AgentConfigYamlReader;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.ResourceLoader;
 import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsSyncIncrMessageHandler;
+import com.elco.eeds.agent.sdk.transfer.quartz.CountScheduler;
+import com.elco.eeds.agent.sdk.transfer.service.data.count.DataCountServiceImpl;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsServiceImpl;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
@@ -36,6 +38,7 @@ public class AgentStarter {
 
     private static AgentRegisterService registerService = new AgentRegisterService(thingsSyncService, thingsSyncIncrMessageHandler);
 
+    private static CountScheduler countScheduler = new CountScheduler();
     private AgentConfigYamlReader configReader;
 
     private static void init(AgentStartProperties agentStartProperties) throws Exception {
@@ -53,9 +56,9 @@ public class AgentStarter {
             // 根据协议加载数据源信息
             // TODO 根据协议加载数据源信息
             // 加载统计
-            // TODO 加载统计
+            DataCountServiceImpl.setUp();
             // 统计定时任务
-            // TODO 统计定时任务
+            countScheduler.startCountScheduler();
             logger.info(Logo.logo);
         } catch (Exception e) {
             e.printStackTrace();

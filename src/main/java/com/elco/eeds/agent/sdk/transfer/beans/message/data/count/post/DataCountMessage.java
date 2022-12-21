@@ -2,7 +2,9 @@ package com.elco.eeds.agent.sdk.transfer.beans.message.data.count.post;
 
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
+import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
+import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
 import com.elco.eeds.agent.sdk.transfer.beans.data.count.PostDataCount;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 import org.slf4j.Logger;
@@ -30,5 +32,9 @@ public class DataCountMessage extends BaseMessage<SubDataCountMessage> {
         message.setData(SubDataCountMessage.getSubMsg(dataCount));
         String msg = JSON.toJSONString(message);
         return msg;
+    }
+
+    public static String getTopic(String agentId) {
+        return ConstantTopic.TOPIC_SED_DATA_COUNT_POST.replace(ConstantCommon.TOPIC_SUFFIX_AGENTID, agentId);
     }
 }
