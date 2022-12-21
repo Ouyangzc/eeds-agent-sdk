@@ -34,17 +34,6 @@ public class AgentHeartMessageHandler implements IReceiverMessageHandler {
         } catch (Exception e) {
             logger.error("客户端心跳报文处理异常", e);
             e.printStackTrace();
-
         }
-    }
-
-    public static void main(String[] args) {
-        AgentHeartMessageHandler agentHeartMessageHandler = new AgentHeartMessageHandler();
-        String agentId = "1234567890";
-        String topic = "server.agent.heartBeat.request.{agentId}";
-        String message = "{\"method\":\"agent_heartBeat_request\",\"timestamp\":\"1666349496479\",\"data\":{\"operation\":\"ping\"}}";
-        topic = topic.replace("{agentId}", agentId);
-
-        agentHeartMessageHandler.handleRecData(topic, message);
     }
 }
