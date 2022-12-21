@@ -15,6 +15,7 @@ import com.elco.eeds.agent.sdk.core.util.ReplaceTopicAgentId;
 import com.elco.eeds.agent.sdk.core.util.http.IpUtil;
 import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentTokenRequest;
 import com.elco.eeds.agent.sdk.transfer.handler.agent.*;
+import com.elco.eeds.agent.sdk.transfer.handler.data.count.DataCountConfirmMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsSyncIncrMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.service.agent.AgentRequestHttpService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncService;
@@ -37,6 +38,7 @@ public class AgentRegisterService implements IAgentRegisterService {
     private AgentConfigGlobalMessageHandler agentConfigGlobalMessageHandler = new AgentConfigGlobalMessageHandler();
     private AgentConfigLocalMessageHandler agentConfigLocalMessageHandler = new AgentConfigLocalMessageHandler();
     private AgentLinkTestMessageHandler agentLinkTestMessageHandler = new AgentLinkTestMessageHandler();
+    private DataCountConfirmMessageHandler dataCountConfirmMessageHandler = new DataCountConfirmMessageHandler();
     private AgentRequestHttpService agentRequestHttpService = new AgentRequestHttpService();
     private ThingsSyncService thingsSyncService;
 
@@ -111,6 +113,10 @@ public class AgentRegisterService implements IAgentRegisterService {
 
             //数据源--增量同步
             natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_REC_THINGS_SYNC_INCR, agentId), thingsSyncIncrMessageHandler);
+
+            //统计--统计确认
+            natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_REC_DATA_COUNT_CONFIRM, agentId), dataCountConfirmMessageHandler);
+
             // 订阅其他topic...
             // 待补充
         } catch (Exception e) {

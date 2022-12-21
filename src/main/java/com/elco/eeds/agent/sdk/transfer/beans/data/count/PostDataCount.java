@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.data.count;
 
+import com.alibaba.fastjson.JSON;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,7 +84,10 @@ public class PostDataCount {
     public void setThingsCountList(List<ThingsDataCount> thingsCountList) {
         this.thingsCountList = thingsCountList;
     }
-
+    @Override
+    public String toString() {
+        return JSON.toJSONString(this);
+    }
     /**
      * 获取新的统计记录
      *

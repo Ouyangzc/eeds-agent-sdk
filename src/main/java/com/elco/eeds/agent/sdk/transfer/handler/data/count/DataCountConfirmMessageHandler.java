@@ -17,17 +17,11 @@ import org.slf4j.LoggerFactory;
 public class DataCountConfirmMessageHandler implements IReceiverMessageHandler {
     private static Logger logger = LoggerFactory.getLogger(DataCountConfirmMessageHandler.class);
 
-    private DataCountServiceImpl dataCountService;
-
-    public DataCountConfirmMessageHandler(DataCountServiceImpl dataCountService) {
-        this.dataCountService = dataCountService;
-    }
-
     @Override
     public void handleRecData(String topic, String recData) {
         logger.info("数据统计--收到确认报文,主题:{},内容:{}", topic, recData);
         DataCountConfirmMessage confirmMessage = JSON.parseObject(recData, DataCountConfirmMessage.class);
         SubDataCountConfirmMessage message = confirmMessage.getData();
-        dataCountService.recConfirmMsg(message.getCountId());
+        DataCountServiceImpl.recConfirmMsg(message.getCountId());
     }
 }

@@ -52,7 +52,7 @@ public class CountDataHolder {
      * @return
      */
     public PostDataCount getLastPostData() {
-        if (waitingCountDatas.isEmpty()) {
+        if (!waitingCountDatas.isEmpty()) {
             int size = this.waitingCountDatas.size() - 1;
             PostDataCount postDataCount = this.waitingCountDatas.get(size);
             this.waitingCountDatas.remove(size);

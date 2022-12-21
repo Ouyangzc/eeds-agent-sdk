@@ -15,7 +15,7 @@ public interface DataCountService {
      *
      * @return
      */
-    CountDataHolder getCountFile();
+    //CountDataHolder getCountFile();
 
 
     /**
@@ -24,7 +24,7 @@ public interface DataCountService {
      * @param collectTime 数据采集时间戳
      * @param thingsDataCount 数据源统计信息
      */
-    void recRealTimeData(String agentId, Long collectTime, ThingsDataCount thingsDataCount);
+    //void recRealTimeData(String agentId, Long collectTime, ThingsDataCount thingsDataCount);
 
 
     /**
@@ -36,24 +36,4 @@ public interface DataCountService {
 
 
 
-
-    /**
-     * 保存统计数据
-     *
-     * @param dataCount 统计记录
-     */
-    void saveDoneCountData(PostDataCount dataCount);
-
-    /**
-     * 初始化
-     */
-    void setUp();
-
-
-    /**
-     * 收到确认报文
-     *
-     * @param countId 统计ID
-     */
-    void recConfirmMsg(String countId);
 }

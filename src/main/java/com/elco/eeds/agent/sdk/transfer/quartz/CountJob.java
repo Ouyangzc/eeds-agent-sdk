@@ -15,11 +15,6 @@ import org.slf4j.LoggerFactory;
  */
 public class CountJob implements Job {
     public static final Logger logger = LoggerFactory.getLogger(CountJob.class);
-    private DataCountServiceImpl dataCountService;
-
-    public CountJob(DataCountServiceImpl dataCountService) {
-        this.dataCountService = dataCountService;
-    }
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {

@@ -98,7 +98,7 @@ public class RealTimeDataMessageFileUtils {
      * @param thingsId 数据源ID 文件目录
      * @param data     数据
      */
-    public void writeAppend(String thingsId, String data) {
+    public static void writeAppend(String thingsId, String data) {
         //写文件
         try {
             File file = getCurrentWriteFile(thingsId);
@@ -132,7 +132,7 @@ public class RealTimeDataMessageFileUtils {
      *
      * @param agentBaseFileCycle
      */
-    private void removeFile(String agentBaseFileCycle) {
+    public static void removeFile(String agentBaseFileCycle) {
         int offset = Integer.valueOf("-" + agentBaseFileCycle);
         DateTime newDate2 = DateUtil.offsetDay(new Date(), offset);
         long nowTime = newDate2.getTime();
