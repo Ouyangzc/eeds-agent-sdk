@@ -1,8 +1,10 @@
 package com.elco.eeds.agent.sdk.transfer.service.things;
 
+import cn.hutool.core.thread.ThreadUtil;
 import com.elco.eeds.agent.mq.nats.plugin.NatsPlugin;
 import com.elco.eeds.agent.mq.plugin.MQPluginManager;
 import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
+import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
 import com.elco.eeds.agent.sdk.transfer.beans.message.things.ThingsHeartBeatMessage;
 
@@ -17,9 +19,14 @@ public class ThingsHeartBeatMqService {
     private static final String DIS_CONNECT = "3";
 
     private static void send(String thingsId, String status) {
-        MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
-        mqPlugin.publish(ConstantTopic.TOPIC_THINGS_HEARTBEAT_REQUEST + thingsId
-                , ThingsHeartBeatMessage.create(thingsId, status).toJson(), null);
+        ThreadUtil.execute(new Runnable() {
+            @Override
+            public void run() {
+                MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
+                mqPlugin.publish(ConstantTopic.TOPIC_THINGS_HEARTBEAT_REQUEST + Agent.getInstance().getAgentBaseInfo().getAgentId()
+                        , ThingsHeartBeatMessage.create(thingsId, status).toJson(), null);
+            }
+        });
     }
 
     public static void sendConnectMsg(String thingsId) {

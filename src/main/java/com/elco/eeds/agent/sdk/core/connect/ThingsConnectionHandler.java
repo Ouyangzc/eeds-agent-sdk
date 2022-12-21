@@ -7,11 +7,18 @@ import com.elco.eeds.agent.sdk.core.parsing.DataParsing;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsThings;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import com.elco.eeds.agent.sdk.transfer.service.data.RealTimePropertiesValueService;
+import com.elco.eeds.agent.sdk.transfer.service.things.ThingsConnectStatusMqService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author ：ytl
@@ -20,7 +27,9 @@ import java.util.List;
  */
 public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
 
+    public static final Logger logger = LoggerFactory.getLogger(ThingsConnectionHandler.class);
 
+    private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(4);
     private ThingsConnection thingsConnection;
 
     public ThingsConnection getThingsConnection() {
@@ -45,7 +54,7 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
             //
             parsing= (M) ((Class)types[1]).newInstance();
             //这里需要强转得到的是实体类类路径
-//            如果types[1].getClass().newInstance();并不行，得到的是泛型类型
+            //如果types[1].getClass().newInstance();并不行，得到的是泛型类型
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -136,8 +145,34 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
         RealTimePropertiesValueService.recRealTimePropertiesValue(msg,thingsId,collectTime,valueList);
     }
 
+    /**
+     * 执行重连
+     */
+    public void reconnect(){
+        ThingsConnectStatusMqService.sendDisConnectMsg(this.getThingsId());
+        Integer reconnectNum = Integer.valueOf(this.context.getReconnectNum());
+        Long reconnectInterval = Long.valueOf(this.context.getReconnectInterval()) * 1000;
+        ThingsConnection connection = this.getThingsConnection();
+        ThingsDriverContext info = this.getContext();
+        ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+            Integer num = 1;
+
+            @Override
+            public void run() {
+                try {
+                    if (num <= reconnectNum) {
+                        connection.connect(info);
+                    }
+                } catch (Throwable e) {
+                    num++;
+                    logger.error("自定义重连失败，失败原因，msg:{}", e.getMessage());
+                }
+            }
+        }, 1000, reconnectInterval, TimeUnit.MILLISECONDS);
 
 
+
+    }
 
 
 

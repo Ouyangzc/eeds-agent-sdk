@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.service.things;
 
+import cn.hutool.core.thread.ThreadUtil;
 import com.elco.eeds.agent.mq.nats.plugin.NatsPlugin;
 import com.elco.eeds.agent.mq.plugin.MQPluginManager;
 import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
@@ -17,9 +18,14 @@ public class ThingsConnectStatusMqService {
     private static final String DIS_CONNECT = "3";
 
     private static void send(String thingsId, String status,String msg) {
-        MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
-        mqPlugin.publish(ConstantTopic.TOPIC_THINGS_CONNECTSTATUS_REQUEST + thingsId
-                , ThingsConnectStatusMessage.create(thingsId, status,msg).toJson(), null);
+        ThreadUtil.execute(new Runnable() {
+            @Override
+            public void run() {
+                MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
+                mqPlugin.publish(ConstantTopic.TOPIC_THINGS_CONNECTSTATUS_REQUEST + thingsId
+                        , ThingsConnectStatusMessage.create(thingsId, status,msg).toJson(), null);
+            }
+        });
     }
 
     public static void sendConnectMsg(String thingsId) {
