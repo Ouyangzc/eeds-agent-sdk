@@ -4,6 +4,7 @@ import com.elco.eeds.agent.sdk.transfer.beans.things.EedsProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsThings;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @ClassName ThingsService
@@ -53,7 +54,7 @@ public interface ThingsService {
      * @param thingsId
      * @param addProperties
      */
-    void addProperties(String thingsId, EedsProperties addProperties);
+    void addProperties(String thingsId, EedsProperties addProperties, List<EedsThings> syncThingsList);
 
     /**
      * 删除变量

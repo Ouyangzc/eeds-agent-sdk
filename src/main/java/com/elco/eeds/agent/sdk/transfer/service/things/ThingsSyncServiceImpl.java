@@ -207,7 +207,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                     //新增
                     PROPERTIES_CONTEXT_MAP.put(addProperties.getPropertiesId(), addProperties);
                     EedsProperties eedsProperties = getEedsProperties(syncThingsList, addProperties);
-                    thingsService.addProperties(addProperties.getThingsId(), eedsProperties);
+                    thingsService.addProperties(addProperties.getThingsId(), eedsProperties,syncThingsList);
                 }
             }
         } catch (Exception e) {
