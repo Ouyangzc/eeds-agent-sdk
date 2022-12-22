@@ -56,6 +56,10 @@ public class ConstantTopic {
      */
     public static final String TOPIC_REC_DATA_SYNC_REQ = "server.data.syncData.request.{agentId}";
     /**
+     * 数据--同步-取消
+     */
+    public static final String TOPIC_REC_DATA_SYNC_CANCEL = "server.data.syncData.cancel.{agentId}";
+    /**
      * 数据--同步--确认--发送
      */
     public static final String TOPIC_SED_DATA_SYNC_CONFRIM = "agent.data.syncData.confirm.{agentId}";
@@ -67,6 +71,8 @@ public class ConstantTopic {
      * 数据--同步--同步数据--同步完成
      */
     public static final String TOPIC_SED_DATA_SYNC_FINISH = "agent.data.syncData.respond.{agentId}";
+
+
 
     /**
      * 数据--实时--变量值

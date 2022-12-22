@@ -16,8 +16,11 @@ import com.elco.eeds.agent.sdk.core.util.http.IpUtil;
 import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentTokenRequest;
 import com.elco.eeds.agent.sdk.transfer.handler.agent.*;
 import com.elco.eeds.agent.sdk.transfer.handler.data.count.DataCountConfirmMessageHandler;
+import com.elco.eeds.agent.sdk.transfer.handler.data.sync.DataSyncCancelMessageHandler;
+import com.elco.eeds.agent.sdk.transfer.handler.data.sync.DataSyncRequestMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsSyncIncrMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.service.agent.AgentRequestHttpService;
+import com.elco.eeds.agent.sdk.transfer.service.data.sync.DataSyncService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +42,11 @@ public class AgentRegisterService implements IAgentRegisterService {
     private AgentConfigLocalMessageHandler agentConfigLocalMessageHandler = new AgentConfigLocalMessageHandler();
     private AgentLinkTestMessageHandler agentLinkTestMessageHandler = new AgentLinkTestMessageHandler();
     private DataCountConfirmMessageHandler dataCountConfirmMessageHandler = new DataCountConfirmMessageHandler();
+
+    private DataSyncService dataSyncService = new DataSyncService();
+
+    private DataSyncRequestMessageHandler dataSyncRequestMessageHandler = new DataSyncRequestMessageHandler(dataSyncService);
+    private  DataSyncCancelMessageHandler dataSyncCancelMessageHandler = new DataSyncCancelMessageHandler(dataSyncService);
     private AgentRequestHttpService agentRequestHttpService = new AgentRequestHttpService();
     private ThingsSyncService thingsSyncService;
 
@@ -116,6 +124,11 @@ public class AgentRegisterService implements IAgentRegisterService {
 
             //统计--统计确认
             natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_REC_DATA_COUNT_CONFIRM, agentId), dataCountConfirmMessageHandler);
+
+            //同步--数据--请求
+            natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_REC_DATA_SYNC_REQ, agentId), dataSyncRequestMessageHandler);
+            //同步--数据--取消
+            natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_REC_DATA_SYNC_CANCEL, agentId), dataSyncCancelMessageHandler);
 
             // 订阅其他topic...
             // 待补充

@@ -6,9 +6,14 @@ import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
+import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
+import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
+import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessage;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +31,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date 2022/12/20 13:58
  */
 public class RealTimeDataMessageFileUtils {
+
+    public static final Logger logger = LoggerFactory.getLogger(RealTimeDataMessageFileUtils.class);
 
     public static Map<String, File> fileMap = new ConcurrentHashMap<>();
     public static Map<String, Map<File, File>> fileReadMap = new ConcurrentHashMap<>();
@@ -57,10 +64,10 @@ public class RealTimeDataMessageFileUtils {
         return fileFullPath;
     }
 
-    public List<PropertiesValue> getFileData(String thinsId, Long startTime, Long endTime) {
+    public static List<PropertiesValue> getFileData(String thingsId, Long startTime, Long endTime, List<PropertiesContext> propertiesContextList) {
         List<PropertiesValue> result = new ArrayList<>();
         try {
-            Map<File, File> fileMap = fileReadMap.get(thinsId);
+            Map<File, File> fileMap = fileReadMap.get(thingsId);
             if (ObjectUtil.isEmpty(fileMap)) {
                 return result;
             }
@@ -72,20 +79,20 @@ public class RealTimeDataMessageFileUtils {
                     List<String> dataList = FileUtils.readLines(key, StandardCharsets.UTF_8);
                     for (String data : dataList) {
                         //调用解析方法
-
-                        //List<ReportDataMessage> messages = JSON.parseArray(data, ReportDataMessage.class);
-                        //for (ReportDataMessage message : messages) {
-                        //    Long timestamp = message.getTimeStamp();
-                        //    if (startTime <= timestamp && timestamp <= endTime) {
-                        //        result.add(message);
-                        //    }
-                        //}
+                        OriginalPropertiesValueMessage originalMessage = JSON.parseObject(data, OriginalPropertiesValueMessage.class);
+                        Long collectTime = originalMessage.getCollectTime();
+                        if (startTime <= collectTime && collectTime < endTime) {
+                            String message = originalMessage.getMessage();
+                            List<PropertiesValue> propertiesValueList = ConnectManager.getHandler(thingsId).getParsing().parsing(propertiesContextList, message);
+                            result.addAll(propertiesValueList);
+                        }
                     }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        logger.debug("数据同步：同步数据源id:{},开始时间:{},结束时间：{},获取同步原始报文大小:{}", thingsId, startTime, endTime, result.size());
         return result;
     }
 

@@ -11,7 +11,6 @@ import com.elco.eeds.agent.sdk.core.util.RealTimeDataMessageFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.data.count.ThingsDataCount;
 import com.elco.eeds.agent.sdk.transfer.beans.message.data.realTime.DataRealTimePropertiesMessage;
-import com.elco.eeds.agent.sdk.transfer.handler.data.sync.DataSyncCancelMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.service.data.count.DataCountServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +27,7 @@ public class RealTimePropertiesValueService {
     private static Logger logger = LoggerFactory.getLogger(RealTimePropertiesValueService.class);
 
 
-    public DataCountServiceImpl dataCountService ;
+    public DataCountServiceImpl dataCountService;
 
     /**
      * @param message             原始报文
@@ -39,7 +38,6 @@ public class RealTimePropertiesValueService {
     public static void recRealTimePropertiesValue(String message, String thingsId, Long collectTime, List<PropertiesValue> propertiesValueList) {
         AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
         String agentId = agentBaseInfo.getAgentId();
-        String syncPeriod = agentBaseInfo.getSyncPeriod();
         //存储原始数据
         OriginalPropertiesValueMessage originalPropertiesValueMessage = new OriginalPropertiesValueMessage();
         originalPropertiesValueMessage.setCollectTime(collectTime);
@@ -51,7 +49,7 @@ public class RealTimePropertiesValueService {
         dataCount.setSize(propertiesValueList.size());
         dataCount.setStartTime(collectTime);
         dataCount.setEndTime(collectTime);
-        DataCountServiceImpl.recRealTimeData(agentId, Long.valueOf(syncPeriod), dataCount);
+        DataCountServiceImpl.recRealTimeData(agentId, collectTime, dataCount);
 
         //推送数据
         MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());

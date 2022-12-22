@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,10 +81,14 @@ public class FileUtil {
      * @return 字节 1*1024*1024
      */
     public static Long getFileSize(String fileSize) {
-        long size = Long.valueOf(fileSize) * 1048576L;
+        long size = Long.valueOf(fileSize) * 1024*1024;
         return size;
     }
 
 
-
+    public static void getLastDataFile() {
+        List<String> fileNames = new ArrayList<String>();
+        String fileFolder = AgentFileUtils.getBaseFolder() + ConstantFilePath.PROPERTIES_DATA_FOLDER;
+        FileUtil.loadFile(new File(fileFolder), fileNames);
+    }
 }

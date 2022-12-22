@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.finish;
 
+import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
@@ -16,7 +17,7 @@ import java.util.List;
  * @Date 2022/12/9 14:34
  */
 public class DataSyncFinishMessage extends BaseMessage<SubDataSyncFinishMessage> {
-    public static DataSyncFinishMessage getMessage(String queueId, Boolean syncFlag, List<DataSyncFinishResult> datas) {
+    public static String getMessage(String queueId, Boolean syncFlag, List<DataSyncFinishResult> datas) {
         DataSyncFinishMessage message = new DataSyncFinishMessage();
         message.setMethod(ConstantMethod.METHOD_DATA_SYNC_FINISH);
         message.setTimestamp(DateUtils.getTimestamp());
@@ -25,7 +26,7 @@ public class DataSyncFinishMessage extends BaseMessage<SubDataSyncFinishMessage>
         subMsg.setSyncFlag(syncFlag);
         subMsg.setDatas(datas);
         message.setData(subMsg);
-        return message;
+        return JSON.toJSONString(message);
     }
 
     public static String getTopic(String agentId) {

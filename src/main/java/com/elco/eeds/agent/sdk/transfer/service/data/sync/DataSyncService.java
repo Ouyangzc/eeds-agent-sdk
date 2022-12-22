@@ -89,70 +89,7 @@ public class DataSyncService {
     }
 
 
-    /**
-     * 获取过滤点位信息
-     *
-     * @param properties
-     * @return
-     */
-    private List<PropertiesContext> getPropertiesContext(String thingsId, List<PropertiesContext> properties) {
-        List<PropertiesContext> result = new ArrayList<>();
-        //if (properties.size() > 0) {
-        //    result = properties;
-        //} else {
-        //    result = getLocalProperties(thingsId);
-        //}
-        return properties;
-    }
 
-    ///**
-    // * 获取本地点位
-    // *
-    // * @param thingsId
-    // * @return
-    // */
-    //private List<PropertiesContext> getLocalProperties(String thingsId) {
-    //    List<PropertiesContext> result = new ArrayList<>();
-    //    Map<String, List<PropertiesContext>> contextsMap = SyncThingsServiceImpl.CONTEXTS_MAP;
-    //    for (String protocolKey : contextsMap.keySet()) {
-    //        List<PropertiesContext> propertiesContextList = contextsMap.get(protocolKey);
-    //        List<PropertiesContext> propertiesContexts = propertiesContextList.stream().filter(propertiesContext -> propertiesContext.getThingsId().equals(thingsId)).collect(Collectors.toList());
-    //        result.addAll(propertiesContexts);
-    //    }
-    //    return result;
-    //}
-
-
-    /**
-     * 推送变量同步数据
-     *
-     * @param data
-     * @param agentId
-     * @param thingsId
-     */
-    public void sendSyncDataMsg(List<PropertiesValue> data, String agentId, String thingsId) {
-        String topic = DataSyncPropertiesValueMessage.getTopic(agentId, thingsId);
-        DataSyncPropertiesValueMessage message = DataSyncPropertiesValueMessage.getMessage(data);
-        String msg = JSON.toJSONString(message);
-        logger.info("变量数据同步，推送数据,topic:{}", topic);
-        MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
-        mqPlugin.publish(topic, msg, null);
-    }
-
-    /**
-     * 发送同步结果数据
-     *
-     * @param queueId
-     * @param datas
-     */
-    public void postSyncDataResultMsg(String agentId, String queueId, Boolean syncFlag, List<DataSyncFinishResult> datas) {
-        DataSyncFinishMessage resultMessage = DataSyncFinishMessage.getMessage(queueId, syncFlag, datas);
-        String topic = DataSyncFinishMessage.getTopic(agentId);
-        String msg = JSON.toJSONString(resultMessage);
-        MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
-        logger.info("变量数据同步，同步完成，汇总报文，topic:{},msg:{}", topic, msg);
-        mqPlugin.publish(topic, msg, null);
-    }
 
 
 }
