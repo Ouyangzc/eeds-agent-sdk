@@ -55,6 +55,6 @@ public class ConstantMethod {
     /**
      * 数据--实时--变量
      */
-    public static final String METHOD_DATA_REALTIME_PROPERTIES = "data_realTime_properties";
+    public static final String METHOD_DATA_REALTIME_PROPERTIES = "properties_data_report";
 
 }
