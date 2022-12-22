@@ -203,6 +203,7 @@ public class DataCountServiceImpl implements DataCountService {
             String localAgentId = agentBaseInfo.getAgentId();
             String period = agentBaseInfo.getSyncPeriod();
             long countEndTime = countStartTime + Long.valueOf(period);
+
             PostDataCount count = new PostDataCount();
             String countId = localAgentId + System.currentTimeMillis();
             count.setAgentId(Long.valueOf(localAgentId));

@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.data;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
@@ -19,14 +20,18 @@ import java.util.List;
  */
 public class DataSyncPropertiesValueMessage extends BaseMessage<List<SubDataSyncPropertiesValueMessage>> {
 
-    public static DataSyncPropertiesValueMessage getMessage(List<PropertiesValue> data) {
+    public static String getMessage(List<PropertiesValue> datas) {
         DataSyncPropertiesValueMessage message = new DataSyncPropertiesValueMessage();
         message.setMethod(ConstantMethod.METHOD_DATA_SYNC_DATA);
         message.setTimestamp(DateUtils.getTimestamp());
-        ArrayList<SubDataSyncPropertiesValueMessage> subMsgs = new ArrayList<>();
-        BeanUtil.copyProperties(data, subMsgs);
+        List<SubDataSyncPropertiesValueMessage> subMsgs = new ArrayList<>();
+        for (PropertiesValue pv : datas) {
+            SubDataSyncPropertiesValueMessage valueMessage = new SubDataSyncPropertiesValueMessage();
+            BeanUtil.copyProperties(pv, valueMessage);
+            subMsgs.add(valueMessage);
+        }
         message.setData(subMsgs);
-        return message;
+        return JSON.toJSONString(message);
     }
 
     public static String getTopic(String agentId, String thingsId) {
