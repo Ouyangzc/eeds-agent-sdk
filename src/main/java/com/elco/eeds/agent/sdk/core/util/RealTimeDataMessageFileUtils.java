@@ -11,6 +11,8 @@ import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
 import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessage;
+import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
+import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +73,7 @@ public class RealTimeDataMessageFileUtils {
             if (ObjectUtil.isEmpty(fileMap)) {
                 return result;
             }
+            ThingsDriverContext driverContext = ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.get(thingsId);
             for (File key : fileMap.keySet()) {
                 Long fileStartTime = Long.valueOf(key.getName().replace(ConstantFilePath.FILE_FORMAT_JSON, "")) - 1000L;
                 Long fileEndTime = key.lastModified() + 1000L;
@@ -83,7 +86,7 @@ public class RealTimeDataMessageFileUtils {
                         Long collectTime = originalMessage.getCollectTime();
                         if (startTime <= collectTime && collectTime < endTime) {
                             String message = originalMessage.getMessage();
-                            List<PropertiesValue> propertiesValueList = ConnectManager.getHandler(thingsId).getParsing().parsing(propertiesContextList, message);
+                            List<PropertiesValue> propertiesValueList = ConnectManager.getHandler(thingsId).getParsing().parsing(driverContext,propertiesContextList, message);
                             result.addAll(propertiesValueList);
                         }
                     }
