@@ -2,8 +2,8 @@ package com.elco.eeds.agent.sdk.transfer.service.things;
 
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
-import common.entity.ResponseResult;
-import common.enums.SysCodeEnum;
+import com.elco.eeds.agent.sdk.common.entity.ResponseResult;
+import com.elco.eeds.agent.sdk.common.enums.SysCodeEnum;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;

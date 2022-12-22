@@ -42,7 +42,7 @@ public class AgentConfigLocalMessageHandler implements IReceiverMessageHandler {
             String config = AgentFileExtendUtils.getConfigFromLocalAgentFile();
             JSONArray jsonArray = JSONObject.parseArray(config);
             List<BaseConfigEntity> list = JSONObject.parseArray(jsonArray.toJSONString(), BaseConfigEntity.class);
-            List<BaseConfigEntity> listTemp = list.stream().filter(e -> ConstantCommon.ONE.equals(e.getConfigFieldType())).collect(Collectors.toList());
+            List<BaseConfigEntity> listTemp = list.stream().collect(Collectors.toList());
             listTemp.forEach(e -> {
                 String configFieldName = e.getConfigFieldName();
                 // 通过反射，判断SubAgentConfigMessage类中是否含有同名的Field
@@ -52,9 +52,14 @@ public class AgentConfigLocalMessageHandler implements IReceiverMessageHandler {
                     if (ReflectUtils.isContainKey(agentBaseInfo, configFieldName)) {
                         // 更新
                         String value = (String) ReflectUtils.invokeGet(message.getData(), configFieldName);
-                        ReflectUtils.invokeSet(agentBaseInfo, configFieldName, value);
-                        // 准备要写入json的数据
-                        waitWriteJsonList.add(new BaseConfigEntity(configFieldName, value, ConstantCommon.ONE));
+                        if(!"".equals(value)) {
+                            ReflectUtils.invokeSet(agentBaseInfo, configFieldName, value);
+                            // 准备要写入json的数据
+                            waitWriteJsonList.add(new BaseConfigEntity(configFieldName, value, ConstantCommon.ONE));
+                        }else {
+                            // 如果报文中value为空字符串，则将该字段的公私属性置为"公有"
+                            waitWriteJsonList.add(new BaseConfigEntity(e.getConfigFieldName(), e.getConfigFieldValue(), ConstantCommon.ZERO));
+                        }
                     }else {
                         waitWriteJsonList.add(e);
                     }
@@ -64,8 +69,6 @@ public class AgentConfigLocalMessageHandler implements IReceiverMessageHandler {
             });
             agent.setAgentBaseInfo(agentBaseInfo);
             // 将新的客户端生效的配置，写入agent.json
-            List<BaseConfigEntity> listPrivate = list.stream().filter(e -> ConstantCommon.ZERO.equals(e.getConfigFieldType())).collect(Collectors.toList());
-            waitWriteJsonList.addAll(listPrivate);
             JSONArray writeAgentFileJsonArray = JSONArray.parseArray(JSON.toJSONString(waitWriteJsonList));
             AgentFileExtendUtils.setConfigToLocalAgentFile(writeAgentFileJsonArray);
             logger.debug("客户端更新私有配置成功，新的客户端配置为：{}", agent.getAgentBaseInfo().toString());
@@ -80,7 +83,8 @@ public class AgentConfigLocalMessageHandler implements IReceiverMessageHandler {
         AgentConfigLocalMessageHandler agentConfigLocalMessageHandler = new AgentConfigLocalMessageHandler();
         String agentId = "1234567890";
         String topic = "server.agent.config.localConfig.{agentId}";
-        String message = "{\"method\":\"agent_local_config\",\"timestamp\":\"1666349496479\",\"data\":{\"dataCacheFileSize\":\"20\",\"dataCacheCycle\":\"1\",\"syncPeriod\":\"12000\"}}";
+        // String message = "{\"method\":\"agent_local_config\",\"timestamp\":\"1666349496479\",\"data\":{\"dataCacheFileSize\":\"20\",\"dataCacheCycle\":\"1\",\"syncPeriod\":\"12000\"}}";
+        String message = "{\"data\":{\"syncPeriod\":\"13000\",\"dataCacheCycle\":\"\",\"dataCacheFileSize\":\"7\"},\"method\":\"agent_local_config\",\"timestamp\":1671676765632}";
         topic = topic.replace("{agentId}", agentId);
 
         agentConfigLocalMessageHandler.handleRecData(topic, message);
