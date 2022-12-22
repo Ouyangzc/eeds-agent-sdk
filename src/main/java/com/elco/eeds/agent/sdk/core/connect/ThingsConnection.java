@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.core.connect;
 
 import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
+import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 
 /**
@@ -14,7 +15,9 @@ public interface ThingsConnection {
      *  协议名称
      * @return
      */
-    String protocolName();
+    default String protocolName(){
+     return AgentStartProperties.getInstance().getAgentClientType();
+    }
 
     /**
      * 连接数据源

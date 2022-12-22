@@ -6,7 +6,6 @@ import com.elco.eeds.agent.mq.plugin.MQPluginManager;
 import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentMqInfo;
-import com.elco.eeds.agent.sdk.core.common.constant.client.ConstantClientType;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
 import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
@@ -65,7 +64,7 @@ public class AgentRegisterService implements IAgentRegisterService {
             // TODO 待完成
             Agent agent = Agent.getInstance();
             // 调用http接口的register方法
-            agent = agentRequestHttpService.register(clientIp, port, name, token, ConstantClientType.TYPE_EDGE_GATEWAY);
+            agent = agentRequestHttpService.register(clientIp, port, name, token, AgentStartProperties.getInstance().getAgentClientType());
             if (agent == null) {
                 throw new SdkException(ErrorEnum.CLIENT_REGISTER_ERROR.code());
             }

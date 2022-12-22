@@ -11,6 +11,7 @@ import com.elco.eeds.agent.sdk.core.common.constant.ConstantThings;
 import com.elco.eeds.agent.sdk.core.common.constant.http.ConstantHttpApiPath;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
+import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 import com.elco.eeds.agent.sdk.core.util.ThingsFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.things.SubThingsSyncIncrMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsProperties;
@@ -89,7 +90,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                     BeanUtil.copyProperties(eedsThings, driverContext);
                     THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
                     //todo 加载数据源连接
-                    ConnectManager.create(driverContext,"10312");
+                    ConnectManager.create(driverContext, AgentStartProperties.getInstance().getAgentClientType());
 
                 }
                 boolean delResult = eedsThings.getProperties().stream().allMatch(things -> things.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_DEL));
@@ -99,7 +100,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                     BeanUtil.copyProperties(eedsThings, driverContext);
                     THINGS_DRIVER_CONTEXT_MAP.remove(thingsId);
                     //todo 断开数据源连接
-                    ThingsConnection connection = ConnectManager.getConnection("10312");
+                    ThingsConnection connection = ConnectManager.getConnection(AgentStartProperties.getInstance().getAgentClientType());
                     connection.disconnect();
                 }
                 boolean editResult = eedsThings.getProperties().stream().allMatch(things -> things.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_EDIT));
@@ -255,7 +256,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                     String thingsId = things.getThingsId();
                     THINGS_DRIVER_CONTEXT_MAP.put(things.getThingsId(), driverContext);
                     //todo 调用数据源连接
-                    ConnectManager.create(driverContext,"10312");
+                    ConnectManager.create(driverContext,AgentStartProperties.getInstance().getAgentClientType());
 
 
                     List<EedsProperties> properties = things.getProperties();
