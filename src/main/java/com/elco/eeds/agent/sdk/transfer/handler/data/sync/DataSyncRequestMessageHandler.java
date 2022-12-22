@@ -1,15 +1,25 @@
 package com.elco.eeds.agent.sdk.transfer.handler.data.sync;
 
 import com.alibaba.fastjson.JSON;
+import com.elco.eeds.agent.mq.nats.plugin.NatsPlugin;
+import com.elco.eeds.agent.mq.plugin.MQPluginManager;
+import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
+import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
+import com.elco.eeds.agent.sdk.core.util.FileUtil;
+import com.elco.eeds.agent.sdk.core.util.RealTimeDataMessageFileUtils;
+import com.elco.eeds.agent.sdk.transfer.beans.data.sync.DataSyncFinishResult;
 import com.elco.eeds.agent.sdk.transfer.beans.data.sync.DataSyncServerRequest;
 import com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.confirm.DataSyncConfirmMessage;
+import com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.data.DataSyncPropertiesValueMessage;
+import com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.finish.DataSyncFinishMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.request.DataSyncRequestMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.request.SubDataSyncRequestMessage;
 import com.elco.eeds.agent.sdk.transfer.handler.IReceiverMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.service.data.sync.DataSyncService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,14 +44,75 @@ public class DataSyncRequestMessageHandler implements IReceiverMessageHandler {
         AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
         String agentId = agentBaseInfo.getAgentId();
         //返回确认报文
-        String confirmMessage = DataSyncConfirmMessage.getMsg(agentId, queueId);
-        String confirmTopic = DataSyncConfirmMessage.getTopic(agentId);
-        this.publishMessage(confirmTopic, confirmMessage);
+        this.postConfirMsg(agentId, queueId);
         dataSyncService.setQueueId(queueId);
         dataSyncService.setStatus(true);
         List<DataSyncServerRequest> dataThingsList = data.getDataThingsList();
         for (DataSyncServerRequest request : dataThingsList) {
-            // TODO: 2022/12/15 获取同步数据，发送同步数据，同步完成报文
+            String thingsId = request.getThingsId();
+            Long startTime = request.getStartTime();
+            Long endTime = request.getEndTime();
+            //重新加载文件
+            FileUtil.getLastDataFile();
+            List<PropertiesValue> syncDatas = RealTimeDataMessageFileUtils.getFileData(thingsId, startTime, endTime, request.getProperties());
+            //判断是否取消同步
+            if (!dataSyncService.getStatus()) {
+                //取消状态，跳出此次循环
+                dataSyncService.setStatus(true);
+                break;
+            }
+            if (syncDatas.size() > 0) {
+                dataSyncService.setSyncFlag(true);
+                // 循环发送同步点位数据
+                syncDatas.stream().forEach(t -> {
+                    List<PropertiesValue> propertiesData = new ArrayList<>();
+                    propertiesData.add(t);
+                    //发送数据
+                    this.postPropertiesValueMsg(propertiesData, agentId, thingsId);
+                });
+            }
+            //发送该数据源同步完成
+            this.postDataSyncFinishMessage(agentId, queueId,dataSyncService.getSyncFlag() , thingsId, syncDatas.size(), startTime, endTime);
         }
+    }
+
+
+    /**
+     * 返回确认报文
+     */
+    private void postConfirMsg(String agentId, String queueId) {
+        String confirmMessage = DataSyncConfirmMessage.getMsg(agentId, queueId);
+        String confirmTopic = DataSyncConfirmMessage.getTopic(agentId);
+        logger.debug("数据同步,同步确认,队列ID:{}", queueId);
+        this.publishMessage(confirmTopic, confirmMessage);
+    }
+
+    /**
+     * 推送变量同步数据
+     *
+     * @param propertiesValues
+     * @param agentId
+     * @param thingsId
+     */
+    private void postPropertiesValueMsg(List<PropertiesValue> propertiesValues, String agentId, String thingsId) {
+        String message = DataSyncPropertiesValueMessage.getMessage(propertiesValues);
+        String topic = DataSyncPropertiesValueMessage.getTopic(agentId, thingsId);
+        logger.debug("数据同步,推送数据,topic:{},msg:{}", topic, message);
+        this.publishMessage(topic, message);
+    }
+
+    private void postDataSyncFinishMessage(String agentId, String queueId, Boolean syncFlag, String thingsId, Integer size, Long startTime, Long endTime) {
+        List<DataSyncFinishResult> results = new ArrayList<>();
+        DataSyncFinishResult result = new DataSyncFinishResult();
+        result.setSize(size);
+        result.setStartTime(startTime);
+        result.setEndTime(endTime);
+        result.setThingsId(thingsId);
+        results.add(result);
+        String message = DataSyncFinishMessage.getMessage(queueId, syncFlag, results);
+        String topic = DataSyncFinishMessage.getTopic(agentId);
+        MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
+        logger.debug("数据同步，同步完成，topic:{},msg:{}", topic, message);
+        mqPlugin.publish(topic, message, null);
     }
 }

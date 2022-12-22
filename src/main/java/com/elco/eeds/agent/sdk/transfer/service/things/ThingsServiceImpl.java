@@ -61,14 +61,23 @@ public class ThingsServiceImpl implements ThingsService {
     }
 
     @Override
-    public void addProperties(String thingsId, EedsProperties addProperties) {
+    public void addProperties(String thingsId, EedsProperties addProperties,List<EedsThings> syncThingsList) {
+        boolean flag = true;
         for (EedsThings currentThings : currentThingsList) {
             if (thingsId.equals(currentThings.getThingsId())) {
                 List<EedsProperties> properties = currentThings.getProperties();
                 properties.add(addProperties);
+                flag = false;
             }
         }
-        saveThingsFile(JSON.toJSONString(currentThingsList));
+        if (flag){
+            //新增things
+            EedsThings things = syncThingsList.stream().filter(eedsThings -> eedsThings.getThingsId().equals(thingsId)).findFirst().get();
+            this.addThings(things);
+        }else {
+            //新增点位
+            saveThingsFile(JSON.toJSONString(currentThingsList));
+        }
     }
 
     @Override

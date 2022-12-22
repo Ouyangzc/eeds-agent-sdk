@@ -52,7 +52,7 @@ public class AgentStarter {
             registerService.register(agentStartProperties.getServerUrl(), agentStartProperties.getName(),
                     agentStartProperties.getPort(), agentStartProperties.getToken(), agentStartProperties.getAgentClientType());
             // 加载数据文件
-            // TODO 加载数据文件
+            com.elco.eeds.agent.sdk.core.util.FileUtil.getLastDataFile();
             // 根据协议加载数据源信息
             // TODO 根据协议加载数据源信息
             // 加载统计
