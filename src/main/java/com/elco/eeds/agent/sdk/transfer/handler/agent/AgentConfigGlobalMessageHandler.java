@@ -42,7 +42,7 @@ public class AgentConfigGlobalMessageHandler implements IReceiverMessageHandler 
             String config = AgentFileExtendUtils.getConfigFromLocalAgentFile();
             JSONArray jsonArray = JSONObject.parseArray(config);
             List<BaseConfigEntity> list = JSONObject.parseArray(jsonArray.toJSONString(), BaseConfigEntity.class);
-            List<BaseConfigEntity> listTemp = list.stream().filter(e -> ConstantCommon.ZERO.equals(e.getConfigFieldType())).collect(Collectors.toList());
+            List<BaseConfigEntity> listTemp = list.stream().collect(Collectors.toList());
             listTemp.forEach(e -> {
                 String configFieldName = e.getConfigFieldName();
                 // 通过反射，判断SubAgentConfigMessage类中是否含有同名的Field
@@ -52,9 +52,12 @@ public class AgentConfigGlobalMessageHandler implements IReceiverMessageHandler 
                     if (ReflectUtils.isContainKey(agentBaseInfo, configFieldName)) {
                         // 更新
                         String value = (String) ReflectUtils.invokeGet(message.getData(), configFieldName);
-                        ReflectUtils.invokeSet(agentBaseInfo, configFieldName, value);
-                        // 准备要写入json的数据
-                        waitWriteJsonList.add(new BaseConfigEntity(configFieldName, value, ConstantCommon.ZERO));
+                        if(ConstantCommon.ZERO.equals(e.getConfigFieldType())) {
+                            ReflectUtils.invokeSet(agentBaseInfo, configFieldName, value);
+                            waitWriteJsonList.add(new BaseConfigEntity(configFieldName, value, e.getConfigFieldType()));
+                        }else {
+                            waitWriteJsonList.add(e);
+                        }
                     }else {
                         waitWriteJsonList.add(e);
                     }
@@ -64,8 +67,6 @@ public class AgentConfigGlobalMessageHandler implements IReceiverMessageHandler 
             });
             agent.setAgentBaseInfo(agentBaseInfo);
             // 将新的客户端生效的配置，写入agent.json
-            List<BaseConfigEntity> listPrivate = list.stream().filter(e -> ConstantCommon.ONE.equals(e.getConfigFieldType())).collect(Collectors.toList());
-            waitWriteJsonList.addAll(listPrivate);
             JSONArray writeAgentFileJsonArray = JSONArray.parseArray(JSON.toJSONString(waitWriteJsonList));
             AgentFileExtendUtils.setConfigToLocalAgentFile(writeAgentFileJsonArray);
             logger.debug("客户端更新全局配置成功，新的客户端配置为：{}", agent.getAgentBaseInfo().toString());
@@ -79,7 +80,7 @@ public class AgentConfigGlobalMessageHandler implements IReceiverMessageHandler 
         AgentConfigGlobalMessageHandler agentConfigGlobalMessageHandler = new AgentConfigGlobalMessageHandler();
         String agentId = "1234567890";
         String topic = "server.agent.config.localConfig";
-        String message = "{\"method\":\"agent_local_config\",\"timestamp\":\"1666349496479\",\"data\":{\"dataCacheFileSize\":\"20\",\"dataCacheCycle\":\"1\",\"syncPeriod\":\"2200\"}}";
+        String message = "{\"method\":\"agent_local_config\",\"timestamp\":\"1666349496479\",\"data\":{\"dataCacheFileSize\":\"20\",\"dataCacheCycle\":\"9\",\"syncPeriod\":\"2200\"}}";
         topic = topic.replace("{agentId}", agentId);
 
         agentConfigGlobalMessageHandler.handleRecData(topic, message);
