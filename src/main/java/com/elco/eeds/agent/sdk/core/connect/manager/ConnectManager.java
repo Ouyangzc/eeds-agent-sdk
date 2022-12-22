@@ -89,7 +89,7 @@ public class ConnectManager {
      * @param driverContext
      */
     public static void create(ThingsDriverContext driverContext, String connectKey) {
-        logger.debug("开始创建连接，连接信息：{}", JSONUtil.toJsonStr(driverContext));
+        logger.info("开始创建连接，连接信息：{}", JSONUtil.toJsonStr(driverContext));
         ThingsConnection connection = ConnectManager.getConnection(connectKey);
         connection.connect(driverContext);
         ThingsConnectionHandler handler = (ThingsConnectionHandler) connection;
@@ -97,7 +97,7 @@ public class ConnectManager {
         handler.setThingsConnection(connection);
         handler.setThingsId(driverContext.getThingsId());
         ConnectManager.addHandler(handler);
-        logger.debug("创建连接成功，连接信息：{}", JSONUtil.toJsonStr(driverContext));
+        logger.info("创建连接成功，连接信息：{}", JSONUtil.toJsonStr(driverContext));
     }
 
 

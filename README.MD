@@ -9,7 +9,7 @@
           ├──sdk
             ├──core sdk核心包
               ├──bean 实体类
-              ├──common 公共类
+              ├──com.elco.eeds.agent.sdk.common 公共类
                 └──EedsErrorEnum.java eeds错误码
               ├──exception 异常
                 └──EedsSdkException.java

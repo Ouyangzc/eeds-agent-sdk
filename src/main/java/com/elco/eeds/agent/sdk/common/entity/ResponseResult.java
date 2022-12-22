@@ -1,7 +1,7 @@
-package common.entity;
+package com.elco.eeds.agent.sdk.common.entity;
 
 import cn.hutool.json.JSONUtil;
-import common.enums.SysCodeEnum;
+import com.elco.eeds.agent.sdk.common.enums.SysCodeEnum;
 
 import java.io.Serializable;
 
