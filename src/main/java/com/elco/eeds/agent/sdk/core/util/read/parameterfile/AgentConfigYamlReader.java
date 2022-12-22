@@ -35,6 +35,7 @@ public class AgentConfigYamlReader {
     }
 
     public AgentStartProperties parseYaml(String location) throws SdkException {
+        logger.info("获取配置文件路径：{}",location);
         Map<String,Object> map;
         try{
             Yaml yaml = new Yaml();
