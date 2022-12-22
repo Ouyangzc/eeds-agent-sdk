@@ -11,11 +11,4 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
  */
 public class AgentCommandMessage extends BaseMessage<SubAgentCommandMessage> {
 
-    private SubAgentCommandRspMessage getResponseMsg(AgentCommandMessage agentCommandMessage) {
-        SubAgentCommandRspMessage subAgentCommandRspMessage = new SubAgentCommandRspMessage();
-        // TODO
-
-        return subAgentCommandRspMessage;
-    }
-
 }
