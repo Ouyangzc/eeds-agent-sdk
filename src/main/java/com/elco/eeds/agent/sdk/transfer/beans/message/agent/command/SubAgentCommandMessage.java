@@ -14,5 +14,21 @@ public class SubAgentCommandMessage {
      */
     private String msgSeqNo;
 
-//    private
+    private SubAgentCommandContent command;
+
+    public String getMsgSeqNo() {
+        return msgSeqNo;
+    }
+
+    public void setMsgSeqNo(String msgSeqNo) {
+        this.msgSeqNo = msgSeqNo;
+    }
+
+    public SubAgentCommandContent getCommand() {
+        return command;
+    }
+
+    public void setCommand(SubAgentCommandContent command) {
+        this.command = command;
+    }
 }

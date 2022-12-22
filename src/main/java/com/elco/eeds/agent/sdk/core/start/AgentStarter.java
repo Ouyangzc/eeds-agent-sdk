@@ -112,7 +112,7 @@ public class AgentStarter {
         // 从yml配置文件读取配置，赋值给AgentStartProperties
         AgentStartProperties agentStartProperties = AgentStartProperties.getInstance();
         AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
-        agentStartProperties = agentConfigYamlReader.parseYaml(ymlPath);
+        agentStartProperties = agentConfigYamlReader.parseYaml(ymlPath, true);
         logger.info("读取配置文件成功：{}", agentStartProperties.toString());
         // 调用私有init方法
         init(agentStartProperties);
@@ -131,13 +131,13 @@ public class AgentStarter {
         String fileName = getJarSamePathYml();
         if (FileUtil.exist(new File(fileName))) {
             // 默认在jar包相同路径下读取agent-sdk-config.yaml
-            agentStartProperties = agentConfigYamlReader.parseYaml(fileName);
+            agentStartProperties = agentConfigYamlReader.parseYaml(fileName, true);
             logger.debug("jar包同级路径配置文件读取成功");
             logger.info("读取配置文件成功：{}", agentStartProperties.toString());
         } else {
             // jar包中resource文件下的agent-sdk-config.yaml
             logger.debug("jar包同级路径配置文件不存在，即将开始读取jar包中resource文件下的配置文件");
-            agentStartProperties = agentConfigYamlReader.parseYaml("./" + ConstantFilePath.YML_NAME);
+            agentStartProperties = agentConfigYamlReader.parseYaml("/" + ConstantFilePath.YML_NAME, false);
             if (agentStartProperties == null) {
                 logger.debug("读取配置文件失败");
                 throw new SdkException(ErrorEnum.READ_CONFIG_FILE_ERROR.code());

@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.util.read.parameterfile;
 
+import cn.hutool.core.io.resource.ClassPathResource;
 import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
@@ -34,28 +35,35 @@ public class AgentConfigYamlReader {
 
     }
 
-    public AgentStartProperties parseYaml(String location) throws SdkException {
+    /**
+     *
+     * @param location
+     * @return
+     * @throws SdkException
+     */
+    public AgentStartProperties parseYaml(String location, boolean isAbsolutePath) throws SdkException {
         logger.info("获取配置文件路径：{}",location);
         Map<String,Object> map;
         try{
             Yaml yaml = new Yaml();
             URL resource;
-            if (this.isAbsolutePath(location)) {
+            if (isAbsolutePath) {
                 resource = resourceLoader.getResourceByAbsolutePath(location);
+                if (resource != null){
+                    //读取yaml中的数据并且以map集合的形式存储
+                    UrlResource urlResource = new UrlResource(resource);
+                    map = yaml.load(urlResource.getInputStream());
+                    // logger.debug("yml内容为：{}", map);
+                }else {
+                    throw new SdkException(ErrorEnum.RESOURCE_OBTAIN_ERROR.code());
+                }
             }else {
-                resource = resourceLoader.getResource(location);
+                ClassPathResource classPathResource = resourceLoader.getResource(location);
+                map = yaml.load(classPathResource.getStream());
             }
 
-            if (resource != null){
-                //读取yaml中的数据并且以map集合的形式存储
-                UrlResource urlResource = new UrlResource(resource);
-                map = yaml.load(urlResource.getInputStream());
-                // logger.debug("yml内容为：{}", map);
-            }else {
-                throw new SdkException(ErrorEnum.RESOURCE_OBTAIN_ERROR.code());
-            }
         }catch (Exception e){
-            logger.error("{}路径读取配置文件失败，没有此文件");
+            logger.error("{}路径读取配置文件失败，没有此文件", e);
             e.printStackTrace();
             return null;
         }

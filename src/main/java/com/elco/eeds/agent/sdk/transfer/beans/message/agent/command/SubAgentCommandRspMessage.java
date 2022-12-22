@@ -1,14 +1,20 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.agent.command;
 
 /**
- * @title: SubAgentTokenRspMessage
+ * @title: SubAgentCommandRspMessage
  * @Author wl
- * @Date: 2022/12/21 17:26
+ * @Date: 2022/12/22 13:52
  * @Version 1.0
- * @Description: 客户端指令下发反馈报文结构
  */
 public class SubAgentCommandRspMessage {
 
-    // TODO
+    private String msgSeqNo;
 
+    public String getMsgSeqNo() {
+        return msgSeqNo;
+    }
+
+    public void setMsgSeqNo(String msgSeqNo) {
+        this.msgSeqNo = msgSeqNo;
+    }
 }

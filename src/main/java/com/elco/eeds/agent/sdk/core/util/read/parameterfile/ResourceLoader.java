@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.core.util.read.parameterfile;
 
+import cn.hutool.core.io.resource.ClassPathResource;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,8 +14,9 @@ import java.net.URL;
  */
 public class ResourceLoader {
 
-    public URL getResource(String location) {
-        return this.getClass().getClassLoader().getResource(location);
+    public ClassPathResource getResource(String location) {
+        ClassPathResource classPathResource = new ClassPathResource(location);
+        return classPathResource;
     }
 
     /**
