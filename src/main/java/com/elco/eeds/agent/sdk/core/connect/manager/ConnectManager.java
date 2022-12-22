@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.core.connect.manager;
 
 
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
@@ -70,7 +71,9 @@ public class ConnectManager {
      * @return
      */
     public static ThingsConnection getConnection(String key) {
-        return CONNECTION_MAP.get(key);
+
+        return ReflectUtil.newInstance(CONNECTION_MAP.get(key).getClass());
+//        return CONNECTION_MAP.get(key);
     }
 
     /**
