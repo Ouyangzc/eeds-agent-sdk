@@ -6,7 +6,7 @@ package com.elco.eeds.agent.sdk.core.connect.status;
  * @description：
  */
 public enum ConnectionStatus {
-    NOT_CONNECTED,
+    DISCONNECT,
     CONNECTED,
     CONNECTING;
 }

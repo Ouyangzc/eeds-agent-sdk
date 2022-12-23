@@ -7,6 +7,7 @@ import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
+import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import org.slf4j.Logger;
@@ -87,7 +88,9 @@ public class ConnectManager {
      * @param thingsId
      */
     public static void delConnection(String thingsId) {
-        if(CONNECTION_HANDLER_MAP.get(thingsId).getThingsConnection().disconnect()){
+        ThingsConnectionHandler handler =getHandler(thingsId);
+        if(handler.getThingsConnection().disconnect()){
+            handler.setConnectionStatus(ConnectionStatus.DISCONNECT);
             CONNECTION_HANDLER_MAP.remove(thingsId);
         }
     }
@@ -106,8 +109,10 @@ public class ConnectManager {
         handler.setContext(driverContext);
         handler.setThingsConnection(connection);
         handler.setThingsId(driverContext.getThingsId());
+        handler.setConnectionStatus(ConnectionStatus.CONNECTED);
         ConnectManager.addHandler(handler);
         logger.info("创建连接成功，连接信息：{}", JSONUtil.toJsonStr(driverContext));
+
     }
 
 

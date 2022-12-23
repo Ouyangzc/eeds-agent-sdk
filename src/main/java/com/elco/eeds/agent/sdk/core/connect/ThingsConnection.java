@@ -1,6 +1,5 @@
 package com.elco.eeds.agent.sdk.core.connect;
 
-import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 
@@ -34,11 +33,7 @@ public interface ThingsConnection {
      */
     boolean disconnect();
 
-    /**
-     * 获取连接状态
-     * @return
-     */
-    ConnectionStatus getStatus();
+
 
 
 

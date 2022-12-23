@@ -64,6 +64,15 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
             e.printStackTrace();
         }
     }
+    private ConnectionStatus connectionStatus;
+
+    public ConnectionStatus getConnectionStatus() {
+        return connectionStatus;
+    }
+
+    public void setConnectionStatus(ConnectionStatus connectionStatus) {
+        this.connectionStatus = connectionStatus;
+    }
 
 
     private String thingsId;
@@ -154,7 +163,8 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
         Integer reconnectNum = Integer.valueOf(this.context.getReconnectNum());
         Long reconnectInterval = Long.valueOf(this.context.getReconnectInterval()) * 1000;
         ThingsConnection connection = this.getThingsConnection();
-        if (!connection.getStatus().equals(ConnectionStatus.CONNECTED) || ObjectUtil.isEmpty(connection)) {
+        ThingsConnectionHandler  handler = this;
+        if (!handler.getConnectionStatus().equals(ConnectionStatus.CONNECTED) || ObjectUtil.isEmpty(connection)) {
 
             ThingsDriverContext info = this.getContext();
             ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
@@ -164,7 +174,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
                 public void run() {
                     try {
                         if (num <= reconnectNum) {
-                            if (!connection.getStatus().equals(ConnectionStatus.CONNECTED) || ObjectUtil.isEmpty(connection)) {
+                            if (!handler.getConnectionStatus().equals(ConnectionStatus.CONNECTED) || ObjectUtil.isEmpty(connection)) {
                                 scheduledTaskMap.get(thingsId).cancel(true);
                             } else {
                                 connection.connect(info);
