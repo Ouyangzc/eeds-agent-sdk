@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ConnectManager {
     public static final Logger logger = LoggerFactory.getLogger(ConnectManager.class);
-    private static ConcurrentHashMap<String, ThingsConnection> CONNECTION_MAP = new ConcurrentHashMap<String, ThingsConnection>(16);
+    private static ConcurrentHashMap<String, String> CONNECTION_MAP = new ConcurrentHashMap<>(16);
 
 
     private static ConcurrentHashMap<String, ThingsConnectionHandler> CONNECTION_HANDLER_MAP = new ConcurrentHashMap<String, ThingsConnectionHandler>(256);
@@ -58,10 +58,10 @@ public class ConnectManager {
      * 添加数据源连接
      *
      * @param key
-     * @param connection
+     * @param classPath
      */
-    public static void addConnection(String key, ThingsConnection connection) {
-        CONNECTION_MAP.put(key, connection);
+    public static void addConnection(String key, String classPath) {
+        CONNECTION_MAP.put(key, classPath);
     }
 
     /**
@@ -71,19 +71,18 @@ public class ConnectManager {
      * @return
      */
     public static ThingsConnection getConnection(String key) {
-
-        return ReflectUtil.newInstance(CONNECTION_MAP.get(key).getClass());
-//        return CONNECTION_MAP.get(key);
+        return ReflectUtil.newInstance(CONNECTION_MAP.get(key));
     }
 
     /**
      * 删除数据源连接
      *
-     * @param key
+     * @param thingsId
      */
-    public static void delConnection(String key) {
-        CONNECTION_MAP.get(key).disconnect();
-        CONNECTION_MAP.remove(key);
+    public static void delConnection(String thingsId) {
+        if(CONNECTION_HANDLER_MAP.get(thingsId).getThingsConnection().disconnect()){
+            CONNECTION_HANDLER_MAP.remove(thingsId);
+        }
     }
 
     /**
@@ -92,6 +91,7 @@ public class ConnectManager {
      * @param driverContext
      */
     public static void create(ThingsDriverContext driverContext, String connectKey) {
+        logger.info("连接协议：{}",connectKey);
         logger.info("开始创建连接，连接信息：{}", JSONUtil.toJsonStr(driverContext));
         ThingsConnection connection = ConnectManager.getConnection(connectKey);
         connection.connect(driverContext);

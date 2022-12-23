@@ -44,6 +44,7 @@ public class AgentStarter {
     private static void init(AgentStartProperties agentStartProperties) throws Exception {
         try {
             // 将协议注入
+
             InitConnectFactory.addConnectPackagePath(agentStartProperties.getProtocolPackage());
             InitConnectFactory.initConnect();
 
