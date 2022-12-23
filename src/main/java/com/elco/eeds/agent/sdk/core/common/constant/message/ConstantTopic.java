@@ -97,4 +97,12 @@ public class ConstantTopic {
      */
     public static final String TOPIC_THINGS_CONNECTSTATUS_REQUEST = "agent.things.connectStatus.request.";
 
+
+
+
+    /**
+     * 指令下发确认报文
+     * agent.agent.order.confirm.{thingsId}
+     */
+    public static final String TOPIC_AGENT_AGENT_ORDER_CONFIRM = "agent.agent.order.confirm.";
 }

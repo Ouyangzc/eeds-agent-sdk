@@ -9,7 +9,6 @@ import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantThings;
 import com.elco.eeds.agent.sdk.core.common.constant.http.ConstantHttpApiPath;
-import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 import com.elco.eeds.agent.sdk.core.util.ThingsFileUtils;
@@ -100,8 +99,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                     BeanUtil.copyProperties(eedsThings, driverContext);
                     THINGS_DRIVER_CONTEXT_MAP.remove(thingsId);
                     //todo 断开数据源连接
-                    ThingsConnection connection = ConnectManager.getConnection(AgentStartProperties.getInstance().getAgentClientType());
-                    connection.disconnect();
+                    ConnectManager.delConnection(thingsId);
                 }
                 boolean editResult = eedsThings.getProperties().stream().allMatch(things -> things.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_EDIT));
                 if (editResult) {
@@ -109,6 +107,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                     BeanUtil.copyProperties(eedsThings, driverContext);
                     THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
                     //todo 数据源重新连接
+                    ConnectManager.recreate(driverContext,AgentStartProperties.getInstance().getAgentClientType());
                 }
             }
         }

@@ -6,6 +6,8 @@ import com.elco.eeds.agent.mq.plugin.MQPluginManager;
 import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
 import com.elco.eeds.agent.sdk.transfer.beans.message.things.ThingsConnectStatusMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author ：ytl
@@ -13,6 +15,7 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.things.ThingsConnectStatus
  * @description：
  */
 public class ThingsConnectStatusMqService {
+    public static final Logger logger = LoggerFactory.getLogger(ThingsConnectStatusMqService.class);
 
     private static final String CONNECT = "2";
     private static final String DIS_CONNECT = "3";
@@ -21,9 +24,11 @@ public class ThingsConnectStatusMqService {
         ThreadUtil.execute(new Runnable() {
             @Override
             public void run() {
+                String json = ThingsConnectStatusMessage.create(thingsId, status, msg).toJson();
                 MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
                 mqPlugin.publish(ConstantTopic.TOPIC_THINGS_CONNECTSTATUS_REQUEST + thingsId
-                        , ThingsConnectStatusMessage.create(thingsId, status,msg).toJson(), null);
+                        , json, null);
+                logger.info("发送数据源连接状态报文：{}",json);
             }
         });
     }

@@ -109,6 +109,18 @@ public class ConnectManager {
      *
      * @param driverContext
      */
+    public static void recreate(ThingsDriverContext driverContext, String connectKey) {
+        delConnection(driverContext.getThingsId());
+
+        create(driverContext,connectKey);
+    }
+
+
+    /**
+     * 创建连接并实现handler
+     *
+     * @param driverContext
+     */
     public static void destroy(ThingsDriverContext driverContext) {
         ThingsConnectionHandler handler = ConnectManager.getHandler(driverContext.getThingsId());
         handler.getThingsConnection().disconnect();

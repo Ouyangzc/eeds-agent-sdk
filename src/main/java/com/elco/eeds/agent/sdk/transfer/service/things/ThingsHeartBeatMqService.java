@@ -7,6 +7,8 @@ import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
 import com.elco.eeds.agent.sdk.transfer.beans.message.things.ThingsHeartBeatMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author ：ytl
@@ -14,7 +16,7 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.things.ThingsHeartBeatMess
  * @description：
  */
 public class ThingsHeartBeatMqService {
-
+    public static final Logger logger = LoggerFactory.getLogger(ThingsHeartBeatMqService.class);
     private static final String CONNECT = "2";
     private static final String DIS_CONNECT = "3";
 
@@ -22,9 +24,11 @@ public class ThingsHeartBeatMqService {
         ThreadUtil.execute(new Runnable() {
             @Override
             public void run() {
+                String json = ThingsHeartBeatMessage.create(thingsId, status).toJson();
                 MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
                 mqPlugin.publish(ConstantTopic.TOPIC_THINGS_HEARTBEAT_REQUEST + Agent.getInstance().getAgentBaseInfo().getAgentId()
-                        , ThingsHeartBeatMessage.create(thingsId, status).toJson(), null);
+                        , json, null);
+                logger.info("发送数据源心跳报文：{}",json);
             }
         });
     }
