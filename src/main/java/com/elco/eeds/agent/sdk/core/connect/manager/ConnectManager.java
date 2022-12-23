@@ -102,15 +102,17 @@ public class ConnectManager {
         logger.info("连接协议：{}",connectKey);
         logger.info("开始创建连接，连接信息：{}", JSONUtil.toJsonStr(driverContext));
         ThingsConnection connection = ConnectManager.getConnection(connectKey);
-        connection.connect(driverContext);
-        ThingsConnectionHandler handler = (ThingsConnectionHandler) connection;
-        handler.setContext(driverContext);
-        handler.setThingsConnection(connection);
-        handler.setThingsId(driverContext.getThingsId());
-        handler.setConnectionStatus(ConnectionStatus.CONNECTED);
-        ConnectManager.addHandler(handler);
-        logger.info("创建连接成功，连接信息：{}", JSONUtil.toJsonStr(driverContext));
-
+        if(connection.connect(driverContext)){
+            ThingsConnectionHandler handler = (ThingsConnectionHandler) connection;
+            handler.setContext(driverContext);
+            handler.setThingsConnection(connection);
+            handler.setThingsId(driverContext.getThingsId());
+            handler.setConnectionStatus(ConnectionStatus.CONNECTED);
+            ConnectManager.addHandler(handler);
+            logger.info("创建连接成功，连接信息：{}", JSONUtil.toJsonStr(driverContext));
+        }else {
+            logger.error("创建连接失败，连接信息：{}", JSONUtil.toJsonStr(driverContext));
+        }
     }
 
 
