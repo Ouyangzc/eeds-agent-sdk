@@ -19,6 +19,7 @@ public enum ErrorEnum {
     READ_CONFIG_ERROR("CL0101008", "从agent.json读取config信息异常"),
     CONFIG_FILE_ERROR("CL0101009", "配置文件内容异常，请检查配置文件"),
     READ_CONFIG_FILE_ERROR("CL0101010", "读取配置文件失败，请检查"),
+    THINGS_CONNECT_NOT_EXIST("CL0101011", "数据源连接不存在，请检查"),
     /**
      * 数据源异常，以DE开头
      */

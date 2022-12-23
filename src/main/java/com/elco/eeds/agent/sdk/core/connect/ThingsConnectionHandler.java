@@ -4,7 +4,7 @@ package com.elco.eeds.agent.sdk.core.connect;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.parsing.DataParsing;
-import com.elco.eeds.agent.sdk.transfer.beans.things.EedsThings;
+import com.elco.eeds.agent.sdk.transfer.beans.message.order.OrderPropertiesValue;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import com.elco.eeds.agent.sdk.transfer.service.data.RealTimePropertiesValueService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsConnectStatusMqService;
@@ -123,15 +123,15 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
         return 0;
     }
 
-    public void command(EedsThings things,String command){
-        this.write(things,this.parsing.parsingCommand(command));
-    }
+//    public void command(EedsThings things,String command){
+//        this.write(things,this.parsing.parsingCommand(command));
+//    }
 
 
     public abstract void read(List<PropertiesContext> properties);
 
 
-    public abstract void write(EedsThings things,String msg);
+    public abstract void write(List<OrderPropertiesValue> propertiesValueList);
 
     /**
      * 执行模板方法

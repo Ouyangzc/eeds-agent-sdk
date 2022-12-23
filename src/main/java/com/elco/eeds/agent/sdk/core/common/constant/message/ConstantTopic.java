@@ -98,6 +98,12 @@ public class ConstantTopic {
     public static final String TOPIC_THINGS_CONNECTSTATUS_REQUEST = "agent.things.connectStatus.request.";
 
 
+    /**
+     * 指令下发请求报文
+     * server.agent.order.request.{agentId}
+     */
+    public static final String TOPIC_SERVER_AGENT_ORDER_REQUEST = "server.agent.order.request.{agentId}";
+
 
 
     /**

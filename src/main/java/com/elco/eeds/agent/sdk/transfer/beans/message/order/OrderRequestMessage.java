@@ -8,7 +8,7 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
  * @Author OUYANG
  * @Date 2022/12/19 14:29
  */
-public class OrderRequestMessage extends BaseMessage<SubOrderConfirmMessage> {
+public class OrderRequestMessage extends BaseMessage<SubOrderRequestMessage> {
 
 
 }
