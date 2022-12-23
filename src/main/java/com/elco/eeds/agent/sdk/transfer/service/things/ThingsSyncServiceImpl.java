@@ -88,7 +88,6 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                     ThingsDriverContext driverContext = new ThingsDriverContext();
                     BeanUtil.copyProperties(eedsThings, driverContext);
                     THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
-                    //todo 加载数据源连接
                     ConnectManager.create(driverContext, AgentStartProperties.getInstance().getAgentClientType());
 
                 }
@@ -98,7 +97,6 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                     ThingsDriverContext driverContext = new ThingsDriverContext();
                     BeanUtil.copyProperties(eedsThings, driverContext);
                     THINGS_DRIVER_CONTEXT_MAP.remove(thingsId);
-                    //todo 断开数据源连接
                     ConnectManager.delConnection(thingsId);
                 }
                 boolean editResult = eedsThings.getProperties().stream().allMatch(things -> things.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_EDIT));
@@ -106,8 +104,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                     ThingsDriverContext driverContext = new ThingsDriverContext();
                     BeanUtil.copyProperties(eedsThings, driverContext);
                     THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
-                    //todo 数据源重新连接
-                    ConnectManager.recreate(driverContext,AgentStartProperties.getInstance().getAgentClientType());
+                    ConnectManager.recreate(driverContext, AgentStartProperties.getInstance().getAgentClientType());
                 }
             }
         }

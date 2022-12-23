@@ -1,8 +1,10 @@
 package com.elco.eeds.agent.sdk.core.connect;
 
 
+import cn.hutool.core.util.ObjectUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
+import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
 import com.elco.eeds.agent.sdk.core.parsing.DataParsing;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsThings;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
@@ -15,21 +17,21 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
+import java.util.concurrent.*;
 
 /**
  * @author ：ytl
  * @date ：Created in 2022/12/2 15:25
  * @description：
  */
-public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
+public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
 
     public static final Logger logger = LoggerFactory.getLogger(ThingsConnectionHandler.class);
 
     private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(4);
+
+    public static Map<String, ScheduledFuture> scheduledTaskMap = new ConcurrentHashMap();
     private ThingsConnection thingsConnection;
 
     public ThingsConnection getThingsConnection() {
@@ -40,10 +42,11 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
         this.thingsConnection = thingsConnection;
     }
 
-    public ThingsConnectionHandler(){
+    public ThingsConnectionHandler() {
         attach();
     }
-    public void attach(){
+
+    public void attach() {
 
         //1、返回表示此 Class 所表示的实体（类、接口、基本类型或 void）的直接超类的 Type
         Type genType = getClass().getGenericSuperclass();
@@ -52,7 +55,7 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
         //3、因为BasePresenter 有两个泛型 数组有两个
         try {
             //
-            parsing= (M) ((Class)types[1]).newInstance();
+            parsing = (M) ((Class) types[1]).newInstance();
             //这里需要强转得到的是实体类类路径
             //如果types[1].getClass().newInstance();并不行，得到的是泛型类型
         } catch (InstantiationException e) {
@@ -63,9 +66,7 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
     }
 
 
-
-
-    private  String thingsId;
+    private String thingsId;
 
     public String getThingsId() {
         return thingsId;
@@ -84,7 +85,6 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
     public void setContext(ThingsDriverContext context) {
         this.context = context;
     }
-
 
 
     private String handlerName;
@@ -109,7 +109,7 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
 
     private T master;
 
-    private M parsing ;
+    private M parsing;
 
     public M getParsing() {
         return parsing;
@@ -123,57 +123,63 @@ public abstract class ThingsConnectionHandler<T,M extends DataParsing>{
         return 0;
     }
 
-    public void command(EedsThings things,String command){
-        this.write(things,this.parsing.parsingCommand(command));
+    public void command(EedsThings things, String command) {
+        this.write(things, this.parsing.parsingCommand(command));
     }
 
 
     public abstract void read(List<PropertiesContext> properties);
 
 
-    public abstract void write(EedsThings things,String msg);
+    public abstract void write(EedsThings things, String msg);
 
     /**
      * 执行模板方法
+     *
      * @param thingsId
      * @param msg
      * @param collectTime
      */
-    public void execute(String thingsId,String msg,Long collectTime){
+    public void execute(String thingsId, String msg, Long collectTime) {
         List<PropertiesValue> valueList = this.getParsing()
-                .parsing(this.context,ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId), msg);
-        RealTimePropertiesValueService.recRealTimePropertiesValue(msg,thingsId,collectTime,valueList);
+                .parsing(this.context, ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId), msg);
+        RealTimePropertiesValueService.recRealTimePropertiesValue(msg, thingsId, collectTime, valueList);
     }
 
     /**
      * 执行重连
      */
-    public void reconnect(){
+    public void reconnect() {
         ThingsConnectStatusMqService.sendDisConnectMsg(this.getThingsId());
         Integer reconnectNum = Integer.valueOf(this.context.getReconnectNum());
         Long reconnectInterval = Long.valueOf(this.context.getReconnectInterval()) * 1000;
         ThingsConnection connection = this.getThingsConnection();
-        ThingsDriverContext info = this.getContext();
-        ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
-            Integer num = 1;
+        if (!connection.getStatus().equals(ConnectionStatus.CONNECTED) || ObjectUtil.isEmpty(connection)) {
 
-            @Override
-            public void run() {
-                try {
-                    if (num <= reconnectNum) {
-                        connection.connect(info);
+            ThingsDriverContext info = this.getContext();
+            ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+                Integer num = 1;
+
+                @Override
+                public void run() {
+                    try {
+                        if (num <= reconnectNum) {
+                            if (!connection.getStatus().equals(ConnectionStatus.CONNECTED) || ObjectUtil.isEmpty(connection)) {
+                                scheduledTaskMap.get(thingsId).cancel(true);
+                            } else {
+                                connection.connect(info);
+                            }
+                        }
+                    } catch (Throwable e) {
+                        num++;
+                        logger.error("自定义重连失败，失败原因，msg:{}", e.getMessage());
                     }
-                } catch (Throwable e) {
-                    num++;
-                    logger.error("自定义重连失败，失败原因，msg:{}", e.getMessage());
                 }
-            }
-        }, 1000, reconnectInterval, TimeUnit.MILLISECONDS);
+            }, 1000, reconnectInterval, TimeUnit.MILLISECONDS);
+            scheduledTaskMap.put(thingsId, future);
 
-
+        }
 
     }
-
-
 
 }
