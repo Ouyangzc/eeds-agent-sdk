@@ -208,7 +208,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                     //新增
                     PROPERTIES_CONTEXT_MAP.put(addProperties.getPropertiesId(), addProperties);
                     EedsProperties eedsProperties = getEedsProperties(syncThingsList, addProperties);
-                    thingsService.addProperties(addProperties.getThingsId(), eedsProperties,syncThingsList);
+                    thingsService.addProperties(addProperties.getThingsId(), eedsProperties, syncThingsList);
                 }
             }
         } catch (Exception e) {
@@ -238,8 +238,11 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
         Optional<EedsThings> optional = localThingsList.stream().filter(syncThings -> syncThings.getThingsId().equals(thingsId)).findFirst();
         if (optional.isPresent()) {
             EedsThings things = optional.get();
-            EedsProperties properties = things.getProperties().stream().filter(eedsProperties -> eedsProperties.getPropertiesId().equals(delProperties.getPropertiesId())).findFirst().get();
-            return properties;
+            Optional<EedsProperties> propertiesOptional = things.getProperties().stream().filter(eedsProperties -> eedsProperties.getPropertiesId().equals(delProperties.getPropertiesId())).findFirst();
+            if (propertiesOptional.isPresent()) {
+                EedsProperties eedsProperties = propertiesOptional.get();
+                return eedsProperties;
+            }
         }
         return null;
     }
@@ -256,7 +259,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                     String thingsId = things.getThingsId();
                     THINGS_DRIVER_CONTEXT_MAP.put(things.getThingsId(), driverContext);
                     //todo 调用数据源连接
-                    ConnectManager.create(driverContext,AgentStartProperties.getInstance().getAgentClientType());
+                    ConnectManager.create(driverContext, AgentStartProperties.getInstance().getAgentClientType());
 
 
                     List<EedsProperties> properties = things.getProperties();
@@ -279,6 +282,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 
     /**
      * 根据数据源id,获取点位信息
+     *
      * @param thingsId 数据源ID
      * @return
      */

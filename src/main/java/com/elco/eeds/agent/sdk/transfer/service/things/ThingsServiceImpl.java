@@ -94,7 +94,7 @@ public class ThingsServiceImpl implements ThingsService {
                         propertiesIterators.remove();
                     }
                 }
-                if (ObjectUtil.isEmpty(propertiesIterators)) {
+                if (currentThingsProperties.isEmpty()) {
                     thingsIterators.remove();
                 }
             }
