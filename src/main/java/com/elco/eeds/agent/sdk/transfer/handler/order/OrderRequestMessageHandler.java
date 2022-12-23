@@ -1,8 +1,11 @@
 package com.elco.eeds.agent.sdk.transfer.handler.order;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
+import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
+import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.transfer.beans.message.order.OrderRequestMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.message.order.SubOrderRequestMessage;
 import com.elco.eeds.agent.sdk.transfer.handler.IReceiverMessageHandler;
@@ -27,7 +30,11 @@ public class OrderRequestMessageHandler implements IReceiverMessageHandler {
         SubOrderRequestMessage data = message.getData();
         // 发送指令下发确认报文
         OrderConfirmMqService.send(data.getThingsId(),data.getMsgSeqNo());
+
         ThingsConnectionHandler handler = ConnectManager.getHandler(data.getThingsId());
+        if(ObjectUtil.isEmpty(handler)){
+            throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
+        }
         handler.write(data.getProperties());
     }
 }

@@ -9,7 +9,10 @@ import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
+import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
+import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
+import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
@@ -86,7 +89,11 @@ public class RealTimeDataMessageFileUtils {
                         Long collectTime = originalMessage.getCollectTime();
                         if (startTime <= collectTime && collectTime < endTime) {
                             String message = originalMessage.getMessage();
-                            List<PropertiesValue> propertiesValueList = ConnectManager.getHandler(thingsId).getParsing().parsing(driverContext,propertiesContextList, message);
+                            ThingsConnectionHandler handler = ConnectManager.getHandler(thingsId);
+                            if(ObjectUtil.isEmpty(handler)){
+                                throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
+                            }
+                            List<PropertiesValue> propertiesValueList = handler.getParsing().parsing(driverContext,propertiesContextList, message);
                             result.addAll(propertiesValueList);
                         }
                     }
