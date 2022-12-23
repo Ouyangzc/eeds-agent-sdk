@@ -7,7 +7,7 @@ import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
  * @Author ouyang
  * @Date 2022/12/3 9:33
  **/
-public class SdkException extends Exception {
+public class SdkException extends RuntimeException {
     /**
      * 错误码
      * {@link ErrorEnum}
@@ -24,7 +24,6 @@ public class SdkException extends Exception {
      * @param code
      */
     public SdkException(String code) {
-        super(ErrorEnum.getMessage(code));
         this.message = ErrorEnum.getMessage(code);
         this.code = code;
     }
@@ -37,8 +36,13 @@ public class SdkException extends Exception {
      * @param e       异常对象
      */
     public SdkException(String code, String message, Throwable e) {
-        super(message, e);
         this.code = code;
         this.message = message;
+    }
+
+
+    public SdkException(ErrorEnum errorEnum) {
+        this.code = errorEnum.code();
+        this.message = errorEnum.message();
     }
 }

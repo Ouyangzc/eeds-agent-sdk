@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 public class OrderConfirmMqService {
     public static final Logger logger = LoggerFactory.getLogger(OrderConfirmMqService.class);
 
-    private static void send(String thingsId, String msgSeqNo) {
+    public static void send(String thingsId, String msgSeqNo) {
         ThreadUtil.execute(new Runnable() {
             @Override
             public void run() {

@@ -1,10 +1,13 @@
 package com.elco.eeds.agent.sdk.core.connect.manager;
 
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONUtil;
+import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
+import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,10 +43,14 @@ public class ConnectManager {
     /**
      * 添加数据源连接实例
      *
-     * @param key 数据源ID
+     * @param thingsId 数据源ID
      */
-    public static ThingsConnectionHandler getHandler(String key) {
-        return CONNECTION_HANDLER_MAP.get(key);
+    public static ThingsConnectionHandler getHandler(String thingsId) {
+        ThingsConnectionHandler handler = CONNECTION_HANDLER_MAP.get(thingsId);
+        if(ObjectUtil.isEmpty(handler)){
+            throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
+        }
+        return handler;
     }
 
     /**
