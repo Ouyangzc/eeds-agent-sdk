@@ -197,8 +197,8 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                 for (PropertiesContext editProperties : editList) {
                     //编辑
                     PROPERTIES_CONTEXT_MAP.put(editProperties.getPropertiesId(), editProperties);
-                    EedsProperties eedsProperties = getEedsProperties(localThingsList, editProperties);
-                    thingsService.editProperties(editProperties.getThingsId(), eedsProperties);
+                    EedsThings things = syncThingsList.stream().filter(syncThings -> syncThings.getThingsId().equals(editProperties.getThingsId())).findFirst().get();
+                    thingsService.editProperties(things);
                 }
                 for (PropertiesContext addProperties : addList) {
                     //新增
@@ -213,6 +213,8 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
         }
         return true;
     }
+
+
 
     private List<EedsThings> getSyncThings(List<EedsThings> syncThingsList, List<PropertiesContext> propertiesContextList) {
         //根据数据源id进行分组
@@ -241,6 +243,12 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
             }
         }
         return null;
+    }
+
+    private EedsProperties getEditProperties(List<EedsThings> syncThingsList, PropertiesContext propertiesContext) {
+        EedsThings things = syncThingsList.stream().filter(syncThings -> syncThings.getThingsId().equals(propertiesContext.getThingsId())).findFirst().get();
+        EedsProperties properties = things.getProperties().stream().filter(eedsProperties -> eedsProperties.getPropertiesId().equals(propertiesContext.getPropertiesId())).findFirst().get();
+        return properties;
     }
 
     private void loadThingDriver() {

@@ -68,8 +68,8 @@ public interface ThingsService {
     /**
      * 编辑变量
      *
-     * @param thingsId
+     * @param things
      * @param editProperties
      */
-    void editProperties(String thingsId, EedsProperties editProperties);
+    void editProperties(EedsThings things);
 }

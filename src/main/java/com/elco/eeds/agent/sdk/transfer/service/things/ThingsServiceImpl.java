@@ -1,6 +1,5 @@
 package com.elco.eeds.agent.sdk.transfer.service.things;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.util.ThingsFileUtils;
@@ -61,7 +60,7 @@ public class ThingsServiceImpl implements ThingsService {
     }
 
     @Override
-    public void addProperties(String thingsId, EedsProperties addProperties,List<EedsThings> syncThingsList) {
+    public void addProperties(String thingsId, EedsProperties addProperties, List<EedsThings> syncThingsList) {
         boolean flag = true;
         for (EedsThings currentThings : currentThingsList) {
             if (thingsId.equals(currentThings.getThingsId())) {
@@ -70,11 +69,11 @@ public class ThingsServiceImpl implements ThingsService {
                 flag = false;
             }
         }
-        if (flag){
+        if (flag) {
             //新增things
             EedsThings things = syncThingsList.stream().filter(eedsThings -> eedsThings.getThingsId().equals(thingsId)).findFirst().get();
             this.addThings(things);
-        }else {
+        } else {
             //新增点位
             saveThingsFile(JSON.toJSONString(currentThingsList));
         }
@@ -108,22 +107,16 @@ public class ThingsServiceImpl implements ThingsService {
     }
 
     @Override
-    public void editProperties(String thingsId, EedsProperties editProperties) {
+    public void editProperties(EedsThings things) {
+        String thingsId = things.getThingsId();
         Iterator<EedsThings> thingsIterators = currentThingsList.iterator();
         while (thingsIterators.hasNext()) {
             EedsThings currentThings = thingsIterators.next();
             if (thingsId.equals(currentThings.getThingsId())) {
-                List<EedsProperties> currentThingsProperties = currentThings.getProperties();
-                Iterator<EedsProperties> propertiesIterators = currentThingsProperties.iterator();
-                while (propertiesIterators.hasNext()) {
-                    EedsProperties eedsProperties = propertiesIterators.next();
-                    if (editProperties.getPropertiesId().equals(eedsProperties.getPropertiesId())) {
-                        propertiesIterators.remove();
-                        currentThingsProperties.add(editProperties);
-                    }
-                }
+                thingsIterators.remove();
             }
         }
+        this.addThings(things);
         saveThingsFile(JSON.toJSONString(currentThingsList));
     }
 
