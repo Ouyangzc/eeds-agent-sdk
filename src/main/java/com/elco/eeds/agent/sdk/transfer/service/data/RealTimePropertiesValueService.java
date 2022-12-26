@@ -36,28 +36,30 @@ public class RealTimePropertiesValueService {
      * @param propertiesValueList 解析数据
      */
     public static void recRealTimePropertiesValue(String message, String thingsId, Long collectTime, List<PropertiesValue> propertiesValueList) {
-        AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
-        String agentId = agentBaseInfo.getAgentId();
-        //存储原始数据
-        OriginalPropertiesValueMessage originalPropertiesValueMessage = new OriginalPropertiesValueMessage();
-        originalPropertiesValueMessage.setCollectTime(collectTime);
-        originalPropertiesValueMessage.setMessage(message);
-        RealTimeDataMessageFileUtils.writeAppend(thingsId, JSON.toJSONString(originalPropertiesValueMessage));
-        //调用统计接口
-        ThingsDataCount dataCount = new ThingsDataCount();
-        dataCount.setThingsId(thingsId);
-        dataCount.setSize(propertiesValueList.size());
-        dataCount.setStartTime(collectTime);
-        dataCount.setEndTime(collectTime);
-        DataCountServiceImpl.recRealTimeData(agentId, collectTime, dataCount);
+        if (!propertiesValueList.isEmpty()) {
+            AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
+            String agentId = agentBaseInfo.getAgentId();
+            //存储原始数据
+            OriginalPropertiesValueMessage originalPropertiesValueMessage = new OriginalPropertiesValueMessage();
+            originalPropertiesValueMessage.setCollectTime(collectTime);
+            originalPropertiesValueMessage.setMessage(message);
+            RealTimeDataMessageFileUtils.writeAppend(thingsId, JSON.toJSONString(originalPropertiesValueMessage));
+            //调用统计接口
+            ThingsDataCount dataCount = new ThingsDataCount();
+            dataCount.setThingsId(thingsId);
+            dataCount.setSize(propertiesValueList.size());
+            dataCount.setStartTime(collectTime);
+            dataCount.setEndTime(collectTime);
+            DataCountServiceImpl.recRealTimeData(agentId, collectTime, dataCount);
 
-        //推送数据
-        MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
-        String postMsg = DataRealTimePropertiesMessage.getMessage(propertiesValueList);
+            //推送数据
+            MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
+            String postMsg = DataRealTimePropertiesMessage.getMessage(propertiesValueList);
 
-        String topic = DataRealTimePropertiesMessage.getTopic(agentId, thingsId);
-        logger.info("实时数据推送：topic:{}, msg:{}", topic, postMsg);
-        mqPlugin.publish(topic, postMsg, null);
+            String topic = DataRealTimePropertiesMessage.getTopic(agentId, thingsId);
+            logger.info("实时数据推送：topic:{}, msg:{}", topic, postMsg);
+            mqPlugin.publish(topic, postMsg, null);
+        }
     }
 
 }
