@@ -140,7 +140,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
     public abstract void read(List<PropertiesContext> properties);
 
 
-    public abstract void write(List<OrderPropertiesValue> propertiesValueList);
+    public abstract void write(List<OrderPropertiesValue> propertiesValueList,String msgSeqNo);
 
     /**
      * 执行模板方法

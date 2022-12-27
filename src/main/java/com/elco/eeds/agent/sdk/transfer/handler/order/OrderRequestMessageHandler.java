@@ -35,6 +35,6 @@ public class OrderRequestMessageHandler implements IReceiverMessageHandler {
         if(ObjectUtil.isEmpty(handler)){
             throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
         }
-        handler.write(data.getProperties());
+        handler.write(data.getProperties(),data.getMsgSeqNo());
     }
 }
