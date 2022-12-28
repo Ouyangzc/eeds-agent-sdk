@@ -90,7 +90,7 @@ public class AgentStarter {
         logger.debug("传入参数为：服务器地址：{}，客户端名称：{}，客户端端口：{}，token：{}，文件存储路径：{}",
                 serverUrl, name, port, token, baseFolder);
         // 封装启动参数类
-        AgentStartProperties agentStartProperties = new AgentStartProperties();
+        AgentStartProperties agentStartProperties = AgentStartProperties.getInstance();
         agentStartProperties.setServerUrl(serverUrl);
         agentStartProperties.setName(name);
         agentStartProperties.setPort(port);
