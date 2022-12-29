@@ -90,10 +90,11 @@ public class RealTimeDataMessageFileUtils {
                         if (startTime <= collectTime && collectTime < endTime) {
                             String message = originalMessage.getMessage();
                             ThingsConnectionHandler handler = ConnectManager.getHandler(thingsId);
-                            if(ObjectUtil.isEmpty(handler)){
+                            if (ObjectUtil.isEmpty(handler)) {
                                 throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
                             }
-                            List<PropertiesValue> propertiesValueList = handler.getParsing().parsing(driverContext,propertiesContextList, message);
+                            List<PropertiesValue> propertiesValueList = handler.getParsing().parsing(driverContext, propertiesContextList, message);
+                            propertiesValueList.forEach(pv -> pv.setTimestamp(collectTime));
                             result.addAll(propertiesValueList);
                         }
                     }

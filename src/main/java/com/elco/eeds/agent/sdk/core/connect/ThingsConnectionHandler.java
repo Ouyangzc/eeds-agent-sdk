@@ -64,6 +64,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
             e.printStackTrace();
         }
     }
+
     private ConnectionStatus connectionStatus;
 
     public ConnectionStatus getConnectionStatus() {
@@ -140,7 +141,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
     public abstract void read(List<PropertiesContext> properties);
 
 
-    public abstract void write(List<OrderPropertiesValue> propertiesValueList,String msgSeqNo);
+    public abstract void write(List<OrderPropertiesValue> propertiesValueList, String msgSeqNo);
 
     /**
      * 执行模板方法
@@ -152,6 +153,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
     public void execute(String thingsId, String msg, Long collectTime) {
         List<PropertiesValue> valueList = this.getParsing()
                 .parsing(this.context, ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId), msg);
+        valueList.forEach(pv -> pv.setTimestamp(collectTime));
         RealTimePropertiesValueService.recRealTimePropertiesValue(msg, thingsId, collectTime, valueList);
     }
 
@@ -163,7 +165,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
         Integer reconnectNum = Integer.valueOf(this.context.getReconnectNum());
         Long reconnectInterval = Long.valueOf(this.context.getReconnectInterval()) * 1000;
         ThingsConnection connection = this.getThingsConnection();
-        ThingsConnectionHandler  handler = this;
+        ThingsConnectionHandler handler = this;
         if (!handler.getConnectionStatus().equals(ConnectionStatus.CONNECTED) || ObjectUtil.isEmpty(connection)) {
 
             ThingsDriverContext info = this.getContext();
