@@ -12,7 +12,7 @@ public class OrderConfirmMessage extends BaseMessage<SubOrderConfirmMessage> {
     public static OrderConfirmMessage create(String thingsId,  String msgSeqNo) {
         OrderConfirmMessage msg = new OrderConfirmMessage();
         msg.setMethod("agent_order_confirm");
-        msg.setTimestamp(null);
+        msg.setTimestamp(System.currentTimeMillis());
         msg.setData(new SubOrderConfirmMessage(thingsId, msgSeqNo));
         return msg;
     }

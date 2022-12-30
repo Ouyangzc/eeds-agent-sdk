@@ -14,7 +14,7 @@ import java.util.List;
 public abstract class DataParsing {
     public abstract List<PropertiesValue> parsing(ThingsDriverContext context,List<PropertiesContext> properties, String msg);
 
-    public String parsingCommand(String original){
+    public String parsingCommand(String original, String things){
         return original;
     }
 

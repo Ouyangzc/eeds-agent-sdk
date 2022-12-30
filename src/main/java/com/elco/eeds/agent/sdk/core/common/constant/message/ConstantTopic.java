@@ -111,4 +111,9 @@ public class ConstantTopic {
      * agent.agent.order.confirm.{thingsId}
      */
     public static final String TOPIC_AGENT_AGENT_ORDER_CONFIRM = "agent.agent.order.confirm.";
+
+    /**
+     * 下发指令返回结果报文
+     */
+    public static final String TOPIC_AGENT_AGENT_ORDER_RESPOND = "agent.agent.order.respond.";
 }
