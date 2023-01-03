@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 /**
  * @author ：ytl
  * @date ：Created in 2022/12/2 15:25
- * @description：
+ * @description： 数据源连接抽象类，需用户自己实现该客户端的连接方法，然后交由SDK对连接进行管理
  */
 public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
 
@@ -32,15 +32,39 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
     private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(4);
 
     public static Map<String, ScheduledFuture> scheduledTaskMap = new ConcurrentHashMap();
+    /**
+     * 数据源连接接口
+     */
     private ThingsConnection thingsConnection;
 
-    public ThingsConnection getThingsConnection() {
-        return thingsConnection;
-    }
+    /**
+     * 数据源的连接状态
+     */
+    private ConnectionStatus connectionStatus;
+    /**
+     * 数据源ID
+     */
+    private String thingsId;
+    /**
+     * 数据源连接信息上下文
+     */
+    private ThingsDriverContext context;
 
-    public void setThingsConnection(ThingsConnection thingsConnection) {
-        this.thingsConnection = thingsConnection;
-    }
+    /**
+     *
+     */
+    private String handlerName;
+
+    /**
+     * 数据源连接的client
+     */
+    private T master;
+
+    /**
+     * 数据解析实现类
+     */
+    private M parsing;
+
 
     public ThingsConnectionHandler() {
         attach();
@@ -65,7 +89,43 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
         }
     }
 
-    private ConnectionStatus connectionStatus;
+    /**
+     * 被动获取数据方法，抽象方法，需用户实现，SDK定时调用该方法
+     * @param properties 变量点位集合
+     */
+    public abstract void read(List<PropertiesContext> properties);
+
+
+    /**
+     * 下发指令
+     * @param propertiesValueList
+     * @param msgSeqNo
+     */
+    public abstract void write(List<OrderPropertiesValue> propertiesValueList, String msgSeqNo);
+
+
+    /**
+     * 执行模板方法
+     * 主动，被动获取原始报文后都需调用该方法，传入原始报文，由SDK调用解析方法，解析出点位数据
+     * @param thingsId 数据源ID
+     * @param msg 原始报文
+     * @param collectTime 采集时间戳
+     */
+    public void execute(String thingsId, String msg, Long collectTime) {
+        List<PropertiesValue> valueList = this.getParsing()
+                .parsing(this.context, ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId), msg);
+        valueList.forEach(pv -> pv.setTimestamp(collectTime));
+        RealTimePropertiesValueService.recRealTimePropertiesValue(msg, thingsId, collectTime, valueList);
+    }
+
+    public ThingsConnection getThingsConnection() {
+        return thingsConnection;
+    }
+
+    public void setThingsConnection(ThingsConnection thingsConnection) {
+        this.thingsConnection = thingsConnection;
+    }
+
 
     public ConnectionStatus getConnectionStatus() {
         return connectionStatus;
@@ -76,8 +136,6 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
     }
 
 
-    private String thingsId;
-
     public String getThingsId() {
         return thingsId;
     }
@@ -86,7 +144,6 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
         this.thingsId = thingsId;
     }
 
-    private ThingsDriverContext context;
 
     public ThingsDriverContext getContext() {
         return context;
@@ -96,8 +153,6 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
         this.context = context;
     }
 
-
-    private String handlerName;
 
     public String getHandlerName() {
         return handlerName;
@@ -117,10 +172,6 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
     }
 
 
-    private T master;
-
-    private M parsing;
-
     public M getParsing() {
         return parsing;
     }
@@ -136,26 +187,6 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
 //    public void command(EedsThings things,String command){
 //        this.write(things,this.parsing.parsingCommand(command));
 //    }
-
-
-    public abstract void read(List<PropertiesContext> properties);
-
-
-    public abstract void write(List<OrderPropertiesValue> propertiesValueList, String msgSeqNo);
-
-    /**
-     * 执行模板方法
-     *
-     * @param thingsId
-     * @param msg
-     * @param collectTime
-     */
-    public void execute(String thingsId, String msg, Long collectTime) {
-        List<PropertiesValue> valueList = this.getParsing()
-                .parsing(this.context, ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId), msg);
-        valueList.forEach(pv -> pv.setTimestamp(collectTime));
-        RealTimePropertiesValueService.recRealTimePropertiesValue(msg, thingsId, collectTime, valueList);
-    }
 
     /**
      * 执行重连
