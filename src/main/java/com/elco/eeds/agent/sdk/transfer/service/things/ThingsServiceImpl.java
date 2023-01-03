@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -65,7 +66,13 @@ public class ThingsServiceImpl implements ThingsService {
         for (EedsThings currentThings : currentThingsList) {
             if (thingsId.equals(currentThings.getThingsId())) {
                 List<EedsProperties> properties = currentThings.getProperties();
-                properties.add(addProperties);
+                Optional<EedsProperties> optional = properties.stream().filter(p -> p.getPropertiesId().equals(addProperties.getPropertiesId())).findFirst();
+                if (optional.isPresent()) {
+                    delProperties(thingsId, addProperties);
+                    properties.add(addProperties);
+                } else {
+                    properties.add(addProperties);
+                }
                 flag = false;
             }
         }
