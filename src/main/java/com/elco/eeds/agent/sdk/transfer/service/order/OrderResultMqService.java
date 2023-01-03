@@ -7,7 +7,6 @@ import com.elco.eeds.agent.mq.plugin.MQPluginManager;
 import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
 import com.elco.eeds.agent.sdk.transfer.beans.message.order.OrderResultMessage;
-import com.elco.eeds.agent.sdk.transfer.beans.message.order.SubOrderResultMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
