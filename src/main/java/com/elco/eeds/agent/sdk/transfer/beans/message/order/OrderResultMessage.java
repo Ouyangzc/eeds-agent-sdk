@@ -10,15 +10,22 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
  */
 public class OrderResultMessage extends BaseMessage<SubOrderResultMessage> {
 
-    public static final String SUCCESS_CHARACTER = "成功";
     public static final String SUCCESS = "success";
     public static final String FAIL = "fail";
 
-    public static OrderResultMessage create(String thingsId, String msgSeqNo, String result) {
+    public static OrderResultMessage createSuccess(String thingsId, String msgSeqNo) {
         OrderResultMessage msg = new OrderResultMessage();
         msg.setMethod("agent_order_respond");
         msg.setTimestamp(System.currentTimeMillis());
-        msg.setData(new SubOrderResultMessage(thingsId, msgSeqNo, SUCCESS_CHARACTER.equals(result) ? SUCCESS : FAIL));
+        msg.setData(new SubOrderResultMessage(thingsId, msgSeqNo, SUCCESS));
+        return msg;
+    }
+
+    public static OrderResultMessage createFail(String thingsId, String msgSeqNo) {
+        OrderResultMessage msg = new OrderResultMessage();
+        msg.setMethod("agent_order_respond");
+        msg.setTimestamp(System.currentTimeMillis());
+        msg.setData(new SubOrderResultMessage(thingsId, msgSeqNo, FAIL));
         return msg;
     }
 
