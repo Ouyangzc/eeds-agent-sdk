@@ -75,14 +75,4 @@ public class AgentConfigGlobalMessageHandler implements IReceiverMessageHandler 
             e.printStackTrace();
         }
     }
-
-    public static void main(String[] args) throws SdkException {
-        AgentConfigGlobalMessageHandler agentConfigGlobalMessageHandler = new AgentConfigGlobalMessageHandler();
-        String agentId = "1234567890";
-        String topic = "server.agent.config.localConfig";
-        String message = "{\"method\":\"agent_local_config\",\"timestamp\":\"1666349496479\",\"data\":{\"dataCacheFileSize\":\"20\",\"dataCacheCycle\":\"9\",\"syncPeriod\":\"2200\"}}";
-        topic = topic.replace("{agentId}", agentId);
-
-        agentConfigGlobalMessageHandler.handleRecData(topic, message);
-    }
 }

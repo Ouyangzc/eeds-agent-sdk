@@ -1,7 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.agent.linktest;
 
 import cn.hutool.core.util.IdUtil;
-import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
 import com.elco.eeds.agent.sdk.core.util.DateUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
@@ -40,11 +39,6 @@ public class AgentLinkTestMessage extends BaseMessage<SubAgentLinkTestMessage> {
 
         message.setData(subAgentLinkTestMessage);
         return message;
-    }
-
-    public static void main(String[] args) {
-        AgentLinkTestMessage rspMessage = getRspMessage("121212", "232323");
-        System.out.println(JSON.toJSONString(rspMessage));
     }
 
 }

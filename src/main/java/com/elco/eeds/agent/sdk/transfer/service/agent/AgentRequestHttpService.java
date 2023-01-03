@@ -174,23 +174,4 @@ public class AgentRequestHttpService {
         }
     }
 
-    /**
-     * 启动请求数据源同步
-     * @param request
-     * @param token
-     * @return
-     */
-    /*public String getSetupSyncThingsData(SyncThingsRequest request,String token) {
-        // TODO
-        return null;
-    }*/
-
-    /**
-     * 请求数据源同步
-     */
-    /*public String getSyncThingsData(SyncThingsRequest request,String token) {
-        // TODO
-        return null;
-    }*/
-
 }

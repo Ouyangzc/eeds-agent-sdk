@@ -63,7 +63,6 @@ public class AgentRegisterService implements IAgentRegisterService {
         try {
             // 获取IP
             String clientIp = IpUtil.getLocalIpAddress();
-            // TODO 待完成
             Agent agent = Agent.getInstance();
             // 调用http接口的register方法
             agent = agentRequestHttpService.register(clientIp, port, name, token, AgentStartProperties.getInstance().getAgentClientType());
@@ -78,9 +77,6 @@ public class AgentRegisterService implements IAgentRegisterService {
             loadMq(agent.getAgentMqInfo());
             // 数据源同步
             thingsSyncService.setupSyncThings();
-            // TODO 数据源同步
-            // 更新配置
-            // TODO 更新配置
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -110,7 +106,6 @@ public class AgentRegisterService implements IAgentRegisterService {
             // 实例化MQ插件
             MQServicePlugin natsClient = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
             // 订阅 更新token报文topic
-            // TODO 需要传入clientId
             natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_AGENT_TOKEN, agentId), agentTokenMessageHandler);
             // 订阅 客户端心跳报文topic
             natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_AGENT_HEART_REQ, agentId), agentHeartMessageHandler);

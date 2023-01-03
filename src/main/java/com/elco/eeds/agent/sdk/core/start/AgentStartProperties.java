@@ -9,8 +9,6 @@ package com.elco.eeds.agent.sdk.core.start;
  */
 public class AgentStartProperties {
 
-    //TODO 是否需要单例模式
-
     /**
      * server地址
      */

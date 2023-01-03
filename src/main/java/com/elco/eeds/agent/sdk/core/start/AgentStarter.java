@@ -55,7 +55,6 @@ public class AgentStarter {
             // 加载数据文件
             com.elco.eeds.agent.sdk.core.util.FileUtil.getLastDataFile();
             // 根据协议加载数据源信息
-            // TODO 根据协议加载数据源信息
             // 加载统计
             DataCountServiceImpl.setUp();
             // 统计定时任务
