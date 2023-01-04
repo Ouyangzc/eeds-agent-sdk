@@ -187,10 +187,10 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                 List<EedsThings> localThingsList = JSON.parseArray(localThings, EedsThings.class);
                 //处理删除点位
                 for (PropertiesContext delProperties : delList) {
+                    PROPERTIES_CONTEXT_MAP.remove(delProperties.getPropertiesId());
                     //删除
                     EedsProperties eedsProperties = getEedsProperties(localThingsList, delProperties);
                     if (!ObjectUtil.isEmpty(eedsProperties)) {
-                        PROPERTIES_CONTEXT_MAP.remove(delProperties.getPropertiesId());
                         thingsService.delProperties(delProperties.getThingsId(), eedsProperties);
                     }
                 }
@@ -262,7 +262,6 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                     String agentId = things.getAgentId();
                     String thingsId = things.getThingsId();
                     THINGS_DRIVER_CONTEXT_MAP.put(things.getThingsId(), driverContext);
-                    //todo 调用数据源连接
                     ConnectManager.create(driverContext, AgentStartProperties.getInstance().getAgentClientType());
 
 
