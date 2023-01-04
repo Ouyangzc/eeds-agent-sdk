@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.transfer.service.things;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
+import com.elco.eeds.agent.sdk.core.common.constant.ConstantThings;
 import com.elco.eeds.agent.sdk.core.util.ThingsFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsThings;
@@ -9,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -80,9 +80,8 @@ public class ThingsServiceImpl implements ThingsService {
         if (flag) {
             //新增things
             EedsThings things = syncThingsList.stream().filter(eedsThings -> eedsThings.getThingsId().equals(thingsId)).findFirst().get();
-            List<EedsProperties> properties = new ArrayList<>();
-            properties.add(addProperties);
-            things.setProperties(properties);
+            List<EedsProperties> eedsPropertiesList = things.getProperties().stream().filter(p -> p.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_ADD)).collect(Collectors.toList());
+            things.setProperties(eedsPropertiesList);
             this.addThings(things);
         } else {
             //新增点位
