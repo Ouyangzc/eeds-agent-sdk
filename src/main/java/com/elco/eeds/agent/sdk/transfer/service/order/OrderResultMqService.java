@@ -20,12 +20,27 @@ public class OrderResultMqService {
 
     public static final Logger logger = LoggerFactory.getLogger(OrderResultMqService.class);
 
-    public static void send(String message) {
+    public static void sendSuccess(String thingsId, String msgSeqNo) {
         ThreadUtil.execute(new Runnable() {
             @Override
             public void run() {
-                OrderResultMessage orderResultMessage = JSON.parseObject(message, OrderResultMessage.class);
-                String topic = ConstantTopic.TOPIC_AGENT_AGENT_ORDER_RESPOND + orderResultMessage.getData().getThingsId();
+                OrderResultMessage orderResultMessage = OrderResultMessage.createSuccess(thingsId, msgSeqNo);
+                String message = JSON.toJSONString(orderResultMessage);
+                String topic = ConstantTopic.TOPIC_AGENT_AGENT_ORDER_RESPOND + thingsId;
+                MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
+                mqPlugin.publish(topic, message, null);
+                logger.info("发送指令下发结果报文：topic: {}; message: {}", topic, message);
+            }
+        });
+    }
+
+    public static void sendFail(String thingsId, String msgSeqNo) {
+        ThreadUtil.execute(new Runnable() {
+            @Override
+            public void run() {
+                OrderResultMessage orderResultMessage = OrderResultMessage.createFail(thingsId, msgSeqNo);
+                String message = JSON.toJSONString(orderResultMessage);
+                String topic = ConstantTopic.TOPIC_AGENT_AGENT_ORDER_RESPOND + thingsId;
                 MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
                 mqPlugin.publish(topic, message, null);
                 logger.info("发送指令下发结果报文：topic: {}; message: {}", topic, message);
