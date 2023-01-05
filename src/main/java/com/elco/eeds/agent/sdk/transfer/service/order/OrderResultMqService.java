@@ -38,7 +38,21 @@ public class OrderResultMqService {
         ThreadUtil.execute(new Runnable() {
             @Override
             public void run() {
-                OrderResultMessage orderResultMessage = OrderResultMessage.createFail(thingsId, msgSeqNo);
+                OrderResultMessage orderResultMessage = OrderResultMessage.createFail(thingsId, msgSeqNo, "");
+                String message = JSON.toJSONString(orderResultMessage);
+                String topic = ConstantTopic.TOPIC_AGENT_AGENT_ORDER_RESPOND + thingsId;
+                MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
+                mqPlugin.publish(topic, message, null);
+                logger.info("发送指令下发结果报文：topic: {}; message: {}", topic, message);
+            }
+        });
+    }
+
+    public static void sendFail(String thingsId, String msgSeqNo, String errMsg) {
+        ThreadUtil.execute(new Runnable() {
+            @Override
+            public void run() {
+                OrderResultMessage orderResultMessage = OrderResultMessage.createFail(thingsId, msgSeqNo, errMsg);
                 String message = JSON.toJSONString(orderResultMessage);
                 String topic = ConstantTopic.TOPIC_AGENT_AGENT_ORDER_RESPOND + thingsId;
                 MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
