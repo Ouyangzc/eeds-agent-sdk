@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.core.connect;
 
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
@@ -101,7 +102,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
      * @param propertiesValueList
      * @param msgSeqNo
      */
-    public abstract void write(List<OrderPropertiesValue> propertiesValueList, String msgSeqNo);
+    public abstract boolean write(List<OrderPropertiesValue> propertiesValueList, String msgSeqNo);
 
 
     /**
@@ -112,10 +113,13 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
      * @param collectTime 采集时间戳
      */
     public void execute(String thingsId, String msg, Long collectTime) {
-        List<PropertiesValue> valueList = this.getParsing()
-                .parsing(this.context, ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId), msg);
-        valueList.forEach(pv -> pv.setTimestamp(collectTime));
-        RealTimePropertiesValueService.recRealTimePropertiesValue(msg, thingsId, collectTime, valueList);
+        List<PropertiesContext> propertiesContextList = ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId);
+        if(CollectionUtil.isNotEmpty(propertiesContextList)){
+            List<PropertiesValue> valueList = this.getParsing()
+                    .parsing(this.context, ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId), msg);
+            valueList.forEach(pv -> pv.setTimestamp(collectTime));
+            RealTimePropertiesValueService.recRealTimePropertiesValue(msg, thingsId, collectTime, valueList);
+        }
     }
 
     public ThingsConnection getThingsConnection() {

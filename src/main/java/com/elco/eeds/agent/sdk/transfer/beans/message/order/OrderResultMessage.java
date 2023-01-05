@@ -17,15 +17,15 @@ public class OrderResultMessage extends BaseMessage<SubOrderResultMessage> {
         OrderResultMessage msg = new OrderResultMessage();
         msg.setMethod("agent_order_respond");
         msg.setTimestamp(System.currentTimeMillis());
-        msg.setData(new SubOrderResultMessage(thingsId, msgSeqNo, SUCCESS));
+        msg.setData(new SubOrderResultMessage(thingsId, msgSeqNo, SUCCESS, ""));
         return msg;
     }
 
-    public static OrderResultMessage createFail(String thingsId, String msgSeqNo) {
+    public static OrderResultMessage createFail(String thingsId, String msgSeqNo, String errMsg) {
         OrderResultMessage msg = new OrderResultMessage();
         msg.setMethod("agent_order_respond");
         msg.setTimestamp(System.currentTimeMillis());
-        msg.setData(new SubOrderResultMessage(thingsId, msgSeqNo, FAIL));
+        msg.setData(new SubOrderResultMessage(thingsId, msgSeqNo, FAIL, errMsg));
         return msg;
     }
 

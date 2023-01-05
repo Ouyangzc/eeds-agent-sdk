@@ -10,6 +10,7 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.order.OrderRequestMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.message.order.SubOrderRequestMessage;
 import com.elco.eeds.agent.sdk.transfer.handler.IReceiverMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.service.order.OrderConfirmMqService;
+import com.elco.eeds.agent.sdk.transfer.service.order.OrderResultMqService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,10 @@ public class OrderRequestMessageHandler implements IReceiverMessageHandler {
         if(ObjectUtil.isEmpty(handler)){
             throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
         }
-        handler.write(data.getProperties(),data.getMsgSeqNo());
+        // 发送成功：true; 发送失败：false;
+        // 失败需要发送--下发报文结果报文
+        if (!handler.write(data.getProperties(),data.getMsgSeqNo())) {
+            OrderResultMqService.sendFail(data.getThingsId(),data.getMsgSeqNo(), "【失败】客户端发送网关消息失败");
+        }
     }
 }

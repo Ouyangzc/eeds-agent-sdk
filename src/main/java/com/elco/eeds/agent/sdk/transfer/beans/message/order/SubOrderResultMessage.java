@@ -23,10 +23,16 @@ public class SubOrderResultMessage {
      */
     private String result;
 
-    public SubOrderResultMessage(String thingsId, String msgSeqNo, String result) {
+    /**
+     * 错误原因
+     */
+    private String errMsg;
+
+    public SubOrderResultMessage(String thingsId, String msgSeqNo, String result, String errMsg) {
         this.thingsId = thingsId;
         this.msgSeqNo = msgSeqNo;
         this.result = result;
+        this.errMsg = errMsg;
     }
 
     public String getThingsId() {
@@ -51,5 +57,13 @@ public class SubOrderResultMessage {
 
     public void setResult(String result) {
         this.result = result;
+    }
+
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
     }
 }
