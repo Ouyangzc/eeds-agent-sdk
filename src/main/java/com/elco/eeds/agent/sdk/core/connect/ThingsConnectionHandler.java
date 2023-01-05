@@ -102,7 +102,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
      * @param propertiesValueList
      * @param msgSeqNo
      */
-    public abstract void write(List<OrderPropertiesValue> propertiesValueList, String msgSeqNo);
+    public abstract boolean write(List<OrderPropertiesValue> propertiesValueList, String msgSeqNo);
 
 
     /**
