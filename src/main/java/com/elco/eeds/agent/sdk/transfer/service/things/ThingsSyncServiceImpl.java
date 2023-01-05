@@ -84,12 +84,13 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                 String thingsId = eedsThings.getThingsId();
                 boolean addResult = eedsThings.getProperties().stream().allMatch(things -> things.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_ADD));
                 if (addResult) {
-                    //增量新增数据源
-                    ThingsDriverContext driverContext = new ThingsDriverContext();
-                    BeanUtil.copyProperties(eedsThings, driverContext);
-                    THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
-                    ConnectManager.create(driverContext, AgentStartProperties.getInstance().getAgentClientType());
-
+                    if (checkThingsConnectParams(eedsThings)) {
+                        //增量新增数据源
+                        ThingsDriverContext driverContext = new ThingsDriverContext();
+                        BeanUtil.copyProperties(eedsThings, driverContext);
+                        THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
+                        ConnectManager.create(driverContext, AgentStartProperties.getInstance().getAgentClientType());
+                    }
                 }
                 boolean delResult = eedsThings.getProperties().stream().allMatch(things -> things.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_DEL));
                 if (delResult) {
@@ -215,7 +216,6 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
     }
 
 
-
     private List<EedsThings> getSyncThings(List<EedsThings> syncThingsList, List<PropertiesContext> propertiesContextList) {
         //根据数据源id进行分组
         Map<String, List<PropertiesContext>> thingsIdMap = propertiesContextList.stream().collect(Collectors.groupingBy(PropertiesContext::getThingsId));
@@ -292,6 +292,16 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
     public static List<PropertiesContext> getThingsPropertiesContextList(String thingsId) {
         Map<String, List<PropertiesContext>> thingsPropertiesMap = PROPERTIES_CONTEXT_MAP.values().stream().collect(Collectors.groupingBy(PropertiesContext::getThingsId));
         return thingsPropertiesMap.get(thingsId);
+    }
+
+    private boolean checkThingsConnectParams(EedsThings eedsThings) {
+        if (StrUtil.isEmpty(eedsThings.getIp())) {
+            return false;
+        }
+        if (StrUtil.isEmpty(eedsThings.getPort())) {
+            return false;
+        }
+        return true;
     }
 
 }
