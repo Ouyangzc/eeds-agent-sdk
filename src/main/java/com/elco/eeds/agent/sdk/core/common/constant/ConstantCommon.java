@@ -22,4 +22,6 @@ public class ConstantCommon {
 
     public static final String YML_FILE_NAME = "application.yml";
 
+
+    public static final String INITIATIVE = "application.yml";
 }

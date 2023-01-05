@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.connect.scheduler;
 
+import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
 
@@ -20,6 +21,8 @@ public interface IJobManageService {
      */
     boolean addJob(SysTask sysTask) throws ClassNotFoundException, SchedulerException;
 
+
+    boolean addJob(String cron, ThingsConnectionHandler handler) throws SchedulerException;
 
     /**
      * @Author LCXU

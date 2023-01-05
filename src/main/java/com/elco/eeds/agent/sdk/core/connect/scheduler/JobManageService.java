@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.core.connect.scheduler;
 
 
 import cn.hutool.core.util.ObjectUtil;
+import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import org.quartz.*;
 
 import java.util.Date;
@@ -14,6 +15,11 @@ import java.util.Date;
  */
 
 public class JobManageService implements IJobManageService {
+
+    public JobManageService(Scheduler scheduler){
+        this.scheduler = scheduler;
+    }
+
     private Scheduler scheduler;
 
     /**
@@ -31,7 +37,7 @@ public class JobManageService implements IJobManageService {
         }
         JobDetail jobDetail = null;
         Class jobClass = Class.forName(sysTask.getClazzName());
-        jobDetail = JobBuilder.newJob(jobClass).withIdentity(sysTask.getJobName(), sysTask.getJobGroup()).build();
+        jobDetail = JobBuilder.newJob(SchedulerJob.class).withIdentity(sysTask.getJobName(), sysTask.getJobGroup()).build();
         //表达式调度构建器(即任务执行的时间,不立即执行)
         CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(sysTask.getCron()).withMisfireHandlingInstructionDoNothing();
         //按新的cronExpression表达式构建一个新的trigger
@@ -58,51 +64,44 @@ public class JobManageService implements IJobManageService {
         return true;
     }
 
+    @Override
+    public boolean addJob(String cron, ThingsConnectionHandler handler) throws SchedulerException {
+        String jobName = "read_job_"+System.currentTimeMillis();
+        String jobGroup = "read_job_group";
+        Date startDate = new Date();
 
-//    @Override
-//    public boolean addJob2(SysTask sysTask) {
-//
-//        Date startDate = sysTask.getBeginTime();
-//
-////        if (!CronExpression.isValidExpression(sysTask.getCron())) {
-////            throw new RuntimeException("表达式不正确");   //表达式格式不正确
-////        }
-//        JobDetail jobDetail = null;
-//        Class jobClass = Class.forName(sysTask.getClazzName());
-//        jobDetail = JobBuilder.newJob(jobClass).withIdentity(sysTask.getJobName(), sysTask.getJobGroup()).build();
-//        //表达式调度构建器(即任务执行的时间,不立即执行)
-//
-//        // 通过SchedulerFactory获取一个调度器实例
-//        StdSchedulerFactory sf = new StdSchedulerFactory();
-//        // 代表一个Quartz的独立运行容器
-//        Scheduler scheduler = sf.getScheduler();
-//
-////        CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(sysTask.getCron()).withMisfireHandlingInstructionDoNothing();
-//        //按新的cronExpression表达式构建一个新的trigger
-//
-//        SimpleTrigger trigger = (SimpleTrigger) TriggerBuilder.newTrigger().withIdentity("trigger1","group1").
-//                startAt(startDate).build();
-//
-//
-////        CronTrigger trigger = TriggerBuilder.newTrigger()
-////                .withIdentity(sysTask.getJobName(), sysTask.getJobGroup())
-////                .startAt(startDate)
-////                .endAt(ObjectUtil.isNotEmpty(sysTask.getEndTime())?sysTask.getEndTime():null)
-////                .withSchedule(scheduleBuilder).build();
-//
+        if (!CronExpression.isValidExpression(cron)) {
+            throw new RuntimeException("表达式不正确");   //表达式格式不正确
+        }
+        JobDetail jobDetail = null;
+        jobDetail = JobBuilder.newJob(SchedulerJob.class).withIdentity(jobName, jobGroup).build();
+        //表达式调度构建器(即任务执行的时间,不立即执行)
+        CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cron).withMisfireHandlingInstructionDoNothing();
+        //按新的cronExpression表达式构建一个新的trigger
+        CronTrigger trigger = TriggerBuilder.newTrigger()
+                .withIdentity(jobName,jobGroup)
+                .startAt(startDate)
+                .endAt(null)
+                .withSchedule(scheduleBuilder).build();
+
+        trigger.getJobDataMap().put("handler", handler);
+        //传递参数 这里可以传递参数，在任务执行的时候可以获取参数
+
 //        if(sysTask.getTask()!=null){
 //            trigger.getJobDataMap().put("task", sysTask.getTask());
 //        }
-//        //传递参数 这里可以传递参数，在任务执行的时候可以获取参数
+
 //        if (sysTask.getParmas() != null && !"".equals(sysTask.getParmas())) {
 //            trigger.getJobDataMap().put("invokeParam", sysTask.getParmas());
 //            trigger.getJobDataMap().put("desc", sysTask.getJobDesc());
+//            trigger.getJobDataMap().put("type", sysTask.getJobType());
 //            trigger.getJobDataMap().put("taskDesc", sysTask.getTaskDesc());
 //        }
-//        scheduler.scheduleJob(jobDetail, trigger);
-//        // pauseJob(sysTask.getJobName(),sysTask.getJobGroup());
-//        return true;
-//    }
+        scheduler.scheduleJob(jobDetail, trigger);
+        // pauseJob(sysTask.getJobName(),sysTask.getJobGroup());
+        return true;
+    }
+
 
 
     /**

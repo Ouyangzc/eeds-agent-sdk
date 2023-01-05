@@ -4,10 +4,15 @@ package com.elco.eeds.agent.sdk.core.connect.manager;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONUtil;
+import com.elco.eeds.agent.sdk.core.common.constant.ReadTypeEnums;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
+import com.elco.eeds.agent.sdk.core.connect.scheduler.IJobManageService;
+import com.elco.eeds.agent.sdk.core.connect.scheduler.JobManageService;
 import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
+import org.quartz.SchedulerException;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +32,15 @@ public class ConnectManager {
 
     private static ConcurrentHashMap<String, ThingsConnectionHandler> CONNECTION_HANDLER_MAP = new ConcurrentHashMap<String, ThingsConnectionHandler>(256);
 
+    private static IJobManageService jobManage;
+
+    static {
+        try {
+            jobManage = new JobManageService( StdSchedulerFactory.getDefaultScheduler());
+        } catch (SchedulerException e) {
+            logger.error(e.getMessage());
+        }
+    }
 
     /**
      * 添加数据源连接实例
@@ -102,17 +116,26 @@ public class ConnectManager {
         logger.info("连接协议：{}",connectKey);
         logger.info("开始创建连接，连接信息：{}", JSONUtil.toJsonStr(driverContext));
         ThingsConnection connection = ConnectManager.getConnection(connectKey);
-        if(connection.connect(driverContext)){
-            ThingsConnectionHandler handler = (ThingsConnectionHandler) connection;
-            handler.setContext(driverContext);
-            handler.setThingsConnection(connection);
-            handler.setThingsId(driverContext.getThingsId());
-            handler.setConnectionStatus(ConnectionStatus.CONNECTED);
-            ConnectManager.addHandler(handler);
-            logger.info("创建连接成功，连接信息：{}", JSONUtil.toJsonStr(driverContext));
-        }else {
+        if(!connection.connect(driverContext)){
             logger.error("创建连接失败，连接信息：{}", JSONUtil.toJsonStr(driverContext));
+            return;
         }
+        ThingsConnectionHandler handler = (ThingsConnectionHandler) connection;
+        handler.setContext(driverContext);
+        handler.setThingsConnection(connection);
+        handler.setThingsId(driverContext.getThingsId());
+        handler.setConnectionStatus(ConnectionStatus.CONNECTED);
+        ConnectManager.addHandler(handler);
+        logger.info("创建连接成功，连接信息：{}", JSONUtil.toJsonStr(driverContext));
+        if(connection.getReadType().equals(ReadTypeEnums.PASSIVE)){
+            try {
+                jobManage.addJob(connection.getCorn(),handler);
+            }catch (Exception e){
+                logger.error("添加定时任务失败，连接信息：{}", JSONUtil.toJsonStr(driverContext));
+            }
+
+        }
+
     }
 
 

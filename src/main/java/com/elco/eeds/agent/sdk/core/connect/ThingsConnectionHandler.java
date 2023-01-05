@@ -93,7 +93,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
      * 被动获取数据方法，抽象方法，需用户实现，SDK定时调用该方法
      * @param properties 变量点位集合
      */
-    public abstract void read(List<PropertiesContext> properties);
+    public abstract String read(List<PropertiesContext> properties);
 
 
     /**
