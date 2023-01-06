@@ -97,6 +97,11 @@ public class ConstantTopic {
      */
     public static final String TOPIC_THINGS_CONNECTSTATUS_REQUEST = "agent.things.connectStatus.request.";
 
+    /**
+     * 数据源手动重连
+     * server.things.reconnect.manual.{agentId}
+     */
+    public static final String TOPIC_SERVER_THINGS_RECONNECT_MANUAL = "server.things.reconnect.manual.{agentId}";
 
     /**
      * 指令下发请求报文

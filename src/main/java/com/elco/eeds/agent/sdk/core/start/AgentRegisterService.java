@@ -18,6 +18,7 @@ import com.elco.eeds.agent.sdk.transfer.handler.data.count.DataCountConfirmMessa
 import com.elco.eeds.agent.sdk.transfer.handler.data.sync.DataSyncCancelMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.data.sync.DataSyncRequestMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.order.OrderRequestMessageHandler;
+import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsReconnectManualMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsSyncIncrMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.service.agent.AgentRequestHttpService;
 import com.elco.eeds.agent.sdk.transfer.service.data.sync.DataSyncService;
@@ -43,6 +44,7 @@ public class AgentRegisterService implements IAgentRegisterService {
     private AgentConfigLocalMessageHandler agentConfigLocalMessageHandler = new AgentConfigLocalMessageHandler();
     private AgentLinkTestMessageHandler agentLinkTestMessageHandler = new AgentLinkTestMessageHandler();
     private DataCountConfirmMessageHandler dataCountConfirmMessageHandler = new DataCountConfirmMessageHandler();
+    private ThingsReconnectManualMessageHandler thingsReconnectManualMessageHandler = new ThingsReconnectManualMessageHandler();
 
     private DataSyncService dataSyncService = new DataSyncService();
 
@@ -128,6 +130,10 @@ public class AgentRegisterService implements IAgentRegisterService {
 
             //指令下发请求
             natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_SERVER_AGENT_ORDER_REQUEST, agentId), orderRequestMessageHandler);
+
+            // 数据源重新连接
+            natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_SERVER_THINGS_RECONNECT_MANUAL, agentId), thingsReconnectManualMessageHandler);
+
             // 订阅其他topic...
             // 待补充
         } catch (Exception e) {
