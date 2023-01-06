@@ -257,22 +257,24 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
             if (!ObjectUtil.isEmpty(localThings)) {
                 List<EedsThings> eedsThings = JSON.parseArray(localThings, EedsThings.class);
                 for (EedsThings things : eedsThings) {
-                    ThingsDriverContext driverContext = new ThingsDriverContext();
-                    BeanUtil.copyProperties(things, driverContext);
-                    String agentId = things.getAgentId();
-                    String thingsId = things.getThingsId();
-                    THINGS_DRIVER_CONTEXT_MAP.put(things.getThingsId(), driverContext);
-                    ConnectManager.create(driverContext, AgentStartProperties.getInstance().getAgentClientType());
+                    if (checkThingsConnectParams(things)) {
+                        ThingsDriverContext driverContext = new ThingsDriverContext();
+                        BeanUtil.copyProperties(things, driverContext);
+                        String agentId = things.getAgentId();
+                        String thingsId = things.getThingsId();
+                        THINGS_DRIVER_CONTEXT_MAP.put(things.getThingsId(), driverContext);
+                        ConnectManager.create(driverContext, AgentStartProperties.getInstance().getAgentClientType());
 
 
-                    List<EedsProperties> properties = things.getProperties();
-                    for (EedsProperties p : properties) {
-                        PropertiesContext propertiesContext = new PropertiesContext();
-                        BeanUtil.copyProperties(p, propertiesContext);
-                        propertiesContext.setAgentId(agentId);
-                        propertiesContext.setThingsId(thingsId);
-                        propertiesContext.setThingsType(things.getThingsType());
-                        PROPERTIES_CONTEXT_MAP.put(p.getPropertiesId(), propertiesContext);
+                        List<EedsProperties> properties = things.getProperties();
+                        for (EedsProperties p : properties) {
+                            PropertiesContext propertiesContext = new PropertiesContext();
+                            BeanUtil.copyProperties(p, propertiesContext);
+                            propertiesContext.setAgentId(agentId);
+                            propertiesContext.setThingsId(thingsId);
+                            propertiesContext.setThingsType(things.getThingsType());
+                            PROPERTIES_CONTEXT_MAP.put(p.getPropertiesId(), propertiesContext);
+                        }
                     }
                 }
             }
