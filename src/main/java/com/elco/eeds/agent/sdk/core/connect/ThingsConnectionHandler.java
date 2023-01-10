@@ -219,10 +219,16 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
 //                            }
                             if(!handler.getConnectionStatus().equals(ConnectionStatus.DISCONNECT) || ObjectUtil.isEmpty(connection)) {
                                 scheduledTaskMap.get(thingsId).cancel(true);
+                                logger.debug("删除定时任务：{}", thingsId);
                             }else {
-                                connection.connect(info);
+                                if (!connection.connect(info)) {
+                                    num++;
+                                }
                             }
 
+                        }else {
+                            scheduledTaskMap.get(thingsId).cancel(true);
+                            logger.debug("设定次数：{}，已抵达，删除定时任务：{}", reconnectNum, thingsId);
                         }
                     } catch (Throwable e) {
                         num++;
