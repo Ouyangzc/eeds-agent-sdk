@@ -156,4 +156,9 @@ public class ThingsServiceImpl implements ThingsService {
             return 0L;
         }
     }
+    
+    public boolean checkThingsExist(String thingsId){
+        Optional<EedsThings> optional = currentThingsList.stream().filter(eedsThings -> eedsThings.getThingsId().equals(thingsId)).findAny();
+        return optional.isPresent();
+    }
 }
