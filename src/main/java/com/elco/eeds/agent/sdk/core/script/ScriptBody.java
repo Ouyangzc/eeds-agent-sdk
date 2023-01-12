@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.core.script;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
+import com.elco.eeds.agent.sdk.core.script.domain.PropertiesInfo;
+import com.elco.eeds.agent.sdk.core.script.domain.Virtual;
+import com.elco.eeds.agent.sdk.core.script.impl.JsInvokeServiceImpl;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author ：ytl
@@ -72,12 +74,56 @@ public class ScriptBody {
     }
 
     public static void main(String[] args) {
-        HashMap<String,Object>argMap = new HashMap<>();
-        argMap.put("a",1);
-        argMap.put("b",2);
-        argMap.put("c",3);
-        ScriptBody scriptBody =new ScriptBody("a+b+c",argMap);
-        System.out.println(scriptBody.doEval());
+        PropertiesInfo propertiesInfo1 =new PropertiesInfo();
+        propertiesInfo1.setAddress("201");
+        propertiesInfo1.setPropertiesId("01");
+        propertiesInfo1.setVariableName("a_01");
+
+        PropertiesInfo propertiesInfo2 =new PropertiesInfo();
+        propertiesInfo2.setAddress("202");
+        propertiesInfo2.setPropertiesId("02");
+        propertiesInfo2.setVariableName("a_02");
+
+
+        PropertiesInfo propertiesInfo3 =new PropertiesInfo();
+        propertiesInfo3.setAddress("203");
+        propertiesInfo3.setPropertiesId("03");
+        propertiesInfo3.setVariableName("a_03");
+
+        List<PropertiesInfo> argsList = new ArrayList<>();
+        argsList.add(propertiesInfo1);
+        argsList.add(propertiesInfo2);
+        argsList.add(propertiesInfo3);
+
+        Virtual virtual = new Virtual();
+
+        virtual.setAddress("101");
+        virtual.setScriptBody("a_01+a_02+a_03");
+        virtual.setArgsList(argsList);
+
+        PropertiesValue propertiesValue1= new PropertiesValue();
+        propertiesValue1.setAddress("201");
+        propertiesValue1.setValue("20");
+
+        PropertiesValue propertiesValue2= new PropertiesValue();
+        propertiesValue2.setAddress("202");
+        propertiesValue2.setValue("30");
+
+
+        PropertiesValue propertiesValue3= new PropertiesValue();
+        propertiesValue3.setAddress("203");
+        propertiesValue3.setValue("60");
+
+
+        List<PropertiesValue> propertiesValueList = new ArrayList<>();
+        propertiesValueList.add(propertiesValue1);
+        propertiesValueList.add(propertiesValue2);
+        propertiesValueList.add(propertiesValue3);
+
+        JsInvokeService jsInvokeService = new JsInvokeServiceImpl();
+
+        String execute = jsInvokeService.execute(virtual, propertiesValueList);
+        System.out.println(execute);
     }
 
 

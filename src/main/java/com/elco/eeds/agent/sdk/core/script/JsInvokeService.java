@@ -15,9 +15,17 @@
  */
 package com.elco.eeds.agent.sdk.core.script;
 
+import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
+import com.elco.eeds.agent.sdk.core.script.domain.Virtual;
+
+import java.util.List;
+
 public interface JsInvokeService {
 
     void eval( String scriptBody, String... argNames);
+
+    String execute(Virtual virtual, List<PropertiesValue> propertiesValueList);
+
 
 //    ListenableFuture<Object> invokeFunction(TenantId tenantId, CustomerId customerId, UUID scriptId, Object... args);
 //
