@@ -52,13 +52,13 @@ public class AgentStarter {
             // 注册
             registerService.register(agentStartProperties.getServerUrl(), agentStartProperties.getName(),
                     agentStartProperties.getPort(), agentStartProperties.getToken(), agentStartProperties.getAgentClientType());
+            // 统计定时任务
+            countScheduler.startCountScheduler();
             // 加载数据文件
             com.elco.eeds.agent.sdk.core.util.FileUtil.getLastDataFile();
             // 根据协议加载数据源信息
             // 加载统计
             DataCountServiceImpl.setUp();
-            // 统计定时任务
-            countScheduler.startCountScheduler();
             logger.info(Logo.logo);
         } catch (Exception e) {
             e.printStackTrace();
