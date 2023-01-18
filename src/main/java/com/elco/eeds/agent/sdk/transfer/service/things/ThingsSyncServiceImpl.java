@@ -265,9 +265,6 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 						BeanUtil.copyProperties(things, driverContext);
 						String agentId = things.getAgentId();
 						String thingsId = things.getThingsId();
-						THINGS_DRIVER_CONTEXT_MAP.put(things.getThingsId(), driverContext);
-						ConnectManager.create(driverContext, AgentStartProperties.getInstance().getAgentClientType());
-						
 						
 						List<EedsProperties> properties = things.getProperties();
 						for (EedsProperties p : properties) {
@@ -278,6 +275,8 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 							propertiesContext.setThingsType(things.getThingsType());
 							PROPERTIES_CONTEXT_MAP.put(p.getPropertiesId(), propertiesContext);
 						}
+						THINGS_DRIVER_CONTEXT_MAP.put(things.getThingsId(), driverContext);
+						ConnectManager.create(driverContext, AgentStartProperties.getInstance().getAgentClientType());
 					}
 				}
 			}
