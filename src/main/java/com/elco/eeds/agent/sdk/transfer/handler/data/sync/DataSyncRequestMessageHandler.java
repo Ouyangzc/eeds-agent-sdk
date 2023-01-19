@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.handler.data.sync;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.mq.nats.plugin.NatsPlugin;
 import com.elco.eeds.agent.mq.plugin.MQPluginManager;
@@ -63,12 +64,13 @@ public class DataSyncRequestMessageHandler implements IReceiverMessageHandler {
             }
             if (syncDatas.size() > 0) {
                 dataSyncService.setSyncFlag(true);
+                List<List<PropertiesValue>> split = CollectionUtil.split(syncDatas, 2000);
                 // 循环发送同步点位数据
-                syncDatas.stream().forEach(t -> {
-                    List<PropertiesValue> propertiesData = new ArrayList<>();
-                    propertiesData.add(t);
+                split.stream().forEach(t -> {
+//                    List<PropertiesValue> propertiesData = new ArrayList<>();
+//                    propertiesData.add(t);
                     //发送数据
-                    this.postPropertiesValueMsg(propertiesData, agentId, thingsId);
+                    this.postPropertiesValueMsg(t, agentId, thingsId);
                 });
             }
             //发送该数据源同步完成
