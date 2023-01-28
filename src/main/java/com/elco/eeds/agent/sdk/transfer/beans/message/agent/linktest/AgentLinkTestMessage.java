@@ -32,8 +32,7 @@ public class AgentLinkTestMessage extends BaseMessage<SubAgentLinkTestMessage> {
         List<SubAgentLinkTestThingsData> list = new ArrayList<>();
         Map<String, Object> filter = new HashMap<String, Object>();
         filter.put("filter", "");
-        list.add(new SubAgentLinkTestThingsData(IdUtil.simpleUUID(), IdUtil.simpleUUID(), "", "MQTT(宜科边缘网关)", IdUtil.simpleUUID(), "temperature", "DB2.DB1.2",
-                "double", "23.1", "23.1", "true", filter));
+        list.add(SubAgentLinkTestThingsData.getTestData());
         subAgentLinkTestData.setThingsData(list);
         subAgentLinkTestMessage.setData(subAgentLinkTestData);
 

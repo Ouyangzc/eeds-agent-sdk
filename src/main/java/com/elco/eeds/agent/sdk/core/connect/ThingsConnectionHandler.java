@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.core.connect;
 
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
@@ -101,7 +102,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
      * @param propertiesValueList
      * @param msgSeqNo
      */
-    public abstract void write(List<OrderPropertiesValue> propertiesValueList, String msgSeqNo);
+    public abstract boolean write(List<OrderPropertiesValue> propertiesValueList, String msgSeqNo);
 
 
     /**
@@ -112,10 +113,13 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
      * @param collectTime 采集时间戳
      */
     public void execute(String thingsId, String msg, Long collectTime) {
-        List<PropertiesValue> valueList = this.getParsing()
-                .parsing(this.context, ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId), msg);
-        valueList.forEach(pv -> pv.setTimestamp(collectTime));
-        RealTimePropertiesValueService.recRealTimePropertiesValue(msg, thingsId, collectTime, valueList);
+        List<PropertiesContext> propertiesContextList = ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId);
+        if(CollectionUtil.isNotEmpty(propertiesContextList)){
+            List<PropertiesValue> valueList = this.getParsing()
+                    .parsing(this.context, ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId), msg);
+            valueList.forEach(pv -> pv.setTimestamp(collectTime));
+            RealTimePropertiesValueService.recRealTimePropertiesValue(msg, thingsId, collectTime, valueList);
+        }
     }
 
     public ThingsConnection getThingsConnection() {
@@ -197,7 +201,8 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
         Long reconnectInterval = Long.valueOf(this.context.getReconnectInterval()) * 1000;
         ThingsConnection connection = this.getThingsConnection();
         ThingsConnectionHandler handler = this;
-        if (!handler.getConnectionStatus().equals(ConnectionStatus.CONNECTED) || ObjectUtil.isEmpty(connection)) {
+//        if (!handler.getConnectionStatus().equals(ConnectionStatus.CONNECTED) || ObjectUtil.isEmpty(connection)) {
+        if (handler.getConnectionStatus().equals(ConnectionStatus.DISCONNECT) || ObjectUtil.isEmpty(connection)) {
 
             ThingsDriverContext info = this.getContext();
             ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
@@ -207,11 +212,23 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
                 public void run() {
                     try {
                         if (num <= reconnectNum) {
-                            if (!handler.getConnectionStatus().equals(ConnectionStatus.CONNECTED) || ObjectUtil.isEmpty(connection)) {
+//                            if (!handler.getConnectionStatus().equals(ConnectionStatus.CONNECTED) || ObjectUtil.isEmpty(connection)) {
+//                                scheduledTaskMap.get(thingsId).cancel(true);
+//                            } else {
+//                                connection.connect(info);
+//                            }
+                            if(!handler.getConnectionStatus().equals(ConnectionStatus.DISCONNECT) || ObjectUtil.isEmpty(connection)) {
                                 scheduledTaskMap.get(thingsId).cancel(true);
-                            } else {
-                                connection.connect(info);
+                                logger.debug("删除定时任务：{}", thingsId);
+                            }else {
+                                if (!connection.connect(info)) {
+                                    num++;
+                                }
                             }
+
+                        }else {
+                            scheduledTaskMap.get(thingsId).cancel(true);
+                            logger.debug("设定次数：{}，已抵达，删除定时任务：{}", reconnectNum, thingsId);
                         }
                     } catch (Throwable e) {
                         num++;
