@@ -220,3 +220,6 @@
   └──client.jks
   └──logback.xml
 ```
+# dev-1.1.0 feature</br>
+feature1 : 变量变动通知  
+说明：变量点位得增删,通知到客户端，适用于对变量得单独订阅  
