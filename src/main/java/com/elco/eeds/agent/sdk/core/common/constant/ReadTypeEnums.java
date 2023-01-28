@@ -11,7 +11,11 @@ public enum ReadTypeEnums {
      */
     INITIATIVE,
     /**
-     * 被动模式
+     * 被动模式 corn表达式
      */
-    PASSIVE
+    PASSIVE_CORN,
+    /**
+     * 被动模式 interval 固定间隔
+     */
+    PASSIVE_INTERVAL
 }

@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.core.connect.scheduler;
 
 
 import cn.hutool.core.util.ObjectUtil;
+import com.elco.eeds.agent.sdk.core.common.constant.ReadTypeEnums;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import org.quartz.*;
 
@@ -65,24 +66,40 @@ public class JobManageService implements IJobManageService {
     }
 
     @Override
-    public boolean addJob(String cron, ThingsConnectionHandler handler) throws SchedulerException {
+    public boolean addJob(String cron, ThingsConnectionHandler handler, ReadTypeEnums enums) throws SchedulerException {
         String jobName = "read_job_"+System.currentTimeMillis();
         String jobGroup = "read_job_group";
         Date startDate = new Date();
 
-        if (!CronExpression.isValidExpression(cron)) {
-            throw new RuntimeException("表达式不正确");   //表达式格式不正确
-        }
+
         JobDetail jobDetail = null;
         jobDetail = JobBuilder.newJob(SchedulerJob.class).withIdentity(jobName, jobGroup).build();
+        Trigger trigger;
+        if(enums.equals(ReadTypeEnums.PASSIVE_CORN)){
+            if (!CronExpression.isValidExpression(cron)) {
+                throw new RuntimeException("表达式不正确");   //表达式格式不正确
+            }
+            //表达式调度构建器(即任务执行的时间,不立即执行)
+            CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cron).withMisfireHandlingInstructionDoNothing();
+            trigger = TriggerBuilder.newTrigger()
+                    .withIdentity(jobName,jobGroup)
+                    .startAt(startDate)
+                    .endAt(null)
+                    .withSchedule(scheduleBuilder).build();
+        }else{
+            trigger = TriggerBuilder.newTrigger().withIdentity(jobName, jobGroup).startAt(startDate)
+                    .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(Integer.parseInt(cron))
+                            .withRepeatCount(20)).build();
+        }
+        //SimpleTrigger.REPEAT_INDEFINITELY
         //表达式调度构建器(即任务执行的时间,不立即执行)
-        CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cron).withMisfireHandlingInstructionDoNothing();
+//        CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cron).withMisfireHandlingInstructionDoNothing();
         //按新的cronExpression表达式构建一个新的trigger
-        CronTrigger trigger = TriggerBuilder.newTrigger()
-                .withIdentity(jobName,jobGroup)
-                .startAt(startDate)
-                .endAt(null)
-                .withSchedule(scheduleBuilder).build();
+//        CronTrigger trigger = TriggerBuilder.newTrigger()
+//                .withIdentity(jobName,jobGroup)
+//                .startAt(startDate)
+//                .endAt(null)
+//                .withSchedule(scheduleBuilder).build();
 
         trigger.getJobDataMap().put("handler", handler);
         //传递参数 这里可以传递参数，在任务执行的时候可以获取参数

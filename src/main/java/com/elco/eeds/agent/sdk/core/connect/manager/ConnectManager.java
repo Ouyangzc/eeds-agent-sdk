@@ -127,9 +127,9 @@ public class ConnectManager {
         handler.setConnectionStatus(ConnectionStatus.CONNECTED);
         ConnectManager.addHandler(handler);
         logger.info("创建连接成功，连接信息：{}", JSONUtil.toJsonStr(driverContext));
-        if(connection.getReadType().equals(ReadTypeEnums.PASSIVE)){
+        if(!connection.getReadType().equals(ReadTypeEnums.INITIATIVE)){
             try {
-                jobManage.addJob(connection.getCorn(),handler);
+                jobManage.addJob(connection.getCorn(),handler,connection.getReadType());
             }catch (Exception e){
                 logger.error("添加定时任务失败，连接信息：{}", JSONUtil.toJsonStr(driverContext));
             }
