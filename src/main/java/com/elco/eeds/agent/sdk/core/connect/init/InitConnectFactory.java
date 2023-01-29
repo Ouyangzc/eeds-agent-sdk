@@ -19,6 +19,7 @@ public class InitConnectFactory {
     private static TreeSet<String> CONNECT_PACKAGE_PATH =new TreeSet<>();
 
 
+
     public static void initConnect(){
         logger.info("开始初始化协议");
         logger.info("协议地址：{}",CONNECT_PACKAGE_PATH);

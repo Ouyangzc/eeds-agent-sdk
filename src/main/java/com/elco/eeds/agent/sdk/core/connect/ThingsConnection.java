@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.connect;
 
+import com.elco.eeds.agent.sdk.core.common.constant.ReadTypeEnums;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesEvent;
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
@@ -10,6 +11,10 @@ import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
  * @description：数据源连接接口
  */
 public interface ThingsConnection {
+
+    ReadTypeEnums getReadType();
+
+    String getCorn();
 
     /**
      *  协议名称
