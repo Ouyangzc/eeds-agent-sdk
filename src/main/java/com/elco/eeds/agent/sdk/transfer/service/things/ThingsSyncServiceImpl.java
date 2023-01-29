@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
+import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesEvent;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantThings;
 import com.elco.eeds.agent.sdk.core.common.constant.http.ConstantHttpApiPath;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
@@ -195,6 +196,9 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 					//删除
 					EedsProperties eedsProperties = getEedsProperties(localThingsList, delProperties);
 					if (!ObjectUtil.isEmpty(eedsProperties)) {
+						PropertiesEvent propertiesEvent = new PropertiesEvent();
+						BeanUtil.copyProperties(delProperties,propertiesEvent);
+						ConnectManager.sendPropertiesEventNotify(delProperties.getThingsId(),propertiesEvent);
 						thingsService.delProperties(delProperties.getThingsId(), eedsProperties);
 					}
 				}

@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.connect;
 
+import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesEvent;
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 
@@ -32,6 +33,13 @@ public interface ThingsConnection {
      * @return
      */
     boolean disconnect();
+    
+    
+    /**
+     * 变量变动事件(增，删，改)
+     * @param propertiesEvent
+     */
+    void propertiesEventNotify(PropertiesEvent propertiesEvent);
 
 
 

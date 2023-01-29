@@ -4,6 +4,7 @@ package com.elco.eeds.agent.sdk.core.connect.manager;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONUtil;
+import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesEvent;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
@@ -136,5 +137,13 @@ public class ConnectManager {
     public static void destroy(ThingsDriverContext driverContext) {
         ThingsConnectionHandler handler = ConnectManager.getHandler(driverContext.getThingsId());
         handler.getThingsConnection().disconnect();
+    }
+    
+    public static void sendPropertiesEventNotify(String thingsId, PropertiesEvent propertiesEvent){
+        ThingsConnectionHandler handler = getHandler(thingsId);
+        if (ObjectUtil.isNotEmpty(handler)){
+            logger.info("发送变量变动通知,thingsId:{}",thingsId);
+            handler.getThingsConnection().propertiesEventNotify(propertiesEvent);
+        }
     }
 }
