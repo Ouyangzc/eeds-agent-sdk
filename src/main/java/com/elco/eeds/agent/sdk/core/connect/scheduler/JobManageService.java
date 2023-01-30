@@ -89,7 +89,7 @@ public class JobManageService implements IJobManageService {
         }else{
             trigger = TriggerBuilder.newTrigger().withIdentity(jobName, jobGroup).startAt(startDate)
                     .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(Integer.parseInt(cron))
-                            .withRepeatCount(20)).build();
+                            .withRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY)).build();
         }
         //SimpleTrigger.REPEAT_INDEFINITELY
         //表达式调度构建器(即任务执行的时间,不立即执行)
