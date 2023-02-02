@@ -85,7 +85,7 @@ public class DataSyncRequestMessageHandler implements IReceiverMessageHandler {
     private void postConfirMsg(String agentId, String queueId) {
         String confirmMessage = DataSyncConfirmMessage.getMsg(agentId, queueId);
         String confirmTopic = DataSyncConfirmMessage.getTopic(agentId);
-        logger.debug("数据同步,同步确认,队列ID:{}", queueId);
+        logger.info("数据同步,同步确认,队列ID:{}", queueId);
         this.publishMessage(confirmTopic, confirmMessage);
     }
 
@@ -114,7 +114,7 @@ public class DataSyncRequestMessageHandler implements IReceiverMessageHandler {
         String message = DataSyncFinishMessage.getMessage(queueId, syncFlag, results);
         String topic = DataSyncFinishMessage.getTopic(agentId);
         MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
-        logger.debug("数据同步，同步完成，topic:{},msg:{}", topic, message);
+        logger.info("数据同步，同步完成，topic:{},msg:{}", topic, message);
         mqPlugin.publish(topic, message, null);
     }
 }

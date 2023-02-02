@@ -103,7 +103,7 @@ public class RealTimeDataMessageFileUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        logger.debug("数据同步：同步数据源id:{},开始时间:{},结束时间：{},获取同步原始报文大小:{}", thingsId, startTime, endTime, result.size());
+        logger.info("数据同步：同步数据源id:{},开始时间:{},结束时间：{},获取同步原始报文大小:{}", thingsId, startTime, endTime, result.size());
         return result;
     }
 
