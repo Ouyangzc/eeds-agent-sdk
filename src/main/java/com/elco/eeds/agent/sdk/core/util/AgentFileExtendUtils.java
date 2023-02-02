@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.core.util;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -72,7 +73,7 @@ public class AgentFileExtendUtils {
             }
             jsonObject.put("token", token);
             // 修改后保存
-            AgentFileUtils.strogeLocalAgentFile(JSON.toJSONString(jsonObject));
+            AgentFileUtils.strogeLocalAgentFile(JSONUtil.toJsonStr(jsonObject));
             logger.debug("token保存至json文件成功");
         } catch (IOException ioException) {
             logger.debug("token保存agent.json失败", ioException);
@@ -97,7 +98,7 @@ public class AgentFileExtendUtils {
             }
             jsonObject.put("config", config);
             // 修改后保存
-            AgentFileUtils.strogeLocalAgentFile(JSON.toJSONString(jsonObject));
+            AgentFileUtils.strogeLocalAgentFile(JSONUtil.toJsonStr(jsonObject));
             logger.debug("config保存至json文件成功");
         } catch (IOException ioException) {
             logger.debug("config保存agent.json失败", ioException);

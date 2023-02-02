@@ -34,14 +34,14 @@ public class ThingsRequestHttpService {
         String serverUrl = agentBaseInfo.getServerUrl();
         String requestUrl = serverUrl + apiPath;
         try {
-            String response = HttpClientUtil.post(requestUrl, token, JSON.toJSONString(request));
+            String response = HttpClientUtil.post(requestUrl, token, JSONUtil.toJsonStr(request));
             ResponseResult responseResult = JSONUtil.toBean(response, ResponseResult.class);
             if (!SysCodeEnum.SUCCESS.getCode().equals(responseResult.getCode())) {
                 throw new SdkException(ErrorEnum.THINGS_SYNC_SETUP_HTTP_ERROR.code());
             }
             return responseResult.getData().toString();
         } catch (Exception e) {
-            logger.error("数据源同步--启动API异常, 形参为：{}", JSON.toJSONString(request));
+            logger.error("数据源同步--启动API异常, 形参为：{}", JSONUtil.toJsonStr(request));
             e.printStackTrace();
         }
         return null;

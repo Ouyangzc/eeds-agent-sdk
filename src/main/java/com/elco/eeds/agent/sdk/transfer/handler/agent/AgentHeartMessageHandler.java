@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.handler.agent;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
@@ -30,7 +31,7 @@ public class AgentHeartMessageHandler implements IReceiverMessageHandler {
             // 收到ping，发送pong
             AgentHeartMessage rspMessage = AgentHeartMessage.getRespMessage();
             String rspTopic = ConstantTopic.TOPIC_AGENT_HEART_RSP.replace("{agentId}", agent.getAgentBaseInfo().getAgentId());
-            this.publishMessage(rspTopic, JSON.toJSONString(rspMessage));
+            this.publishMessage(rspTopic, JSONUtil.toJsonStr(rspMessage));
         } catch (Exception e) {
             logger.error("客户端心跳报文处理异常", e);
             e.printStackTrace();

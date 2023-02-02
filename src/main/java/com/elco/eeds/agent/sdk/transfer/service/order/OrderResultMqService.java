@@ -1,7 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.service.order;
 
 import cn.hutool.core.thread.ThreadUtil;
-import com.alibaba.fastjson.JSON;
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.mq.nats.plugin.NatsPlugin;
 import com.elco.eeds.agent.mq.plugin.MQPluginManager;
 import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
@@ -25,7 +25,7 @@ public class OrderResultMqService {
             @Override
             public void run() {
                 OrderResultMessage orderResultMessage = OrderResultMessage.createSuccess(thingsId, msgSeqNo);
-                String message = JSON.toJSONString(orderResultMessage);
+                String message = JSONUtil.toJsonStr(orderResultMessage);
                 String topic = ConstantTopic.TOPIC_AGENT_AGENT_ORDER_RESPOND + thingsId;
                 MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
                 mqPlugin.publish(topic, message, null);
@@ -39,7 +39,7 @@ public class OrderResultMqService {
             @Override
             public void run() {
                 OrderResultMessage orderResultMessage = OrderResultMessage.createFail(thingsId, msgSeqNo, "");
-                String message = JSON.toJSONString(orderResultMessage);
+                String message = JSONUtil.toJsonStr(orderResultMessage);
                 String topic = ConstantTopic.TOPIC_AGENT_AGENT_ORDER_RESPOND + thingsId;
                 MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
                 mqPlugin.publish(topic, message, null);
@@ -53,7 +53,7 @@ public class OrderResultMqService {
             @Override
             public void run() {
                 OrderResultMessage orderResultMessage = OrderResultMessage.createFail(thingsId, msgSeqNo, errMsg);
-                String message = JSON.toJSONString(orderResultMessage);
+                String message = JSONUtil.toJsonStr(orderResultMessage);
                 String topic = ConstantTopic.TOPIC_AGENT_AGENT_ORDER_RESPOND + thingsId;
                 MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
                 mqPlugin.publish(topic, message, null);

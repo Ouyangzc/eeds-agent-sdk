@@ -1,6 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.service.data.count;
 
-import com.alibaba.fastjson.JSON;
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.util.CountFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.data.count.PostDataCount;
 
@@ -123,7 +123,7 @@ public class CountDataHolder {
      * @throws IOException
      */
     public void countDataAppendToFile(PostDataCount dataCount) throws IOException {
-        String data = JSON.toJSONString(dataCount);
+        String data = JSONUtil.toJsonStr(dataCount);
         CountFileUtils.writeAppend(data);
     }
 }

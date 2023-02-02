@@ -1,7 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.data;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.alibaba.fastjson.JSON;
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
@@ -31,7 +31,7 @@ public class DataSyncPropertiesValueMessage extends BaseMessage<List<SubDataSync
             subMsgs.add(valueMessage);
         }
         message.setData(subMsgs);
-        return JSON.toJSONString(message);
+        return JSONUtil.toJsonStr(message);
     }
 
     public static String getTopic(String agentId, String thingsId) {

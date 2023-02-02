@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.handler.agent;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
@@ -28,7 +29,7 @@ public class AgentLinkTestMessageHandler implements IReceiverMessageHandler {
             AgentLinkTestMessage agentLinkTestMessage = JSON.parseObject(recData, AgentLinkTestMessage.class);
             AgentLinkTestMessage rspMessage = AgentLinkTestMessage.getRspMessage(agentLinkTestMessage.getData().getPkUser(), agentLinkTestMessage.getData().getSocketId());
             String rspTopic = ConstantTopic.TOPIC_AGENT_LINK_TEST_RSP.replace("{agentId}", agent.getAgentBaseInfo().getAgentId());
-            this.publishMessage(rspTopic, JSON.toJSONString(rspMessage));
+            this.publishMessage(rspTopic, JSONUtil.toJsonStr(rspMessage));
         }catch (Exception e) {
             logger.error("客户端链接测试报文处理异常", e);
             e.printStackTrace();

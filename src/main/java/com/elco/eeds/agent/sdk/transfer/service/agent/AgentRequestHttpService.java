@@ -48,7 +48,7 @@ public class AgentRequestHttpService {
         AgentRegisterRequest agentRegisterRequest = new AgentRegisterRequest(name, host, port, token, clientType);
         String requestUrl = agent.getAgentBaseInfo().getServerUrl() + ConstantHttpApiPath.AGENT_REGISTER;
         try {
-            String response = HttpClientUtil.post(requestUrl, token, JSON.toJSONString(agentRegisterRequest));
+            String response = HttpClientUtil.post(requestUrl, token, JSONUtil.toJsonStr(agentRegisterRequest));
             if(!JSONUtil.isJson(response)){
                 logger.error("request rpc register error,msg:{}", response);
             }
@@ -56,14 +56,14 @@ public class AgentRequestHttpService {
             if(SysCodeEnum.SUCCESS.getCode().equals(responseResult.getCode())){
                 // 将server-config反馈的data赋值给Agent对象
                 agent = copyFieldToAgent(JSONUtil.toJsonStr(responseResult.getData()));
-                logger.info("rpc register interfaces,result:{}", JSON.toJSONString(response));
+                logger.info("rpc register interfaces,result:{}", JSONUtil.toJsonStr(response));
                 return agent;
             }else{
-                logger.error("request rpc register error,msg:{}", JSON.toJSONString(response));
+                logger.error("request rpc register error,msg:{}", JSONUtil.toJsonStr(response));
                 return null;
             }
         } catch (Exception e) {
-            logger.error("调用server自动注册接口异常, 形参为：{}", JSON.toJSONString(agentRegisterRequest));
+            logger.error("调用server自动注册接口异常, 形参为：{}", JSONUtil.toJsonStr(agentRegisterRequest));
             logger.error("请求地址为：{}", requestUrl);
             e.printStackTrace();
         }
@@ -165,10 +165,10 @@ public class AgentRequestHttpService {
     public void updateAgentEffectTime(AgentTokenRequest agentTokenRequest) {
         String requestUrl = this.agent.getAgentBaseInfo().getServerUrl() + ConstantHttpApiPath.AGENT_TOKEN;
         try {
-            String response = HttpClientUtil.post(requestUrl, agentTokenRequest.getCurrentToken(), JSON.toJSONString(agentTokenRequest));
+            String response = HttpClientUtil.post(requestUrl, agentTokenRequest.getCurrentToken(), JSONUtil.toJsonStr(agentTokenRequest));
             logger.debug("调用token接口返回值为：{}", response);
         } catch (Exception e) {
-            logger.error("更新客户端TOKEN生效时间接口异常, 形参为：{}", JSON.toJSONString(agentTokenRequest));
+            logger.error("更新客户端TOKEN生效时间接口异常, 形参为：{}", JSONUtil.toJsonStr(agentTokenRequest));
             logger.error("请求地址为：{}", requestUrl);
             e.printStackTrace();
         }

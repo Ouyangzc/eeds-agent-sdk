@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.handler.data.sync;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.cancel.DataSyncCancelMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.cancel.SubDataSyncCancelMessage;
@@ -28,7 +29,7 @@ public class DataSyncCancelMessageHandler implements IReceiverMessageHandler {
         SubDataSyncCancelMessage subMsg = message.getData();
         String queueId = subMsg.getQueueId();
         if (queueId.equals(dataSyncService.getQueueId())) {
-            logger.debug("数据同步--取消报文，主题:{},消息内容:{}", topic, JSON.toJSONString(subMsg));
+            logger.debug("数据同步--取消报文，主题:{},消息内容:{}", topic, JSONUtil.toJsonStr(subMsg));
             dataSyncService.setStatus(false);
         }
     }

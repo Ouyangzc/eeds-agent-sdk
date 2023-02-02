@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.util;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
@@ -23,7 +24,7 @@ import java.util.List;
  */
 public class CountFileUtils {
 	public static final Logger logger = LoggerFactory.getLogger(CountFileUtils.class);
-	
+
 	/**
 	 * 获取当前统计文件中所有的统计数据
 	 *
@@ -44,8 +45,8 @@ public class CountFileUtils {
 		}
 		return dataCounts;
 	}
-	
-	
+
+
 	/**
 	 * 删除已完成统计数据
 	 *
@@ -68,13 +69,13 @@ public class CountFileUtils {
 			}
 			FileUtils.writeLines(file, dataCounts, false);
 			//追加到完成文件
-			writeAppendForDoneData(JSON.toJSONString(dataCount));
+			writeAppendForDoneData(JSONUtil.toJsonStr(dataCount));
 		} catch (Exception e) {
 			logger.error("统计已完成记录，删除异常，异常信息:{}", e);
 		}
-		
+
 	}
-	
+
 	/**
 	 * 统计记录追加写
 	 *
@@ -88,8 +89,8 @@ public class CountFileUtils {
 		datas.add(data);
 		FileUtils.writeLines(file, datas, true);
 	}
-	
-	
+
+
 	/**
 	 * 统计完成记录追加写
 	 *
@@ -102,9 +103,9 @@ public class CountFileUtils {
 		List<String> datas = new ArrayList<>();
 		datas.add(data);
 		FileUtils.writeLines(file, datas, true);
-		
+
 	}
-	
+
 	/**
 	 * 更新一条数据
 	 *
@@ -130,7 +131,7 @@ public class CountFileUtils {
 		}
 		FileUtils.writeLines(file, dataCounts, false);
 	}
-	
+
 	/**
 	 * 获取统计文件
 	 *
@@ -142,7 +143,7 @@ public class CountFileUtils {
 		String filePath = AgentFileUtils.getFilePath(baseFolder);
 		return filePath + ConstantFilePath.DATA_COUNT_UNDONE_PATH;
 	}
-	
+
 	/**
 	 * 获取统计完成文件
 	 *

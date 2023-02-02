@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.handler.agent;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -67,7 +68,7 @@ public class AgentConfigGlobalMessageHandler implements IReceiverMessageHandler 
             });
             agent.setAgentBaseInfo(agentBaseInfo);
             // 将新的客户端生效的配置，写入agent.json
-            JSONArray writeAgentFileJsonArray = JSONArray.parseArray(JSON.toJSONString(waitWriteJsonList));
+            JSONArray writeAgentFileJsonArray = JSONArray.parseArray(JSONUtil.toJsonStr(waitWriteJsonList));
             AgentFileExtendUtils.setConfigToLocalAgentFile(writeAgentFileJsonArray);
             logger.debug("客户端更新全局配置成功，新的客户端配置为：{}", agent.getAgentBaseInfo().toString());
         } catch (SdkException e) {

@@ -1,7 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.data.realTime;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.alibaba.fastjson.JSON;
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
@@ -20,6 +20,7 @@ import java.util.List;
  */
 public class DataRealTimePropertiesMessage extends BaseMessage<List<SubDataRealTimePropertiesMessage>> {
 
+
     public static String getMessage(List<PropertiesValue> propertiesValueList) {
         DataRealTimePropertiesMessage message = new DataRealTimePropertiesMessage();
         message.setMethod(ConstantMethod.METHOD_DATA_REALTIME_PROPERTIES);
@@ -31,7 +32,7 @@ public class DataRealTimePropertiesMessage extends BaseMessage<List<SubDataRealT
             subMsgs.add(subMsg);
         }
         message.setData(subMsgs);
-        return JSON.toJSONString(message);
+        return  JSONUtil.toJsonStr(message);
     }
 
     public static String getTopic(String agentId,String thingsId) {

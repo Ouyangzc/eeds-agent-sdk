@@ -1,6 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.confirm;
 
-import com.alibaba.fastjson.JSON;
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
@@ -22,7 +22,7 @@ public class DataSyncConfirmMessage extends BaseMessage<SubDataSyncConfirmMessag
         subMsg.setAgentId(agentId);
         subMsg.setQueueId(queueId);
         message.setData(subMsg);
-        return JSON.toJSONString(message);
+        return JSONUtil.toJsonStr(message);
     }
 
     public static String getTopic(String agentId) {

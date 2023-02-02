@@ -1,7 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.service.data.count;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.alibaba.fastjson.JSON;
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.mq.nats.plugin.NatsPlugin;
 import com.elco.eeds.agent.mq.plugin.MQPluginManager;
 import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
@@ -29,13 +29,13 @@ import java.util.stream.Collectors;
  */
 public class DataCountServiceImpl implements DataCountService {
 	public static final Logger logger = LoggerFactory.getLogger(DataCountServiceImpl.class);
-	
+
 	private static CountDataHolder countDataHolder = new CountDataHolder();
-	
+
 	public static Map<Long, PostDataCount> thingsDataCountMap = new ConcurrentHashMap<>();
-	
+
 	public static Long endTime = 0L;
-	
+
 	public static CountDataHolder getCountFile() {
 		try {
 			List<PostDataCount> fileData = countDataHolder.getCountDataFormFile();
@@ -62,8 +62,8 @@ public class DataCountServiceImpl implements DataCountService {
 		}
 		return null;
 	}
-	
-	
+
+
 	public static synchronized void recRealTimeData(String agentId, Long collectTime, ThingsDataCount thingsDataCount) {
 		try {
 			String thingsId = thingsDataCount.getThingsId();
@@ -116,13 +116,13 @@ public class DataCountServiceImpl implements DataCountService {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public PostDataCount getPostCountData() {
 		return countDataHolder.getDoPostData();
 	}
-	
-	
+
+
 	public static void sentCountData() {
 		PostDataCount doPostData = null;
 		try {
@@ -144,13 +144,13 @@ public class DataCountServiceImpl implements DataCountService {
 			mqPlugin.publish(topic, msg, null);
 		}
 	}
-	
+
 	/**
 	 * 保存统计数据
 	 *
 	 * @param doneData 统计记录
 	 */
-	
+
 	public static void saveDoneCountData(PostDataCount doneData) {
 		//将完成统计移动到统计完成文件中
 		countDataHolder.moveCountDataToDoneFile(doneData);
@@ -158,8 +158,8 @@ public class DataCountServiceImpl implements DataCountService {
 		PostDataCount lastPostData = countDataHolder.getLastPostData();
 		countDataHolder.setDoPostData(lastPostData);
 	}
-	
-	
+
+
 	/**
 	 * 初始化
 	 */
@@ -171,10 +171,10 @@ public class DataCountServiceImpl implements DataCountService {
 				//没有要发送的数据
 				countDataHolder.setLastDataTODoPostData();
 			}
-			
+
 		}
 	}
-	
+
 	/**
 	 * 收到确认报文
 	 *
@@ -193,7 +193,7 @@ public class DataCountServiceImpl implements DataCountService {
 			}
 		}
 	}
-	
+
 	/**
 	 * 初始化统计容器
 	 */
@@ -209,7 +209,7 @@ public class DataCountServiceImpl implements DataCountService {
 			String localAgentId = agentBaseInfo.getAgentId();
 			String period = agentBaseInfo.getSyncPeriod();
 			long countEndTime = countStartTime + Long.valueOf(period);
-			
+
 			PostDataCount count = new PostDataCount();
 			String countId = localAgentId + System.currentTimeMillis();
 			count.setAgentId(Long.valueOf(localAgentId));
@@ -223,7 +223,7 @@ public class DataCountServiceImpl implements DataCountService {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * 定时任务检查当前统计队列
 	 */
@@ -241,7 +241,7 @@ public class DataCountServiceImpl implements DataCountService {
 						if (nowTimestamp - countEndTime > 1000) {
 							postDataCount.setStatus(ConstantCount.STATUS_UN_SENT);
 							try {
-								logger.info("统计记录--生成--追加写到文件，信息:{}", JSON.toJSONString(postDataCount));
+								logger.info("统计记录--生成--追加写到文件，信息:{}", JSONUtil.toJsonStr(postDataCount));
 								countDataHolder.countDataAppendToFile(postDataCount);
 							} catch (IOException e) {
 								logger.error("统计记录--未发送--追加写到文件,发生异常，信息:{}", e);
@@ -262,6 +262,6 @@ public class DataCountServiceImpl implements DataCountService {
 			logger.error("定时任务结束统计发生异常，信息:{}", e);
 			e.printStackTrace();
 		}
-		
+
 	}
 }

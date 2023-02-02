@@ -29,12 +29,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConnectManager {
 	public static final Logger logger = LoggerFactory.getLogger(ConnectManager.class);
 	private static ConcurrentHashMap<String, String> CONNECTION_MAP = new ConcurrentHashMap<>(16);
-	
-	
+
+
 	private static ConcurrentHashMap<String, ThingsConnectionHandler> CONNECTION_HANDLER_MAP = new ConcurrentHashMap<String, ThingsConnectionHandler>(256);
-	
+
 	private static IJobManageService jobManage;
-	
+
 	static {
 		try {
 			jobManage = new JobManageService(StdSchedulerFactory.getDefaultScheduler());
@@ -42,18 +42,18 @@ public class ConnectManager {
 			logger.error(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * 添加数据源连接实例
 	 *
 	 * @param handler
 	 */
 	public static void addHandler(ThingsConnectionHandler handler) {
-		
+
 		CONNECTION_HANDLER_MAP.put(handler.getThingsId(), handler);
 	}
-	
-	
+
+
 	/**
 	 * 添加数据源连接实例
 	 *
@@ -66,15 +66,15 @@ public class ConnectManager {
 		}
 		return handler;
 	}
-	
+
 	/**
 	 * 获取所有数据源连接实例
 	 */
 	public static List<ThingsConnectionHandler> getAllHandler() {
 		return new ArrayList<>(CONNECTION_HANDLER_MAP.values());
 	}
-	
-	
+
+
 	/**
 	 * 添加数据源连接
 	 *
@@ -84,7 +84,7 @@ public class ConnectManager {
 	public static void addConnection(String key, String classPath) {
 		CONNECTION_MAP.put(key, classPath);
 	}
-	
+
 	/**
 	 * 获取数据源连接
 	 *
@@ -94,7 +94,7 @@ public class ConnectManager {
 	public static ThingsConnection getConnection(String key) {
 		return ReflectUtil.newInstance(CONNECTION_MAP.get(key));
 	}
-	
+
 	/**
 	 * 删除数据源连接
 	 *
@@ -107,7 +107,7 @@ public class ConnectManager {
 			CONNECTION_HANDLER_MAP.remove(thingsId);
 		}
 	}
-	
+
 	/**
 	 * 创建连接并实现handler
 	 *
@@ -134,11 +134,11 @@ public class ConnectManager {
 			}catch (Exception e){
 				logger.error("添加定时任务失败，连接信息：{}", JSONUtil.toJsonStr(driverContext));
 			}
-			
+
 		}
 	}
-	
-	
+
+
 	/**
 	 * 创建连接并实现handler
 	 *
@@ -146,11 +146,11 @@ public class ConnectManager {
 	 */
 	public static void recreate(ThingsDriverContext driverContext, String connectKey) {
 		delConnection(driverContext.getThingsId());
-		
+
 		create(driverContext, connectKey);
 	}
-	
-	
+
+
 	/**
 	 * 创建连接并实现handler
 	 *
@@ -160,7 +160,7 @@ public class ConnectManager {
 		ThingsConnectionHandler handler = ConnectManager.getHandler(driverContext.getThingsId());
 		handler.getThingsConnection().disconnect();
 	}
-    
+
     public static void sendPropertiesEventNotify(String thingsId, PropertiesEvent propertiesEvent){
         ThingsConnectionHandler handler = getHandler(thingsId);
         if (ObjectUtil.isNotEmpty(handler)){
@@ -168,5 +168,5 @@ public class ConnectManager {
             handler.getThingsConnection().propertiesEventNotify(propertiesEvent);
         }
     }
-	
+
 }

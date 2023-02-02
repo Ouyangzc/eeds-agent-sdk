@@ -3,6 +3,7 @@ package com.elco.eeds.agent.sdk.transfer.service.things;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
@@ -36,20 +37,20 @@ import java.util.stream.Collectors;
  * @Date 2022/12/16 13:27
  */
 public class ThingsSyncServiceImpl implements ThingsSyncService {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(ThingsSyncServiceImpl.class);
-	
+
 	public static final Map<String, List<PropertiesContext>> CONTEXTS_MAP = new ConcurrentHashMap<>();
-	
+
 	public static final Map<String, PropertiesContext> PROPERTIES_CONTEXT_MAP = new ConcurrentHashMap<>();
 	public static final Map<String, ThingsDriverContext> THINGS_DRIVER_CONTEXT_MAP = new ConcurrentHashMap<>();
-	
+
 	private ThingsServiceImpl thingsService;
-	
+
 	public ThingsSyncServiceImpl(ThingsServiceImpl thingsService) {
 		this.thingsService = thingsService;
 	}
-	
+
 	@Override
 	public void setupSyncThings() {
 		Long thingsChangeTime = thingsService.getThingsChangeTime();
@@ -65,7 +66,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 		//重新加载数据源文件
 		this.loadThingDriver();
 	}
-	
+
 	@Override
 	public void incrSyncThings(SubThingsSyncIncrMessage message) {
 		Long thingsChangeTime = thingsService.getThingsChangeTime();
@@ -114,8 +115,8 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 			}
 		}
 	}
-	
-	
+
+
 	public List<EedsThings> getSetupSyncData(ThingsSyncRequest request, String token) {
 		String datas = ThingsRequestHttpService.getThingsSyncData(request, token, ConstantHttpApiPath.THINGS_SETUP_SYNC_API);
 		if (datas != null) {
@@ -124,8 +125,8 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 		}
 		return null;
 	}
-	
-	
+
+
 	public List<EedsThings> getSyncData(ThingsSyncRequest request, String token) {
 		String datas = ThingsRequestHttpService.getThingsSyncData(request, token, ConstantHttpApiPath.THINGS_INCR_SYNC_API);
 		if (datas != null) {
@@ -134,8 +135,8 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 		}
 		return null;
 	}
-	
-	
+
+
 	public List<PropertiesContext> convertData(List<EedsThings> convertData) {
 		List<PropertiesContext> propertiesContextList = new ArrayList<>();
 		for (EedsThings edgeThings : convertData) {
@@ -154,18 +155,18 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 		}
 		return propertiesContextList;
 	}
-	
-	
+
+
 	public boolean saveToLocalFile(String thingsData) throws Exception {
 		ThingsFileUtils.saveThingsFileToLocal(thingsData);
 		return true;
 	}
-	
-	
+
+
 	public String getLocalThings() throws IOException {
 		return ThingsFileUtils.readLocalThingsFile();
 	}
-	
+
 	public boolean handleSyncThingsData(List<EedsThings> syncThingsList, List<PropertiesContext> propertiesContexts) {
 		List<PropertiesContext> addList = propertiesContexts.stream().filter(p -> p.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_ADD)).collect(Collectors.toList());
 		List<PropertiesContext> editList = propertiesContexts.stream().filter(p -> p.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_EDIT)).collect(Collectors.toList());
@@ -185,7 +186,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 					result.addAll(editThings);
 				}
 				if (!result.isEmpty()) {
-					saveToLocalFile(JSON.toJSONString(result));
+					saveToLocalFile(JSONUtil.toJsonStr(result));
 				}
 			} else {
 				//有本地数据
@@ -221,8 +222,8 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 		}
 		return true;
 	}
-	
-	
+
+
 	private List<EedsThings> getSyncThings(List<EedsThings> syncThingsList, List<PropertiesContext> propertiesContextList) {
 		//根据数据源id进行分组
 		Map<String, List<PropertiesContext>> thingsIdMap = propertiesContextList.stream().collect(Collectors.groupingBy(PropertiesContext::getThingsId));
@@ -237,7 +238,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 		}
 		return syncThingsList;
 	}
-	
+
 	private EedsProperties getEedsProperties(List<EedsThings> localThingsList, PropertiesContext delProperties) {
 		String thingsId = delProperties.getThingsId();
 		Optional<EedsThings> optional = localThingsList.stream().filter(syncThings -> syncThings.getThingsId().equals(thingsId)).findFirst();
@@ -251,13 +252,13 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 		}
 		return null;
 	}
-	
+
 	private EedsProperties getEditProperties(List<EedsThings> syncThingsList, PropertiesContext propertiesContext) {
 		EedsThings things = syncThingsList.stream().filter(syncThings -> syncThings.getThingsId().equals(propertiesContext.getThingsId())).findFirst().get();
 		EedsProperties properties = things.getProperties().stream().filter(eedsProperties -> eedsProperties.getPropertiesId().equals(propertiesContext.getPropertiesId())).findFirst().get();
 		return properties;
 	}
-	
+
 	private void loadThingDriver() {
 		try {
 			String localThings = getLocalThings();
@@ -269,7 +270,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 						BeanUtil.copyProperties(things, driverContext);
 						String agentId = things.getAgentId();
 						String thingsId = things.getThingsId();
-						
+
 						List<EedsProperties> properties = things.getProperties();
 						for (EedsProperties p : properties) {
 							PropertiesContext propertiesContext = new PropertiesContext();
@@ -284,13 +285,13 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 					}
 				}
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	/**
 	 * 根据数据源id,获取点位信息
 	 *
@@ -301,7 +302,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 		Map<String, List<PropertiesContext>> thingsPropertiesMap = PROPERTIES_CONTEXT_MAP.values().stream().collect(Collectors.groupingBy(PropertiesContext::getThingsId));
 		return thingsPropertiesMap.get(thingsId);
 	}
-	
+
 	private boolean checkThingsConnectParams(EedsThings eedsThings) {
 		if (StrUtil.isEmpty(eedsThings.getIp())) {
 			return false;
@@ -311,5 +312,5 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 		}
 		return true;
 	}
-	
+
 }
