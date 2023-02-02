@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
@@ -34,7 +35,7 @@ public class DataCountServiceImpl implements DataCountService {
 
 	public static Map<Long, PostDataCount> thingsDataCountMap = new ConcurrentHashMap<>();
 
-	public static Long endTime = 0L;
+	public static AtomicLong endTime = new AtomicLong(0L);
 
 	public static CountDataHolder getCountFile() {
 		try {
@@ -97,19 +98,19 @@ public class DataCountServiceImpl implements DataCountService {
 							thingsCountList.add(thingsDataCount);
 						}
 					}
-					endTime = currentEndTime;
+					endTime = new AtomicLong(currentEndTime);
 					flag = false;
 				}
 			}
 			if (flag) {
 				//新增一个区间
-				thingsDataCount.setStartTime(endTime);
+				thingsDataCount.setStartTime(endTime.get());
 				Long syncPeriod = Long.valueOf(Agent.getInstance().getAgentBaseInfo().getSyncPeriod());
-				Long countEndTime = endTime + syncPeriod;
+				Long countEndTime = endTime.addAndGet(syncPeriod);
 				thingsDataCount.setEndTime(countEndTime);
 				PostDataCount postDataCount = PostDataCount.getNewPostDataCount(agentId, thingsDataCount);
-				thingsDataCountMap.put(endTime, postDataCount);
-				endTime = countEndTime;
+				thingsDataCountMap.put(endTime.get(), postDataCount);
+				endTime = new AtomicLong(countEndTime);
 			}
 		} catch (Exception e) {
 			logger.error("统计实时数据出现异常，异常信息:{}", e);
@@ -200,10 +201,10 @@ public class DataCountServiceImpl implements DataCountService {
 	public static void setUpThingsDataCountMap() {
 		Long countStartTime = null;
 		try {
-			if (endTime == 0L) {
+			if (endTime.get()== 0L) {
 				countStartTime = DateUtils.getTimestamp();
 			} else {
-				countStartTime = endTime;
+				countStartTime = endTime.get();
 			}
 			AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
 			String localAgentId = agentBaseInfo.getAgentId();
@@ -218,7 +219,7 @@ public class DataCountServiceImpl implements DataCountService {
 			count.setEndTime(countEndTime);
 			count.setThingsCountList(null);
 			thingsDataCountMap.put(countEndTime, count);
-			endTime = countEndTime;
+			endTime = new AtomicLong(countEndTime);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
