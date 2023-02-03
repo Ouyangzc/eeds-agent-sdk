@@ -83,7 +83,7 @@ public class AgentRegisterService implements IAgentRegisterService {
         } catch (Exception e) {
             e.printStackTrace();
             // throw new SdkException(ErrorEnum.CLIENT_REGISTER_ERROR.code());
-            logger.error("客户端注册流程失败！{}", e);
+            logger.error("客户端注册流程失败！{}", e.getMessage());
             this.close(e.getMessage());
             return false;
         }
