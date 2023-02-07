@@ -78,8 +78,8 @@ public class DataCountServiceImpl implements DataCountService {
 				Long currentEndTime = postDataCount.getEndTime();
 				if (startTime <= collectTime && collectTime < currentEndTime) {
 					addThingsDataCountToPostDataCount(postDataCount, thingsDataCount);
-					endTime.set(currentEndTime);
 					flag = false;
+					break;
 				}
 			}
 			if (flag) {
@@ -221,7 +221,7 @@ public class DataCountServiceImpl implements DataCountService {
 					List<ThingsDataCount> thingsCountList = postDataCount.getThingsCountList();
 					if (!ObjectUtil.isEmpty(thingsCountList)) {
 						Long countEndTime = postDataCount.getEndTime();
-						Long period = Long.valueOf(Agent.getInstance().getAgentBaseInfo().getSyncPeriod());
+						Long period = Long.valueOf(Agent.getInstance().getAgentBaseInfo().getSyncPeriod()) * 2;
 						if (nowTimestamp - countEndTime > period) {
 							postDataCount.setStatus(ConstantCount.STATUS_UN_SENT);
 							try {
