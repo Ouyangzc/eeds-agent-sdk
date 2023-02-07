@@ -65,9 +65,8 @@ public class DataCountServiceImpl implements DataCountService {
 	}
 	
 	
-	public static synchronized void recRealTimeData(String agentId, Long collectTime, ThingsDataCount thingsDataCount) {
+	public static void recRealTimeData(String agentId, Long collectTime, ThingsDataCount thingsDataCount) {
 		try {
-			String thingsId = thingsDataCount.getThingsId();
 			Set<Long> keySet = thingsDataCountMap.keySet();
 			Boolean flag = true;
 			for (Long key : keySet) {
@@ -75,42 +74,13 @@ public class DataCountServiceImpl implements DataCountService {
 				Long startTime = postDataCount.getStartTime();
 				Long currentEndTime = postDataCount.getEndTime();
 				if (startTime <= collectTime && collectTime < currentEndTime) {
-					List<ThingsDataCount> thingsCountList = postDataCount.getThingsCountList();
-					if (ObjectUtil.isEmpty(thingsCountList)) {
-						thingsDataCount.setStartTime(startTime);
-						thingsDataCount.setEndTime(currentEndTime);
-						List<ThingsDataCount> dataCounts = new ArrayList<>();
-						dataCounts.add(thingsDataCount);
-						postDataCount.setThingsCountList(dataCounts);
-					} else {
-						Optional<ThingsDataCount> dataOptional = thingsCountList.stream().filter(count -> count.getThingsId().equals(thingsId)).findFirst();
-						if (dataOptional.isPresent()) {
-							//存在
-							ThingsDataCount count = dataOptional.get();
-							Integer currentSize = count.getSize();
-							Integer size = thingsDataCount.getSize();
-							int sumSize = new AtomicInteger(currentSize).addAndGet(size);
-							count.setSize(sumSize);
-						} else {
-							//不存在则加入该队列
-							thingsDataCount.setStartTime(startTime);
-							thingsDataCount.setEndTime(currentEndTime);
-							thingsCountList.add(thingsDataCount);
-						}
-					}
+					addThingsDataCountToPostDataCount(postDataCount, thingsDataCount);
 					endTime.set(currentEndTime);
 					flag = false;
 				}
 			}
 			if (flag) {
-				//新增一个区间
-				thingsDataCount.setStartTime(endTime.get());
-				Long syncPeriod = Long.valueOf(Agent.getInstance().getAgentBaseInfo().getSyncPeriod());
-				Long countEndTime = endTime.addAndGet(syncPeriod);
-				thingsDataCount.setEndTime(countEndTime);
-				PostDataCount postDataCount = PostDataCount.getNewPostDataCount(agentId, thingsDataCount);
-				thingsDataCountMap.put(endTime.get(), postDataCount);
-				endTime.set(countEndTime);
+				createCountMapSection(thingsDataCount);
 			}
 		} catch (Exception e) {
 			logger.error("统计实时数据出现异常，异常信息:{}", e);
@@ -195,6 +165,43 @@ public class DataCountServiceImpl implements DataCountService {
 		}
 	}
 	
+	public static synchronized void createCountMapSection(ThingsDataCount thingsDataCount) {
+		Long countStartTime = null;
+		if (endTime.get() == 0L) {
+			countStartTime = DateUtils.getTimestamp();
+		} else {
+			countStartTime = endTime.get();
+		}
+		AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
+		String localAgentId = agentBaseInfo.getAgentId();
+		String period = agentBaseInfo.getSyncPeriod();
+		long countEndTime = countStartTime + Long.valueOf(period);
+		if (!thingsDataCountMap.containsKey(countEndTime)) {
+			//创建一个新的区间
+			PostDataCount count = new PostDataCount();
+			String countId = localAgentId + System.currentTimeMillis();
+			count.setAgentId(Long.valueOf(localAgentId));
+			count.setCountId(countId);
+			count.setStartTime(countStartTime);
+			count.setEndTime(countEndTime);
+			count.setThingsCountList(null);
+			thingsDataCountMap.put(countEndTime, count);
+			endTime.set(countEndTime);
+			if (null != thingsDataCount) {
+				Long collectTime = thingsDataCount.getCollectTime();
+				thingsDataCount.setStartTime(countStartTime);
+				thingsDataCount.setEndTime(countEndTime);
+				recRealTimeData(null, collectTime, thingsDataCount);
+			}
+		} else {
+			//加入到新的区间中
+			PostDataCount postDataCount = thingsDataCountMap.get(countEndTime);
+			addThingsDataCountToPostDataCount(postDataCount, thingsDataCount);
+		}
+		
+	}
+	
+	
 	/**
 	 * 初始化统计容器
 	 */
@@ -264,5 +271,34 @@ public class DataCountServiceImpl implements DataCountService {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public static void addThingsDataCountToPostDataCount(PostDataCount postDataCount, ThingsDataCount thingsDataCount) {
+		List<ThingsDataCount> thingsCountList = postDataCount.getThingsCountList();
+		Long startTime = postDataCount.getStartTime();
+		Long currentEndTime = postDataCount.getEndTime();
+		String thingsId = thingsDataCount.getThingsId();
+		if (ObjectUtil.isEmpty(thingsCountList)) {
+			thingsDataCount.setStartTime(startTime);
+			thingsDataCount.setEndTime(currentEndTime);
+			List<ThingsDataCount> dataCounts = new ArrayList<>();
+			dataCounts.add(thingsDataCount);
+			postDataCount.setThingsCountList(dataCounts);
+		} else {
+			Optional<ThingsDataCount> dataOptional = thingsCountList.stream().filter(count -> count.getThingsId().equals(thingsId)).findFirst();
+			if (dataOptional.isPresent()) {
+				//存在
+				ThingsDataCount count = dataOptional.get();
+				Integer currentSize = count.getSize();
+				Integer size = thingsDataCount.getSize();
+				int sumSize = new AtomicInteger(currentSize).addAndGet(size);
+				count.setSize(sumSize);
+			} else {
+				//不存在则加入该队列
+				thingsDataCount.setStartTime(startTime);
+				thingsDataCount.setEndTime(currentEndTime);
+				thingsCountList.add(thingsDataCount);
+			}
+		}
 	}
 }
