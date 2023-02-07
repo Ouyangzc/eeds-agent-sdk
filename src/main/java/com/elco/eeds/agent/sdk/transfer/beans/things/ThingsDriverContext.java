@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.things;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.Map;
 
 /**
@@ -70,6 +72,9 @@ public class ThingsDriverContext {
      * 扩展map
      */
     private Map<String, String> extraMap;
+
+
+    private String extendFieldMap;
 
     public String getThingsId() {
         return thingsId;
@@ -182,4 +187,18 @@ public class ThingsDriverContext {
     public void setIsMonitoring(String isMonitoring) {
         this.isMonitoring = isMonitoring;
     }
+
+    public String getExtendFieldMap() {
+        return extendFieldMap;
+    }
+
+    public void setExtendFieldMap(String extendFieldMap) {
+        this.extendFieldMap = extendFieldMap;
+    }
+
+    public String getSubTopic() {
+        Map<String, String> map = JSONObject.parseObject(String.valueOf(this.extendFieldMap), Map.class);
+        return map.get("topic");
+    }
+
 }
