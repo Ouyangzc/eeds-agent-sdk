@@ -304,10 +304,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 	}
 
 	private boolean checkThingsConnectParams(EedsThings eedsThings) {
-		if (StrUtil.isEmpty(eedsThings.getIp())) {
-			return false;
-		}
-		if (StrUtil.isEmpty(eedsThings.getPort())) {
+		if (StrUtil.isEmpty(eedsThings.getExtendFieldMap())) {
 			return false;
 		}
 		return true;
