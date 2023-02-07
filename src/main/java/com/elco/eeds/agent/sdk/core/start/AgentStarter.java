@@ -59,7 +59,7 @@ public class AgentStarter {
 			// 根据协议加载数据源信息
 			
 			// 加载统计
-			DataCountServiceImpl.createCountMapSection(null);
+			DataCountServiceImpl.createCountMapSection();
 			DataCountServiceImpl.setUp();
 			logger.info(Logo.logo);
 		} catch (Exception e) {

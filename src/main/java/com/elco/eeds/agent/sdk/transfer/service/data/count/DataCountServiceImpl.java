@@ -85,11 +85,9 @@ public class DataCountServiceImpl implements DataCountService {
 			if (flag) {
 				try {
 					//创建新统计区间
-					createCountMapSection(thingsDataCount);
-					if (null != thingsDataCount) {
-						//重新插入统计区间
-						recRealTimeData(null, collectTime, thingsDataCount);
-					}
+					createCountMapSection();
+					//重新插入统计区间
+					recRealTimeData(null, collectTime, thingsDataCount);
 				} catch (Exception e) {
 					logger.error("创建新统计区间发生异常，异常信息:{}", e.getMessage());
 				}
@@ -179,10 +177,8 @@ public class DataCountServiceImpl implements DataCountService {
 	
 	/**
 	 * 创建统计区间
-	 *
-	 * @param thingsDataCount
 	 */
-	public static void createCountMapSection(ThingsDataCount thingsDataCount) {
+	public static void createCountMapSection() {
 		Long countStartTime = null;
 		if (endTime.get() == 0L) {
 			countStartTime = DateUtils.getTimestamp();
