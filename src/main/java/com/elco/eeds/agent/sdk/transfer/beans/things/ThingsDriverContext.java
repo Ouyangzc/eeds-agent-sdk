@@ -73,7 +73,9 @@ public class ThingsDriverContext {
      */
     private Map<String, String> extraMap;
 
-
+    /**
+     * 客户端从此Map中获取数据
+     */
     private String extendFieldMap;
 
     public String getThingsId() {
@@ -194,11 +196,8 @@ public class ThingsDriverContext {
 
     public void setExtendFieldMap(String extendFieldMap) {
         this.extendFieldMap = extendFieldMap;
-    }
-
-    public String getSubTopic() {
-        Map<String, String> map = JSONObject.parseObject(String.valueOf(this.extendFieldMap), Map.class);
-        return map.get("topic");
+        // 将动态连接信息中的字段赋值给原先的固定字段
+        this.extraMap = JSONObject.parseObject(this.extendFieldMap, Map.class);
     }
 
 }

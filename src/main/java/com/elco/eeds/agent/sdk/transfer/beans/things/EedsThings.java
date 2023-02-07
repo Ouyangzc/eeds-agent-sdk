@@ -147,19 +147,6 @@ public class EedsThings extends BaseThings{
 
     public void setExtendFieldMap(String extendFieldMap) throws Exception {
         this.extendFieldMap = extendFieldMap;
-        // 将动态连接信息中的字段赋值给原先的固定字段
-        Map<String, String> map = JSONObject.parseObject(this.extendFieldMap, Map.class);
-        if (ObjectUtil.isEmpty(map.get("brokerAddress")) || ObjectUtil.isEmpty(map.get("port")) || ObjectUtil.isEmpty(map.get("topic"))) {
-            throw new Exception("动态连接字段非法，请核实...");
-        }
-        try {
-            this.ip = map.get("brokerAddress");
-            this.port = map.get("port");
-            this.thingsCode = map.get("topic").split("/")[2];
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new Exception("解析动态连接字段异常，请检查...");
-        }
     }
 
 }
