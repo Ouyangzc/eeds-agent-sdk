@@ -246,7 +246,8 @@ public class DataCountServiceImpl implements DataCountService {
 					List<ThingsDataCount> thingsCountList = postDataCount.getThingsCountList();
 					if (!ObjectUtil.isEmpty(thingsCountList)) {
 						Long countEndTime = postDataCount.getEndTime();
-						if (nowTimestamp - countEndTime > 1000) {
+						Long period = Long.valueOf(Agent.getInstance().getAgentBaseInfo().getSyncPeriod());
+						if (nowTimestamp - countEndTime > period) {
 							postDataCount.setStatus(ConstantCount.STATUS_UN_SENT);
 							try {
 								logger.info("统计记录--生成--追加写到文件，信息:{}", JSON.toJSONString(postDataCount));
