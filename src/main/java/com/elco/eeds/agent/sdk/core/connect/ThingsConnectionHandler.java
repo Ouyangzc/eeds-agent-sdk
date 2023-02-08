@@ -9,6 +9,7 @@ import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
 import com.elco.eeds.agent.sdk.core.parsing.DataParsing;
 import com.elco.eeds.agent.sdk.transfer.beans.message.order.OrderPropertiesValue;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
+import com.elco.eeds.agent.sdk.transfer.handler.properties.VirtualPropertiesHandle;
 import com.elco.eeds.agent.sdk.transfer.service.data.RealTimePropertiesValueService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsConnectStatusMqService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
@@ -33,6 +34,11 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
     private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(4);
 
     public static Map<String, ScheduledFuture> scheduledTaskMap = new ConcurrentHashMap();
+
+    /**
+     * 1：虚拟变量
+     */
+    private final static String REAL = "1";
     /**
      * 数据源连接接口
      */
@@ -120,7 +126,11 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
         if(CollectionUtil.isNotEmpty(propertiesContextList)){
             List<PropertiesValue> valueList = this.getParsing()
                     .parsing(this.context, ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId), msg);
-            valueList.forEach(pv -> pv.setTimestamp(collectTime));
+            valueList.stream().forEach(pv -> {
+                pv.setTimestamp(collectTime);
+                pv.setIsVirtual(REAL);
+            });
+            VirtualPropertiesHandle.creatVirtualProperties(propertiesContextList, valueList, collectTime);
             RealTimePropertiesValueService.recRealTimePropertiesValue(msg, thingsId, collectTime, valueList);
             long time = System.currentTimeMillis()-startTime;
             num++;

@@ -33,6 +33,11 @@ public class SubDataRealTimePropertiesMessage {
     private String value;
 
     /**
+     * 1实际变量  2虚拟变量
+     */
+    private String isVirtual;
+
+    /**
      * 采集时间戳
      */
     private Long timestamp;
@@ -91,5 +96,13 @@ public class SubDataRealTimePropertiesMessage {
 
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getIsVirtual() {
+        return isVirtual;
+    }
+
+    public void setIsVirtual(String isVirtual) {
+        this.isVirtual = isVirtual;
     }
 }
