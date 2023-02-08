@@ -1,6 +1,8 @@
 package com.elco.eeds.agent.sdk.transfer.service.data.count;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.mq.nats.plugin.NatsPlugin;
 import com.elco.eeds.agent.mq.plugin.MQPluginManager;
@@ -254,26 +256,30 @@ public class DataCountServiceImpl implements DataCountService {
 		Long startTime = postDataCount.getStartTime();
 		Long currentEndTime = postDataCount.getEndTime();
 		String thingsId = thingsDataCount.getThingsId();
-		if (ObjectUtil.isEmpty(thingsCountList)) {
-			thingsDataCount.setStartTime(startTime);
-			thingsDataCount.setEndTime(currentEndTime);
-			List<ThingsDataCount> dataCounts = new ArrayList<>();
-			dataCounts.add(thingsDataCount);
-			postDataCount.setThingsCountList(dataCounts);
-		} else {
-			Optional<ThingsDataCount> dataOptional = thingsCountList.stream().filter(count -> count.getThingsId().equals(thingsId)).findFirst();
-			if (dataOptional.isPresent()) {
-				//存在
-				ThingsDataCount count = dataOptional.get();
-				Integer currentSize = count.getSize();
-				Integer size = thingsDataCount.getSize();
-				int sumSize = new AtomicInteger(currentSize).addAndGet(size);
-				count.setSize(sumSize);
-			} else {
-				//不存在则加入该队列
+		synchronized ("lockNum") {
+			if (ObjectUtil.isEmpty(thingsCountList)) {
 				thingsDataCount.setStartTime(startTime);
 				thingsDataCount.setEndTime(currentEndTime);
-				thingsCountList.add(thingsDataCount);
+				List<ThingsDataCount> dataCounts = new ArrayList<>();
+				dataCounts.add(thingsDataCount);
+				postDataCount.setThingsCountList(dataCounts);
+			} else {
+				Optional<ThingsDataCount> dataOptional = thingsCountList.stream().filter(count -> count.getThingsId().equals(thingsId)).findFirst();
+				if (dataOptional.isPresent()) {
+					//存在
+					
+					ThingsDataCount count = dataOptional.get();
+					Integer currentSize = count.getSize();
+					Integer size = thingsDataCount.getSize();
+					int sumSize = new AtomicInteger(currentSize).addAndGet(size);
+					count.setSize(sumSize);
+					
+				} else {
+					//不存在则加入该队列
+					thingsDataCount.setStartTime(startTime);
+					thingsDataCount.setEndTime(currentEndTime);
+					thingsCountList.add(thingsDataCount);
+				}
 			}
 		}
 	}
