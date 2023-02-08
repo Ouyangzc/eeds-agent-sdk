@@ -70,7 +70,7 @@ public class DataCountServiceImpl implements DataCountService {
 	}
 	
 	
-	public static synchronized void recRealTimeData(String agentId, Long collectTime, ThingsDataCount thingsDataCount) {
+	public static void recRealTimeData(String agentId, Long collectTime, ThingsDataCount thingsDataCount) {
 		try {
 			Set<Long> keySet = thingsDataCountMap.keySet();
 			Boolean flag = true;
