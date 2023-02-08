@@ -70,7 +70,7 @@ public class DataCountServiceImpl implements DataCountService {
 	}
 	
 	
-	public static void recRealTimeData(String agentId, Long collectTime, ThingsDataCount thingsDataCount) {
+	public static synchronized void recRealTimeData(String agentId, Long collectTime, ThingsDataCount thingsDataCount) {
 		try {
 			Set<Long> keySet = thingsDataCountMap.keySet();
 			Boolean flag = true;
@@ -87,7 +87,7 @@ public class DataCountServiceImpl implements DataCountService {
 			if (flag) {
 				try {
 					//创建新统计区间
-					createCountMapSection();
+					createCountMapSection(thingsDataCount);
 					//重新插入统计区间
 					recRealTimeData(null, collectTime, thingsDataCount);
 				} catch (Exception e) {
@@ -180,7 +180,7 @@ public class DataCountServiceImpl implements DataCountService {
 	/**
 	 * 创建统计区间
 	 */
-	public static void createCountMapSection() {
+	public static void createCountMapSection(ThingsDataCount thingsDataCount) {
 		Long countStartTime = null;
 		if (endTime.get() == 0L) {
 			countStartTime = DateUtils.getTimestamp();
@@ -204,6 +204,7 @@ public class DataCountServiceImpl implements DataCountService {
 				count.setThingsCountList(null);
 				thingsDataCountMap.put(countEndTime, count);
 				endTime.set(countEndTime);
+				logger.info("创建一个新的区间，区间开始时间:{},区间结束时间:{},区间对象:{}", DateUtil.date(countStartTime), DateUtil.date(countEndTime), JSONUtil.toJsonStr(count), JSONUtil.toJsonStr(thingsDataCount));
 			}
 		}
 		
@@ -252,11 +253,11 @@ public class DataCountServiceImpl implements DataCountService {
 	}
 	
 	public static void addThingsDataCountToPostDataCount(PostDataCount postDataCount, ThingsDataCount thingsDataCount) {
-		List<ThingsDataCount> thingsCountList = postDataCount.getThingsCountList();
-		Long startTime = postDataCount.getStartTime();
-		Long currentEndTime = postDataCount.getEndTime();
-		String thingsId = thingsDataCount.getThingsId();
 		synchronized ("lockNum") {
+			List<ThingsDataCount> thingsCountList = postDataCount.getThingsCountList();
+			Long startTime = postDataCount.getStartTime();
+			Long currentEndTime = postDataCount.getEndTime();
+			String thingsId = thingsDataCount.getThingsId();
 			if (ObjectUtil.isEmpty(thingsCountList)) {
 				thingsDataCount.setStartTime(startTime);
 				thingsDataCount.setEndTime(currentEndTime);
@@ -267,13 +268,11 @@ public class DataCountServiceImpl implements DataCountService {
 				Optional<ThingsDataCount> dataOptional = thingsCountList.stream().filter(count -> count.getThingsId().equals(thingsId)).findFirst();
 				if (dataOptional.isPresent()) {
 					//存在
-					
 					ThingsDataCount count = dataOptional.get();
 					Integer currentSize = count.getSize();
 					Integer size = thingsDataCount.getSize();
 					int sumSize = new AtomicInteger(currentSize).addAndGet(size);
 					count.setSize(sumSize);
-					
 				} else {
 					//不存在则加入该队列
 					thingsDataCount.setStartTime(startTime);
