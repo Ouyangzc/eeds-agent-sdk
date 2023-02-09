@@ -24,7 +24,7 @@ public class VirtualPropertiesHandle {
     /**
      * 常量
      */
-    private final static String PREFIX = "a";
+    private final static String PREFIX = "var";
 
     /**
      * 2：虚拟变量
