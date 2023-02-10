@@ -1,8 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.service.data.count;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.mq.nats.plugin.NatsPlugin;
 import com.elco.eeds.agent.mq.plugin.MQPluginManager;
@@ -204,7 +202,6 @@ public class DataCountServiceImpl implements DataCountService {
 				count.setThingsCountList(null);
 				thingsDataCountMap.put(countEndTime, count);
 				endTime.set(countEndTime);
-				logger.info("创建一个新的区间，区间开始时间:{},区间结束时间:{},区间对象:{}", DateUtil.date(countStartTime), DateUtil.date(countEndTime), JSONUtil.toJsonStr(count), JSONUtil.toJsonStr(thingsDataCount));
 			}
 		}
 		
