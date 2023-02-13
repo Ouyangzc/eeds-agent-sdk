@@ -2,7 +2,6 @@ package com.elco.eeds.agent.sdk.transfer.beans.data.count;
 
 import cn.hutool.json.JSONUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -88,23 +87,5 @@ public class PostDataCount {
     public String toString() {
         return JSONUtil.toJsonStr(this);
     }
-    /**
-     * 获取新的统计记录
-     *
-     * @param agentId
-     * @param dataCount
-     * @return
-     */
-    public static PostDataCount getNewPostDataCount(String agentId,ThingsDataCount dataCount) {
-        PostDataCount postDataCount = new PostDataCount();
-        String countId = agentId + System.currentTimeMillis();
-        postDataCount.setCountId(countId);
-        postDataCount.setAgentId(Long.valueOf(agentId));
-        postDataCount.setStartTime(dataCount.getStartTime());
-        postDataCount.setEndTime(dataCount.getEndTime());
-        List<ThingsDataCount> dataCounts = new ArrayList<>();
-        dataCounts.add(dataCount);
-        postDataCount.setThingsCountList(dataCounts);
-        return postDataCount;
-    }
+	
 }

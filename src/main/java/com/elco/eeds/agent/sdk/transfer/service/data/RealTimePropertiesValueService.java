@@ -48,6 +48,7 @@ public class RealTimePropertiesValueService {
             ThingsDataCount dataCount = new ThingsDataCount();
             dataCount.setThingsId(thingsId);
             dataCount.setSize(propertiesValueList.size());
+            dataCount.setCollectTime(collectTime);
             dataCount.setStartTime(collectTime);
             dataCount.setEndTime(collectTime);
             DataCountServiceImpl.recRealTimeData(agentId, collectTime, dataCount);
