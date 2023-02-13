@@ -130,7 +130,10 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
                 pv.setTimestamp(collectTime);
                 pv.setIsVirtual(REAL);
             });
+            long startTime1 = System.currentTimeMillis();
             VirtualPropertiesHandle.creatVirtualProperties(propertiesContextList, valueList, collectTime);
+            long time1 = System.currentTimeMillis()-startTime1;
+            logger.debug("虚拟变量数据处理总耗时，time:{},推送数据量:{}",time1,num);
             RealTimePropertiesValueService.recRealTimePropertiesValue(msg, thingsId, collectTime, valueList);
             long time = System.currentTimeMillis()-startTime;
             num++;

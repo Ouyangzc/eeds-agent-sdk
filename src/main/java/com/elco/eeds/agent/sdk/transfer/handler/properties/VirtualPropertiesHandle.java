@@ -4,6 +4,9 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
+import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -20,6 +23,8 @@ import java.util.stream.Collectors;
  * @Des 虚拟变量操作类
  */
 public class VirtualPropertiesHandle {
+
+    public static final Logger logger = LoggerFactory.getLogger(VirtualPropertiesHandle.class);
 
     /**
      * 常量
@@ -60,7 +65,10 @@ public class VirtualPropertiesHandle {
                 proList.stream().forEach(temp->{
                     PropertiesValue propertiesValue = new PropertiesValue();
                     BeanUtil.copyProperties(temp, propertiesValue);
+                    long startTime1 = System.currentTimeMillis();
                     creatValue(temp, propertiesValue, valueList);
+                    long time1 = System.currentTimeMillis()-startTime1;
+                    logger.debug("虚拟变量数据js引擎处理耗时，time:{}",time1);
                     propertiesValue.setTimestamp(collectTime);
                     propertiesValue.setIsVirtual(String.valueOf(VIRTUAL));
                     valueList.add(propertiesValue);
@@ -149,12 +157,15 @@ public class VirtualPropertiesHandle {
      */
     private static String conversionType(Object eval, String type){
         String value = "";
-        if(type.indexOf(INT) > -1 || type.indexOf(UINT) > -1){
-            value = String.valueOf(Integer.valueOf(eval.toString()));
-        } else if(type.indexOf(FLOAT) > -1){
-            value = String.valueOf(Long.valueOf(eval.toString()));
-        } else {
+        if(TRUE.equals(eval.toString().toUpperCase()) || FALSE.equals(eval.toString().toUpperCase())){
             value = eval.toString();
+        } else {
+            if(type.indexOf(INT) > -1 || type.indexOf(UINT) > -1){
+                Double evalD = (Double)eval;
+                value = String.valueOf(evalD.intValue());
+            } else {
+                value = eval.toString();
+            }
         }
         return value;
     }
