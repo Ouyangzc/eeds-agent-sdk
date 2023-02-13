@@ -18,7 +18,7 @@ public class CountJob implements Job {
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        DataCountServiceImpl.setUpThingsDataCountMap();
+//        DataCountServiceImpl.setUpThingsDataCountMap();
         DataCountServiceImpl.sentCountData();
         //定时任务校验当前统计数据
         DataCountServiceImpl.scheduledCheckCurrentCountingData();

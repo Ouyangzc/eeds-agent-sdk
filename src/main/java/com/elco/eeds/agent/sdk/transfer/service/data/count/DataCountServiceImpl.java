@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
@@ -33,9 +34,12 @@ public class DataCountServiceImpl implements DataCountService {
 	private static CountDataHolder countDataHolder = new CountDataHolder();
 
 	public static Map<Long, PostDataCount> thingsDataCountMap = new ConcurrentHashMap<>();
-
-	public static Long endTime = 0L;
-
+	
+	public static AtomicLong endTime = new AtomicLong(0L);
+	
+	//序列号
+	public static AtomicInteger countNum = new AtomicInteger(0);
+	
 	public static CountDataHolder getCountFile() {
 		try {
 			List<PostDataCount> fileData = countDataHolder.getCountDataFormFile();
@@ -62,11 +66,10 @@ public class DataCountServiceImpl implements DataCountService {
 		}
 		return null;
 	}
-
-
-	public static synchronized void recRealTimeData(String agentId, Long collectTime, ThingsDataCount thingsDataCount) {
+	
+	
+	public static void recRealTimeData(String agentId, Long collectTime, ThingsDataCount thingsDataCount) {
 		try {
-			String thingsId = thingsDataCount.getThingsId();
 			Set<Long> keySet = thingsDataCountMap.keySet();
 			Boolean flag = true;
 			for (Long key : keySet) {
@@ -74,42 +77,20 @@ public class DataCountServiceImpl implements DataCountService {
 				Long startTime = postDataCount.getStartTime();
 				Long currentEndTime = postDataCount.getEndTime();
 				if (startTime <= collectTime && collectTime < currentEndTime) {
-					List<ThingsDataCount> thingsCountList = postDataCount.getThingsCountList();
-					if (ObjectUtil.isEmpty(thingsCountList)) {
-						thingsDataCount.setStartTime(startTime);
-						thingsDataCount.setEndTime(currentEndTime);
-						List<ThingsDataCount> dataCounts = new ArrayList<>();
-						dataCounts.add(thingsDataCount);
-						postDataCount.setThingsCountList(dataCounts);
-					} else {
-						Optional<ThingsDataCount> dataOptional = thingsCountList.stream().filter(count -> count.getThingsId().equals(thingsId)).findFirst();
-						if (dataOptional.isPresent()) {
-							//存在
-							ThingsDataCount count = dataOptional.get();
-							Integer currentSize = count.getSize();
-							Integer size = thingsDataCount.getSize();
-							int sumSize = new AtomicInteger(currentSize).addAndGet(size);
-							count.setSize(sumSize);
-						} else {
-							//不存在则加入该队列
-							thingsDataCount.setStartTime(startTime);
-							thingsDataCount.setEndTime(currentEndTime);
-							thingsCountList.add(thingsDataCount);
-						}
-					}
-					endTime = currentEndTime;
+					addThingsDataCountToPostDataCount(postDataCount, thingsDataCount);
 					flag = false;
+					break;
 				}
 			}
 			if (flag) {
-				//新增一个区间
-				thingsDataCount.setStartTime(endTime);
-				Long syncPeriod = Long.valueOf(Agent.getInstance().getAgentBaseInfo().getSyncPeriod());
-				Long countEndTime = endTime + syncPeriod;
-				thingsDataCount.setEndTime(countEndTime);
-				PostDataCount postDataCount = PostDataCount.getNewPostDataCount(agentId, thingsDataCount);
-				thingsDataCountMap.put(endTime, postDataCount);
-				endTime = countEndTime;
+				try {
+					//创建新统计区间
+					createCountMapSection(thingsDataCount);
+					//重新插入统计区间
+					recRealTimeData(null, collectTime, thingsDataCount);
+				} catch (Exception e) {
+					logger.error("创建新统计区间发生异常，异常信息:{}", e.getMessage());
+				}
 			}
 		} catch (Exception e) {
 			logger.error("统计实时数据出现异常，异常信息:{}", e);
@@ -195,35 +176,37 @@ public class DataCountServiceImpl implements DataCountService {
 	}
 
 	/**
-	 * 初始化统计容器
+	 * 创建统计区间
 	 */
-	public static void setUpThingsDataCountMap() {
+	public static void createCountMapSection(ThingsDataCount thingsDataCount) {
 		Long countStartTime = null;
-		try {
-			if (endTime == 0L) {
-				countStartTime = DateUtils.getTimestamp();
-			} else {
-				countStartTime = endTime;
-			}
-			AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
-			String localAgentId = agentBaseInfo.getAgentId();
-			String period = agentBaseInfo.getSyncPeriod();
-			long countEndTime = countStartTime + Long.valueOf(period);
-
-			PostDataCount count = new PostDataCount();
-			String countId = localAgentId + System.currentTimeMillis();
-			count.setAgentId(Long.valueOf(localAgentId));
-			count.setCountId(countId);
-			count.setStartTime(countStartTime);
-			count.setEndTime(countEndTime);
-			count.setThingsCountList(null);
-			thingsDataCountMap.put(countEndTime, count);
-			endTime = countEndTime;
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (endTime.get() == 0L) {
+			countStartTime = DateUtils.getTimestamp();
+		} else {
+			countStartTime = endTime.get();
 		}
+		AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
+		String localAgentId = agentBaseInfo.getAgentId();
+		String period = agentBaseInfo.getSyncPeriod();
+		long countEndTime = countStartTime + Long.valueOf(period);
+		synchronized ("lock") {
+			if (!thingsDataCountMap.containsKey(countEndTime)) {
+				//创建一个新的区间
+				PostDataCount count = new PostDataCount();
+				int num = countNum.incrementAndGet();
+				String countId = localAgentId + num + System.currentTimeMillis();
+				count.setAgentId(Long.valueOf(localAgentId));
+				count.setCountId(countId);
+				count.setStartTime(countStartTime);
+				count.setEndTime(countEndTime);
+				count.setThingsCountList(null);
+				thingsDataCountMap.put(countEndTime, count);
+				endTime.set(countEndTime);
+			}
+		}
+		
 	}
-
+	
 	/**
 	 * 定时任务检查当前统计队列
 	 */
@@ -238,7 +221,8 @@ public class DataCountServiceImpl implements DataCountService {
 					List<ThingsDataCount> thingsCountList = postDataCount.getThingsCountList();
 					if (!ObjectUtil.isEmpty(thingsCountList)) {
 						Long countEndTime = postDataCount.getEndTime();
-						if (nowTimestamp - countEndTime > 1000) {
+						Long period = Long.valueOf(Agent.getInstance().getAgentBaseInfo().getSyncPeriod()) * 2;
+						if (nowTimestamp - countEndTime > period) {
 							postDataCount.setStatus(ConstantCount.STATUS_UN_SENT);
 							try {
 								logger.info("统计记录--生成--追加写到文件，信息:{}", JSONUtil.toJsonStr(postDataCount));
@@ -262,6 +246,37 @@ public class DataCountServiceImpl implements DataCountService {
 			logger.error("定时任务结束统计发生异常，信息:{}", e);
 			e.printStackTrace();
 		}
-
+		
+	}
+	
+	public static void addThingsDataCountToPostDataCount(PostDataCount postDataCount, ThingsDataCount thingsDataCount) {
+		synchronized ("lockNum") {
+			List<ThingsDataCount> thingsCountList = postDataCount.getThingsCountList();
+			Long startTime = postDataCount.getStartTime();
+			Long currentEndTime = postDataCount.getEndTime();
+			String thingsId = thingsDataCount.getThingsId();
+			if (ObjectUtil.isEmpty(thingsCountList)) {
+				thingsDataCount.setStartTime(startTime);
+				thingsDataCount.setEndTime(currentEndTime);
+				List<ThingsDataCount> dataCounts = new ArrayList<>();
+				dataCounts.add(thingsDataCount);
+				postDataCount.setThingsCountList(dataCounts);
+			} else {
+				Optional<ThingsDataCount> dataOptional = thingsCountList.stream().filter(count -> count.getThingsId().equals(thingsId)).findFirst();
+				if (dataOptional.isPresent()) {
+					//存在
+					ThingsDataCount count = dataOptional.get();
+					Integer currentSize = count.getSize();
+					Integer size = thingsDataCount.getSize();
+					int sumSize = new AtomicInteger(currentSize).addAndGet(size);
+					count.setSize(sumSize);
+				} else {
+					//不存在则加入该队列
+					thingsDataCount.setStartTime(startTime);
+					thingsDataCount.setEndTime(currentEndTime);
+					thingsCountList.add(thingsDataCount);
+				}
+			}
+		}
 	}
 }
