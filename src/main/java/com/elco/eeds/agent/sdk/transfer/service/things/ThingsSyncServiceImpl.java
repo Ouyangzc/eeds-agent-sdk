@@ -93,6 +93,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 						ThingsDriverContext driverContext = new ThingsDriverContext();
 						BeanUtil.copyProperties(eedsThings, driverContext);
 						THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
+                        ConnectManager.delConnection(thingsId);
 						ConnectManager.create(driverContext, AgentStartProperties.getInstance().getAgentClientType());
 					}
 				}
