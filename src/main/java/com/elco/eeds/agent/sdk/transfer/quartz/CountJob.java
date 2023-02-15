@@ -14,13 +14,13 @@ import org.slf4j.LoggerFactory;
  * @Date 2022/12/9 16:20
  */
 public class CountJob implements Job {
-    public static final Logger logger = LoggerFactory.getLogger(CountJob.class);
-
-    @Override
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-//        DataCountServiceImpl.setUpThingsDataCountMap();
-        DataCountServiceImpl.sentCountData();
-        //定时任务校验当前统计数据
-        DataCountServiceImpl.scheduledCheckCurrentCountingData();
-    }
+	public static final Logger logger = LoggerFactory.getLogger(CountJob.class);
+	
+	@Override
+	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+		logger.debug("执行定时任务:{}", CountJob.class.getName());
+		DataCountServiceImpl.sentCountData();
+		//定时任务校验当前统计数据
+		DataCountServiceImpl.scheduledCheckCurrentCountingData();
+	}
 }
