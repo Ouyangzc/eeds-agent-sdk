@@ -49,7 +49,33 @@ public class VirtualPropertiesHandle {
 
     private final static String UINT = "uint";
 
-    private final static String FLOAT = "float";
+    private final static String FLOAT32 = "float32";
+
+    private final static String FLOAT64 = "float64";
+
+    private final static int INT16_MAX_VALUE = 32767;
+
+    private final static int INT16_MIN_VALUE = -32768;
+
+    private final static int INT32_MAX_VALUE = 2147483647;
+
+    private final static int INT32_MIN_VALUE = -2147483648;
+
+    private final static String INT64_MAX_VALUE = "9223372036854775807";
+
+    private final static String INT64_MIN_VALUE = "-9223372036854775808";
+
+
+
+    /**
+     * FLOAT32可以精确到小数6位，加上小数点和整数一共是8位
+     */
+    private final static int FLOAT32_MAX_LENGTH = 8;
+
+    /**
+     * FLOAT32可以精确到小数15位，加上小数点和整数一共是17位
+     */
+    private final static int FLOAT64_MAX_LENGTH = 17;
 
     /**
      * 构建虚拟变量数据
@@ -161,13 +187,37 @@ public class VirtualPropertiesHandle {
             value = eval.toString();
         } else {
             if(type.indexOf(INT) > -1 || type.indexOf(UINT) > -1){
-                Double evalD = (Double)eval;
-                value = String.valueOf(evalD.intValue());
+//                Double evalD = (Double)eval;
+                if(eval.toString().indexOf(CHARACTER) > -1){
+                    value = eval.toString().substring(0,eval.toString().indexOf(CHARACTER));
+                } else {
+                    value = eval.toString();
+                }
             } else {
                 value = eval.toString();
             }
+//            if(type.indexOf(FLOAT32) > -1) {
+//                String evalStr = eval.toString();
+//                if(evalStr.length() > FLOAT32_MAX_LENGTH){
+//                    value = evalStr.substring(0,FLOAT32_MAX_LENGTH);
+//                } else {
+//                    value = eval.toString();
+//                }
+//            } else if(type.indexOf(FLOAT64) > -1) {
+//                String evalStr = eval.toString();
+//                if(evalStr.length() > FLOAT64_MAX_LENGTH){
+//                    value = evalStr.substring(0,FLOAT64_MAX_LENGTH);
+//                } else {
+//                    value = eval.toString();
+//                }
+//            }
         }
         return value;
+    }
+
+    public static void main(String[] args) {
+        String  a  = "1.123456910101016";
+        System.out.println(a.substring(0,a.indexOf(".")));
     }
 
 }
