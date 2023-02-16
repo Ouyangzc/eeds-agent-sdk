@@ -38,7 +38,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
     /**
      * 1：虚拟变量
      */
-    private final static String REAL = "1";
+    private final static int REAL = 1;
     /**
      * 数据源连接接口
      */

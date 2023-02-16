@@ -31,6 +31,10 @@ public class SubDataSyncPropertiesValueMessage {
      * 变量值
      */
     private String value;
+    /**
+     * 1实际变量  2虚拟变量
+     */
+    private int isVirtual;
 
     /**
      * 采集时间戳
@@ -91,5 +95,13 @@ public class SubDataSyncPropertiesValueMessage {
 
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public int getIsVirtual() {
+        return isVirtual;
+    }
+
+    public void setIsVirtual(int isVirtual) {
+        this.isVirtual = isVirtual;
     }
 }

@@ -15,6 +15,7 @@ import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
+import com.elco.eeds.agent.sdk.transfer.handler.properties.VirtualPropertiesHandle;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName RealTimeDataMessageFileUtils
@@ -41,6 +43,11 @@ public class RealTimeDataMessageFileUtils {
 
     public static Map<String, File> fileMap = new ConcurrentHashMap<>(128);
     public static Map<String, Map<File, File>> fileReadMap = new ConcurrentHashMap<>();
+
+    /**
+     * 1：实际变量
+     */
+    private final static int REAL = 1;
 
     /**
      * 获取该数据源的写文件
@@ -88,6 +95,7 @@ public class RealTimeDataMessageFileUtils {
                     //必定有重合
                     List<String> dataList = FileUtils.readLines(key, StandardCharsets.UTF_8);
                     for (String data : dataList) {
+                        logger.debug("RealTimeDataMessageFileUtils:" + data);
                         //调用解析方法
                         OriginalPropertiesValueMessage originalMessage = JSON.parseObject(data, OriginalPropertiesValueMessage.class);
                         Long collectTime = originalMessage.getCollectTime();
@@ -98,7 +106,12 @@ public class RealTimeDataMessageFileUtils {
                                 throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
                             }
                             List<PropertiesValue> propertiesValueList = handler.getParsing().parsing(driverContext, propertiesContextList, message);
-                            propertiesValueList.forEach(pv -> pv.setTimestamp(collectTime));
+                            propertiesValueList.forEach(pv -> {
+                                pv.setTimestamp(collectTime);
+                                pv.setIsVirtual(REAL);
+                            });
+                            VirtualPropertiesHandle.creatVirtualProperties(propertiesContextList, propertiesValueList, collectTime);
+
                             result.addAll(propertiesValueList);
                         }
                     }

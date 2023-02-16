@@ -92,11 +92,12 @@ public class VirtualPropertiesHandle {
                     PropertiesValue propertiesValue = new PropertiesValue();
                     BeanUtil.copyProperties(temp, propertiesValue);
                     long startTime1 = System.currentTimeMillis();
+                    // 构建虚拟变量值
                     creatValue(temp, propertiesValue, valueList);
                     long time1 = System.currentTimeMillis()-startTime1;
                     logger.debug("虚拟变量数据js引擎处理耗时，time:{}",time1);
                     propertiesValue.setTimestamp(collectTime);
-                    propertiesValue.setIsVirtual(String.valueOf(VIRTUAL));
+                    propertiesValue.setIsVirtual(VIRTUAL);
                     valueList.add(propertiesValue);
                 });
             }

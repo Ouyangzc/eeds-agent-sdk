@@ -37,7 +37,7 @@ public class PropertiesValue {
     /**
      * 1实际变量  2虚拟变量
      */
-    private String isVirtual;
+    private int isVirtual;
 
     /**
      * 采集时间戳
@@ -100,11 +100,11 @@ public class PropertiesValue {
         this.timestamp = timestamp;
     }
 
-    public String getIsVirtual() {
+    public int getIsVirtual() {
         return isVirtual;
     }
 
-    public void setIsVirtual(String isVirtual) {
+    public void setIsVirtual(int isVirtual) {
         this.isVirtual = isVirtual;
     }
 }
