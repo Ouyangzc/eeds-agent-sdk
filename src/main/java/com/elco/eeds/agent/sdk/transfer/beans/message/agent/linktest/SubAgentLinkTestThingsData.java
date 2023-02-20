@@ -111,4 +111,12 @@ public class SubAgentLinkTestThingsData {
     public void setValue(String value) {
         this.value = value;
     }
+
+    public String getIsVirtual() {
+        return isVirtual;
+    }
+
+    public void setIsVirtual(String isVirtual) {
+        this.isVirtual = isVirtual;
+    }
 }
