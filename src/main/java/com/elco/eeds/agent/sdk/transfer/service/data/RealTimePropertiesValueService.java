@@ -1,6 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.service.data;
 
-import com.alibaba.fastjson.JSON;
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.mq.nats.plugin.NatsPlugin;
 import com.elco.eeds.agent.mq.plugin.MQPluginManager;
 import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
@@ -43,7 +43,7 @@ public class RealTimePropertiesValueService {
             OriginalPropertiesValueMessage originalPropertiesValueMessage = new OriginalPropertiesValueMessage();
             originalPropertiesValueMessage.setCollectTime(collectTime);
             originalPropertiesValueMessage.setMessage(message);
-            RealTimeDataMessageFileUtils.writeAppend(thingsId, JSON.toJSONString(originalPropertiesValueMessage));
+            RealTimeDataMessageFileUtils.writeAppend(thingsId, JSONUtil.toJsonStr(originalPropertiesValueMessage));
             //调用统计接口
             ThingsDataCount dataCount = new ThingsDataCount();
             dataCount.setThingsId(thingsId);

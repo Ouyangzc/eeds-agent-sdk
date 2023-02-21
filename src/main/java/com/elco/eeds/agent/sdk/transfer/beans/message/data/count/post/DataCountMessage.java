@@ -1,7 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.data.count.post;
 
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSON;
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
@@ -30,7 +30,7 @@ public class DataCountMessage extends BaseMessage<SubDataCountMessage> {
         message.setMethod(ConstantMethod.METHOD_DATA_COUNT_POST);
         message.setTimestamp(DateUtil.currentSeconds());
         message.setData(SubDataCountMessage.getSubMsg(dataCount));
-        String msg = JSON.toJSONString(message);
+        String msg = JSONUtil.toJsonStr(message);
         return msg;
     }
 

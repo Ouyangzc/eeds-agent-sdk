@@ -3,6 +3,7 @@ package com.elco.eeds.agent.sdk.transfer.service.things;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
@@ -184,7 +185,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
 					result.addAll(editThings);
 				}
 				if (!result.isEmpty()) {
-					saveToLocalFile(JSON.toJSONString(result));
+					saveToLocalFile(JSONUtil.toJsonStr(result));
 				}
 			} else {
 				//有本地数据

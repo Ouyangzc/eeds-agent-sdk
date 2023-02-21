@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.handler.order;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
@@ -27,7 +28,7 @@ public class OrderRequestMessageHandler implements IReceiverMessageHandler {
     @Override
     public void handleRecData(String topic, String recData) {
         OrderRequestMessage message = JSON.parseObject(recData, OrderRequestMessage.class);
-        logger.info("接收到指令下发消息，topic:{},data:{}", topic, JSON.toJSONString(message));
+        logger.info("接收到指令下发消息，topic:{},data:{}", topic, JSONUtil.toJsonStr(message));
         SubOrderRequestMessage data = message.getData();
         // 发送指令下发确认报文
         OrderConfirmMqService.send(data.getThingsId(),data.getMsgSeqNo());

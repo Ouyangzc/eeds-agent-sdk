@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.util;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
@@ -68,7 +69,7 @@ public class CountFileUtils {
 			}
 			FileUtils.writeLines(file, dataCounts, false);
 			//追加到完成文件
-			writeAppendForDoneData(JSON.toJSONString(dataCount));
+			writeAppendForDoneData(JSONUtil.toJsonStr(dataCount));
 		} catch (Exception e) {
 			logger.error("统计已完成记录，删除异常，异常信息:{}", e);
 		}

@@ -1,6 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.beans.data.count;
 
-import com.alibaba.fastjson.JSON;
+import cn.hutool.json.JSONUtil;
 
 import java.util.List;
 
@@ -86,7 +86,7 @@ public class PostDataCount {
 	
 	@Override
 	public String toString() {
-		return JSON.toJSONString(this);
+		return JSONUtil.toJsonStr(this);
 	}
 	
 }

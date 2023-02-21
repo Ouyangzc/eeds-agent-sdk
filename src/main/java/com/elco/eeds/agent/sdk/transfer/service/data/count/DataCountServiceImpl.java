@@ -1,7 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.service.data.count;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.alibaba.fastjson.JSON;
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.mq.nats.plugin.NatsPlugin;
 import com.elco.eeds.agent.mq.plugin.MQPluginManager;
 import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
@@ -225,7 +225,7 @@ public class DataCountServiceImpl implements DataCountService {
 						if (nowTimestamp - countEndTime > period) {
 							postDataCount.setStatus(ConstantCount.STATUS_UN_SENT);
 							try {
-								logger.info("统计记录--生成--追加写到文件，信息:{}", JSON.toJSONString(postDataCount));
+								logger.info("统计记录--生成--追加写到文件，信息:{}", JSONUtil.toJsonStr(postDataCount));
 								countDataHolder.countDataAppendToFile(postDataCount);
 							} catch (IOException e) {
 								logger.error("统计记录--未发送--追加写到文件,发生异常，信息:{}", e);

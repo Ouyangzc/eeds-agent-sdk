@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.service.things;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantThings;
 import com.elco.eeds.agent.sdk.core.util.ThingsFileUtils;
@@ -45,20 +46,20 @@ public class ThingsServiceImpl implements ThingsService {
     @Override
     public void addThings(EedsThings addThings) {
         currentThingsList.add(addThings);
-        saveThingsFile(JSON.toJSONString(currentThingsList));
+        saveThingsFile(JSONUtil.toJsonStr(currentThingsList));
     }
 
     @Override
     public void delThings(EedsThings delThings) {
         currentThingsList = currentThingsList.stream().filter(things -> !things.getThingsId().equals(delThings.getThingsId())).collect(Collectors.toList());
-        saveThingsFile(JSON.toJSONString(currentThingsList));
+        saveThingsFile(JSONUtil.toJsonStr(currentThingsList));
     }
 
     @Override
     public void editThings(EedsThings editThings) {
         currentThingsList = currentThingsList.stream().filter(things -> !things.getThingsId().equals(editThings.getThingsId())).collect(Collectors.toList());
         currentThingsList.add(editThings);
-        saveThingsFile(JSON.toJSONString(currentThingsList));
+        saveThingsFile(JSONUtil.toJsonStr(currentThingsList));
     }
 
     @Override
@@ -85,7 +86,7 @@ public class ThingsServiceImpl implements ThingsService {
             this.addThings(things);
         } else {
             //新增点位
-            saveThingsFile(JSON.toJSONString(currentThingsList));
+            saveThingsFile(JSONUtil.toJsonStr(currentThingsList));
         }
     }
 
@@ -109,7 +110,7 @@ public class ThingsServiceImpl implements ThingsService {
             }
         }
         if (currentThingsList.size() > 0) {
-            saveThingsFile(JSON.toJSONString(currentThingsList));
+            saveThingsFile(JSONUtil.toJsonStr(currentThingsList));
         } else {
             saveThingsFile("");
         }
@@ -127,7 +128,7 @@ public class ThingsServiceImpl implements ThingsService {
             }
         }
         this.addThings(things);
-        saveThingsFile(JSON.toJSONString(currentThingsList));
+        saveThingsFile(JSONUtil.toJsonStr(currentThingsList));
     }
 
     /**

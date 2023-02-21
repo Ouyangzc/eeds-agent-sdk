@@ -1,6 +1,6 @@
 package com.elco.eeds.agent.sdk.core.start;
 
-import com.alibaba.fastjson.JSON;
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.mq.nats.plugin.NatsPlugin;
 import com.elco.eeds.agent.mq.plugin.MQPluginManager;
 import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
@@ -100,7 +100,7 @@ public class AgentRegisterService implements IAgentRegisterService {
         try {
             Agent agent = Agent.getInstance();
             String agentId = agent.getAgentBaseInfo().getAgentId();
-            String mqInfoStr = JSON.toJSONString(mqInfo);
+            String mqInfoStr = JSONUtil.toJsonStr(mqInfo);
             // 将mqSecurityInfo 替换为 tlsInfo
             mqInfoStr = mqInfoStr.replace("mqSecurityInfo", "tlsInfo");
             // 加载插件

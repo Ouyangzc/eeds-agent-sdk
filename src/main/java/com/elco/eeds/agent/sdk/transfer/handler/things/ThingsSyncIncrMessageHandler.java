@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.handler.things;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.transfer.beans.message.things.ThingsSyncIncrMessage;
 import com.elco.eeds.agent.sdk.transfer.handler.IReceiverMessageHandler;
@@ -26,7 +27,7 @@ public class ThingsSyncIncrMessageHandler implements IReceiverMessageHandler {
     @Override
     public void handleRecData(String topic, String recData) {
         ThingsSyncIncrMessage message = JSON.parseObject(recData, ThingsSyncIncrMessage.class);
-        logger.info("接收到数据源信息同步消息，topic:{},data:{}", topic, JSON.toJSONString(message));
+        logger.info("接收到数据源信息同步消息，topic:{},data:{}", topic, JSONUtil.toJsonStr(message));
         thingsSyncService.incrSyncThings(message.getData());
     }
 }

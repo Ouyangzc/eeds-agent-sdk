@@ -1,6 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.handler.data.sync;
 
-import com.alibaba.fastjson.JSON;
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.cancel.DataSyncCancelMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.cancel.SubDataSyncCancelMessage;
 import com.elco.eeds.agent.sdk.transfer.handler.IReceiverMessageHandler;
@@ -24,11 +24,11 @@ public class DataSyncCancelMessageHandler implements IReceiverMessageHandler {
 
     @Override
     public void handleRecData(String topic, String recData) {
-        DataSyncCancelMessage message = JSON.parseObject(recData, DataSyncCancelMessage.class);
+        DataSyncCancelMessage message = JSONUtil.toBean(recData, DataSyncCancelMessage.class);
         SubDataSyncCancelMessage subMsg = message.getData();
         String queueId = subMsg.getQueueId();
         if (queueId.equals(dataSyncService.getQueueId())) {
-            logger.debug("数据同步--取消报文，主题:{},消息内容:{}", topic, JSON.toJSONString(subMsg));
+            logger.debug("数据同步--取消报文，主题:{},消息内容:{}", topic, JSONUtil.toJsonStr(subMsg));
             dataSyncService.setStatus(false);
         }
     }
