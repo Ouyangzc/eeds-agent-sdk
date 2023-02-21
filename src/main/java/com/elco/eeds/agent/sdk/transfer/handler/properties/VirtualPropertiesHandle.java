@@ -141,23 +141,23 @@ public class VirtualPropertiesHandle {
         ScriptEngineManager sem = new ScriptEngineManager();
         ScriptEngine engine = sem.getEngineByName("js");
         // 记录发送的实际变量数量
-        AtomicInteger num = new AtomicInteger();
-        realIds.stream().forEach(temp->{
+        int num = 0;
+        for(String temp : realIds){
             List<PropertiesValue> collect = valueList.stream().filter(f -> f.getPropertiesId().equals(temp)).collect(Collectors.toList());
             if(ObjectUtil.isNotEmpty(collect)){
                 String value = collect.get(0).getValue();
                 conversionValue(engine, temp, value);
-                num.getAndIncrement();
+                num++;
             }
-        });
+        }
 
         // num==0 说明该虚拟变量关联的实际变量没有实时数据，不做计算
         // num.get() == realIds.size() 说明该虚拟变量关联的实际变量全部都有实时数据
         // num.get() != realIds.size() 说明该虚拟变量关联的实际变量缺失不是实时数据
-        if(num.get() == 0){
+        if(num == 0){
             return false;
         } else {
-            if(num.get() == realIds.size()){
+            if(num == realIds.size()){
                 try {
                     Object eval = engine.eval(expression);
                     propertiesValue.setValue(conversionType(eval, type));
