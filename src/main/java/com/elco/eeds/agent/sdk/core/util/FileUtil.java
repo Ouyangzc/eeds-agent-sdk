@@ -40,7 +40,7 @@ public class FileUtil {
             File file = new File(dir, files[i]);
             // 如果文件
             if (file.isFile()) {
-                String thingsId = dir.getName();
+                String thingsId = dir.getParentFile().getName();
                 //文件名 时间戳
                 Long currentFileName = Long.valueOf(files[i].replace(ConstantFilePath.FILE_FORMAT_JSON, "").trim());
                 File cacheFile = RealTimeDataMessageFileUtils.fileMap.get(thingsId);
