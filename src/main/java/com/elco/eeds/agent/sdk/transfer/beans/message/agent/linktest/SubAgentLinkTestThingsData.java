@@ -36,8 +36,12 @@ public class SubAgentLinkTestThingsData {
      * 值
      */
     private String value;
+    /**
+     * 1实际变量  2虚拟变量
+     */
+    private String isVirtual;
 
-    public SubAgentLinkTestThingsData(String address, String agentId, String propertiesId, String thingsId, String timestamp, String type, String value) {
+    public SubAgentLinkTestThingsData(String address, String agentId, String propertiesId, String thingsId, String timestamp, String type, String value,String isVirtual) {
         this.address = address;
         this.agentId = agentId;
         this.propertiesId = propertiesId;
@@ -45,10 +49,11 @@ public class SubAgentLinkTestThingsData {
         this.timestamp = timestamp;
         this.type = type;
         this.value = value;
+        this.isVirtual = isVirtual;
     }
 
     public static SubAgentLinkTestThingsData getTestData() {
-        return new SubAgentLinkTestThingsData("27", "1606121268447412224", "1611308151217455109", "1611308151204872192", "1673001588047", "int", "117");
+        return new SubAgentLinkTestThingsData("27", "1606121268447412224", "1611308151217455109", "1611308151204872192", "1673001588047", "int32", "117","1");
     }
 
     public String getAddress() {
@@ -105,5 +110,13 @@ public class SubAgentLinkTestThingsData {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getIsVirtual() {
+        return isVirtual;
+    }
+
+    public void setIsVirtual(String isVirtual) {
+        this.isVirtual = isVirtual;
     }
 }

@@ -85,7 +85,6 @@ public class NIOFileUtils {
 			//创建一个byte缓冲区
 			ByteBuffer byteBuffer = ByteBuffer.allocate(allocate);
 			byteBuffer.put(context.getBytes(chartName));
-			byteBuffer.put("\r\n".getBytes(chartName));
 			byteBuffer.clear();
 			channel.write(byteBuffer);
 			channel.close();
