@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.util;
 
+import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -15,6 +16,7 @@ import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
+import com.elco.eeds.agent.sdk.transfer.handler.properties.VirtualPropertiesHandle;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -41,6 +43,7 @@ public class RealTimeDataMessageFileUtils {
 
 	public static Map<String, File> fileMap = new ConcurrentHashMap<>(128);
 	public static Map<String, Map<File, File>> fileReadMap = new ConcurrentHashMap<>();
+	private static final int REAL = 1;
 
 	/**
 	 * 获取该数据源的写文件
@@ -99,7 +102,11 @@ public class RealTimeDataMessageFileUtils {
 								throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
 							}
 							List<PropertiesValue> propertiesValueList = handler.getParsing().parsing(driverContext, propertiesContextList, message);
-							propertiesValueList.forEach(pv -> pv.setTimestamp(collectTime));
+							propertiesValueList.forEach(pv -> {
+								pv.setTimestamp(collectTime);
+								pv.setIsVirtual(REAL);
+							});
+							VirtualPropertiesHandle.creatVirtualProperties(propertiesContextList, propertiesValueList, collectTime);
 							result.addAll(propertiesValueList);
 						}
 					}

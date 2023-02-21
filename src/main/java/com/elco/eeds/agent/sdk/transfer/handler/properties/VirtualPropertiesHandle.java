@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
-import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +12,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -84,42 +84,44 @@ public class VirtualPropertiesHandle {
      * @param collectTime 采集时间戳
      */
     public static void creatVirtualProperties(List<PropertiesContext> propertiesContextList, List<PropertiesValue> valueList, Long collectTime){
-        if(ObjectUtil.isNotEmpty(valueList)){
-            // 查询本地json数据是否存在虚拟变量
-            List<PropertiesContext> proList = propertiesContextList.stream().filter(f -> f.getIsVirtual() == VIRTUAL).collect(Collectors.toList());
-            if(ObjectUtil.isNotEmpty(proList)){
-                proList.stream().forEach(temp->{
-                    PropertiesValue propertiesValue = new PropertiesValue();
-                    BeanUtil.copyProperties(temp, propertiesValue);
-                    long startTime1 = System.currentTimeMillis();
-                    // 构建虚拟变量值
-                    creatValue(temp, propertiesValue, valueList);
-                    long time1 = System.currentTimeMillis()-startTime1;
-                    logger.debug("虚拟变量数据js引擎处理耗时，time:{}",time1);
+        // 查询本地json数据是否存在虚拟变量
+        List<PropertiesContext> virtualList = propertiesContextList.stream().filter(f -> f.getIsVirtual() == VIRTUAL).collect(Collectors.toList());
+        if(ObjectUtil.isNotEmpty(virtualList)){
+            virtualList.stream().forEach(virtualPro->{
+                PropertiesValue propertiesValue = new PropertiesValue();
+                BeanUtil.copyProperties(virtualPro, propertiesValue);
+                long startTime1 = System.currentTimeMillis();
+                // 构建虚拟变量值
+                boolean flag = creatValue(virtualPro, propertiesValue, valueList);
+                long time1 = System.currentTimeMillis()-startTime1;
+                logger.debug("虚拟变量数据js引擎处理耗时，time:{}",time1);
+                if(flag){
                     propertiesValue.setTimestamp(collectTime);
                     propertiesValue.setIsVirtual(VIRTUAL);
                     valueList.add(propertiesValue);
-                });
-            }
+                }
+            });
+            logger.info("valueList的数量：" + valueList.size());
         }
     }
 
     /**
      * 构建虚拟变量值
-     * @param propertiesContext 本地变量json数据
+     * @param propertiesContext 本地变量json数据(虚拟变量)
      * @param propertiesValue 虚拟变量值信息
      * @param valueList 实际变量实时数据集合
-     * @return
+     * @return true 需要发送的数据 false 不需要发送的数据
      */
-    private static void creatValue(PropertiesContext propertiesContext, PropertiesValue propertiesValue, List<PropertiesValue> valueList){
+    private static boolean creatValue(PropertiesContext propertiesContext, PropertiesValue propertiesValue, List<PropertiesValue> valueList){
         // 虚拟变量相关的实际变量ID集合
         String relationIds = propertiesContext.getRelationIds();
         if(ObjectUtil.isNotEmpty(relationIds)){
             // 根据实际变量计算虚拟变量的值
-            toCalculate(propertiesContext.getType(), propertiesContext.getDefaultValue(), propertiesContext.getExpression(), relationIds, propertiesValue, valueList);
+            return toCalculate(propertiesContext.getType(), propertiesContext.getDefaultValue(), propertiesContext.getExpression(), relationIds, propertiesValue, valueList);
         } else {
             // 赋默认值
             propertiesValue.setValue(propertiesContext.getDefaultValue());
+            return true;
         }
     }
 
@@ -131,26 +133,46 @@ public class VirtualPropertiesHandle {
      * @param relationIds 虚拟变量相关的实际变量ID集合
      * @param propertiesValue 虚拟变量值信息
      * @param valueList 实际变量实时数据集合
+     * @return true 需要发送的数据 false 不需要发送的数据
      */
-    private static void toCalculate(String type, String defaultValue, String expression, String relationIds, PropertiesValue propertiesValue, List<PropertiesValue> valueList){
+    private static boolean toCalculate(String type, String defaultValue, String expression, String relationIds, PropertiesValue propertiesValue, List<PropertiesValue> valueList){
         // 虚拟变量相关的实际变量ID集合
         List<String> realIds = Arrays.asList(relationIds.split(","));
         ScriptEngineManager sem = new ScriptEngineManager();
         ScriptEngine engine = sem.getEngineByName("js");
+        // 记录发送的实际变量数量
+        AtomicInteger num = new AtomicInteger();
         realIds.stream().forEach(temp->{
             List<PropertiesValue> collect = valueList.stream().filter(f -> f.getPropertiesId().equals(temp)).collect(Collectors.toList());
             if(ObjectUtil.isNotEmpty(collect)){
                 String value = collect.get(0).getValue();
                 conversionValue(engine, temp, value);
+                num.getAndIncrement();
             }
         });
-        try {
-            Object eval = engine.eval(expression);
-            propertiesValue.setValue(conversionType(eval, type));
-        } catch (Exception e) {
-            e.printStackTrace();
-            propertiesValue.setValue(defaultValue);
+
+        // num==0 说明该虚拟变量关联的实际变量没有实时数据，不做计算
+        // num.get() == realIds.size() 说明该虚拟变量关联的实际变量全部都有实时数据
+        // num.get() != realIds.size() 说明该虚拟变量关联的实际变量缺失不是实时数据
+        if(num.get() == 0){
+            return false;
+        } else {
+            if(num.get() == realIds.size()){
+                try {
+                    Object eval = engine.eval(expression);
+                    propertiesValue.setValue(conversionType(eval, type));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    propertiesValue.setValue("error");
+                    logger.error("js引擎处理表达式报错", e);
+                }
+            } else {
+                propertiesValue.setValue(defaultValue);
+            }
+            return true;
+
         }
+
     }
 
     /**
@@ -216,9 +238,13 @@ public class VirtualPropertiesHandle {
         return value;
     }
 
-    public static void main(String[] args) {
-        String  a  = "1.123456910101016";
-        System.out.println(a.substring(0,a.indexOf(".")));
+    public static void main(String[] args) throws ScriptException {
+        ScriptEngineManager sem = new ScriptEngineManager();
+        ScriptEngine engine = sem.getEngineByName("js");
+        String c1="a/b";
+        engine.put("a", 2);
+        Object eval = engine.eval(c1);
+        System.out.println(eval);
     }
 
 }
