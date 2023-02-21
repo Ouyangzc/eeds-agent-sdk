@@ -205,18 +205,21 @@ public class RealTimeDataMessageFileUtils {
 	 */
 	public static void removeDayFile(Integer agentBaseFileCycle) {
 		try {
+			int offset = Integer.valueOf("-" + agentBaseFileCycle);
+			DateTime newDate2 = DateUtil.offsetDay(new Date(), offset);
+			long nowTime = newDate2.getTime();
 			DateTime dateEnd = DateUtil.offset(DateUtil.date(), DateField.DAY_OF_MONTH, -agentBaseFileCycle);
 			AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
 			String baseFolder = agentBaseInfo.getBaseFolder();
 			String fileFolder = baseFolder + ConstantFilePath.PROPERTIES_DATA_FOLDER;
-			removeFile(new File(fileFolder), dateEnd);
+			removeFile(new File(fileFolder), dateEnd,nowTime);
 		} catch (Exception e) {
 			logger.error("删除数据文件失败，异常信息:{}", e.getMessage());
 		}
 	}
 
 
-	public static void removeFile(File dir, DateTime dateEnd) throws IOException {
+	public static void removeFile(File dir, DateTime dateEnd, Long nowTime) throws IOException {
 		// 判断是否存在目录
 		if (!dir.exists() || !dir.isDirectory()) {
 			return;
@@ -233,12 +236,20 @@ public class RealTimeDataMessageFileUtils {
 					DateTime dateTime = DateUtil.parse(name);
 					int compare = DateUtil.compare(dateTime, dateEnd);
 					if (compare < 1) {
-						logger.info("删除文件目录:{}", file.getAbsolutePath());
-						FileUtils.deleteDirectory(file);
+						File dataFiles = new File(dir, files[i]);
+						File[] listFiles = dataFiles.listFiles();
+						for (File dataFile : listFiles) {
+							//文件名 时间戳
+							long fileEndTime = dataFile.lastModified();
+							if (nowTime >= fileEndTime) {
+								logger.info("删除文件:{}", dataFile.getAbsolutePath());
+								FileUtils.deleteQuietly(dataFile);
+							}
+						}
 					}
 				}
 				// 如果是目录，回调自身继续查询
-				removeFile(file, dateEnd);
+				removeFile(file, dateEnd, nowTime);
 			}
 		}
 	}
