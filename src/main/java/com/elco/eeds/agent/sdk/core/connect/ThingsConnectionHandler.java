@@ -65,6 +65,8 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
      * 数据解析实现类
      */
     private M parsing;
+    
+    public static int num = 0;
 
 
     public ThingsConnectionHandler() {
@@ -113,12 +115,17 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
      * @param collectTime 采集时间戳
      */
     public void execute(String thingsId, String msg, Long collectTime) {
+        long startTime = System.currentTimeMillis();
         List<PropertiesContext> propertiesContextList = ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId);
         if(CollectionUtil.isNotEmpty(propertiesContextList)){
             List<PropertiesValue> valueList = this.getParsing()
                     .parsing(this.context, ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId), msg);
             valueList.forEach(pv -> pv.setTimestamp(collectTime));
             RealTimePropertiesValueService.recRealTimePropertiesValue(msg, thingsId, collectTime, valueList);
+            long time = System.currentTimeMillis()-startTime;
+            num++;
+            logger.info("数据处理耗时，time:{},推送数据量:{}",time,num);
+    
         }
     }
 
