@@ -10,10 +10,9 @@ import org.slf4j.LoggerFactory;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -216,51 +215,14 @@ public class VirtualPropertiesHandle {
         if (TRUE.equals(value.toUpperCase()) || FALSE.equals(value.toUpperCase())) {
             return value;
         } else {
-            if (type.indexOf(INT) > -1 || type.indexOf(UINT) > -1) {
-//                Double evalD = (Double)eval;
-                if (value.indexOf(CHARACTER) > -1) {
-                    value = value.substring(0, eval.toString().indexOf(CHARACTER));
-                } else {
-                    return value;
-                }
-            } else {
-                Pattern compile = Pattern.compile(MATCHER);
-                Matcher matcher = compile.matcher(value);
-                boolean b = matcher.find();
-                if (b) {
-                    logger.error("js引擎处理计算错误值,虚拟点位ID为:{},值:{}", propertiesId, value);
-                    value = ERROR;
-                } else {
-                    return value;
-                }
-
+            try {
+                new BigDecimal(value);
+            } catch (Exception e) {
+                logger.error("js引擎处理计算错误值,虚拟点位ID为:{},值:{}", propertiesId, value);
+                value = ERROR;
             }
-//            if(type.indexOf(FLOAT32) > -1) {
-//                String evalStr = eval.toString();
-//                if(evalStr.length() > FLOAT32_MAX_LENGTH){
-//                    value = evalStr.substring(0,FLOAT32_MAX_LENGTH);
-//                } else {
-//                    value = eval.toString();
-//                }
-//            } else if(type.indexOf(FLOAT64) > -1) {
-//                String evalStr = eval.toString();
-//                if(evalStr.length() > FLOAT64_MAX_LENGTH){
-//                    value = evalStr.substring(0,FLOAT64_MAX_LENGTH);
-//                } else {
-//                    value = eval.toString();
-//                }
-//            }
         }
         return value;
-    }
-
-    public static void main(String[] args) throws ScriptException {
-        ScriptEngineManager sem = new ScriptEngineManager();
-        ScriptEngine engine = sem.getEngineByName("js");
-        String c1 = "a/b";
-        engine.put("a", 2);
-        Object eval = engine.eval(c1);
-        System.out.println(eval);
     }
 
 }
