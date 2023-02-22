@@ -94,7 +94,6 @@ public class VirtualPropertiesHandle {
             virtualList.stream().forEach(virtualPro -> {
                 PropertiesValue propertiesValue = new PropertiesValue();
                 BeanUtil.copyProperties(virtualPro, propertiesValue);
-                propertiesValue.setAddress("");
                 long startTime1 = System.currentTimeMillis();
                 // 构建虚拟变量值
                 boolean flag = creatValue(virtualPro, propertiesValue, valueList);
@@ -147,7 +146,7 @@ public class VirtualPropertiesHandle {
         ScriptEngineManager sem = new ScriptEngineManager();
         ScriptEngine engine = sem.getEngineByName("js");
         // 记录发送的实际变量数量
-        int num = 1;
+        int num = 0;
         for (String temp : realIds) {
             List<PropertiesValue> collect = valueList.stream().filter(f -> f.getPropertiesId().equals(temp)).collect(Collectors.toList());
             if (ObjectUtil.isNotEmpty(collect)) {
@@ -160,10 +159,10 @@ public class VirtualPropertiesHandle {
         // num==0 说明该虚拟变量关联的实际变量没有实时数据，不做计算
         // num.get() == realIds.size() 说明该虚拟变量关联的实际变量全部都有实时数据
         // num.get() != realIds.size() 说明该虚拟变量关联的实际变量缺失不是实时数据
-        if (num == 1) {
+        if (num == 0) {
             return false;
         } else {
-            if ((num-1) == realIds.size()) {
+            if (num == realIds.size()) {
                 try {
                     Object eval = engine.eval(expression);
                     propertiesValue.setValue(conversionType(eval, type, propertiesValue.getPropertiesId()));
@@ -225,5 +224,4 @@ public class VirtualPropertiesHandle {
         }
         return value;
     }
-
 }
