@@ -10,9 +10,9 @@ import org.slf4j.LoggerFactory;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +41,10 @@ public class VirtualPropertiesHandle {
      */
     private final static String CHARACTER = ".";
 
+    private final static String ERROR = "error";
+
+    private final static String MATCHER = "[a-zA-Z]+";
+
     private final static String TRUE = "TRUE";
 
     private final static String FALSE = "FALSE";
@@ -66,7 +70,6 @@ public class VirtualPropertiesHandle {
     private final static String INT64_MIN_VALUE = "-9223372036854775808";
 
 
-
     /**
      * FLOAT32可以精确到小数6位，加上小数点和整数一共是8位
      */
@@ -79,43 +82,44 @@ public class VirtualPropertiesHandle {
 
     /**
      * 构建虚拟变量数据
+     *
      * @param propertiesContextList 本地json数据
-     * @param valueList 实际实时数据集合
-     * @param collectTime 采集时间戳
+     * @param valueList             实际实时数据集合
+     * @param collectTime           采集时间戳
      */
-    public static void creatVirtualProperties(List<PropertiesContext> propertiesContextList, List<PropertiesValue> valueList, Long collectTime){
+    public static void creatVirtualProperties(List<PropertiesContext> propertiesContextList, List<PropertiesValue> valueList, Long collectTime) {
         // 查询本地json数据是否存在虚拟变量
         List<PropertiesContext> virtualList = propertiesContextList.stream().filter(f -> f.getIsVirtual() == VIRTUAL).collect(Collectors.toList());
-        if(ObjectUtil.isNotEmpty(virtualList)){
-            virtualList.stream().forEach(virtualPro->{
+        if (ObjectUtil.isNotEmpty(virtualList)) {
+            virtualList.stream().forEach(virtualPro -> {
                 PropertiesValue propertiesValue = new PropertiesValue();
                 BeanUtil.copyProperties(virtualPro, propertiesValue);
                 long startTime1 = System.currentTimeMillis();
                 // 构建虚拟变量值
                 boolean flag = creatValue(virtualPro, propertiesValue, valueList);
-                long time1 = System.currentTimeMillis()-startTime1;
-                logger.debug("虚拟变量数据js引擎处理耗时，time:{}",time1);
-                if(flag){
+                long time1 = System.currentTimeMillis() - startTime1;
+                logger.info("虚拟变量数据js引擎处理耗时，time:{}", time1);
+                if (flag) {
                     propertiesValue.setTimestamp(collectTime);
                     propertiesValue.setIsVirtual(VIRTUAL);
                     valueList.add(propertiesValue);
                 }
             });
-            logger.info("valueList的数量：" + valueList.size());
         }
     }
 
     /**
      * 构建虚拟变量值
+     *
      * @param propertiesContext 本地变量json数据(虚拟变量)
-     * @param propertiesValue 虚拟变量值信息
-     * @param valueList 实际变量实时数据集合
+     * @param propertiesValue   虚拟变量值信息
+     * @param valueList         实际变量实时数据集合
      * @return true 需要发送的数据 false 不需要发送的数据
      */
-    private static boolean creatValue(PropertiesContext propertiesContext, PropertiesValue propertiesValue, List<PropertiesValue> valueList){
+    private static boolean creatValue(PropertiesContext propertiesContext, PropertiesValue propertiesValue, List<PropertiesValue> valueList) {
         // 虚拟变量相关的实际变量ID集合
         String relationIds = propertiesContext.getRelationIds();
-        if(ObjectUtil.isNotEmpty(relationIds)){
+        if (ObjectUtil.isNotEmpty(relationIds)) {
             // 根据实际变量计算虚拟变量的值
             return toCalculate(propertiesContext.getType(), propertiesContext.getDefaultValue(), propertiesContext.getExpression(), relationIds, propertiesValue, valueList);
         } else {
@@ -127,24 +131,25 @@ public class VirtualPropertiesHandle {
 
     /**
      * 计算虚拟变量值，并赋值到valueList
-     * @param type 变量类型
-     * @param defaultValue 默认值
-     * @param expression 表达式
-     * @param relationIds 虚拟变量相关的实际变量ID集合
+     *
+     * @param type            变量类型
+     * @param defaultValue    默认值
+     * @param expression      表达式
+     * @param relationIds     虚拟变量相关的实际变量ID集合
      * @param propertiesValue 虚拟变量值信息
-     * @param valueList 实际变量实时数据集合
+     * @param valueList       实际变量实时数据集合
      * @return true 需要发送的数据 false 不需要发送的数据
      */
-    private static boolean toCalculate(String type, String defaultValue, String expression, String relationIds, PropertiesValue propertiesValue, List<PropertiesValue> valueList){
+    private static boolean toCalculate(String type, String defaultValue, String expression, String relationIds, PropertiesValue propertiesValue, List<PropertiesValue> valueList) {
         // 虚拟变量相关的实际变量ID集合
         List<String> realIds = Arrays.asList(relationIds.split(","));
         ScriptEngineManager sem = new ScriptEngineManager();
         ScriptEngine engine = sem.getEngineByName("js");
         // 记录发送的实际变量数量
         int num = 0;
-        for(String temp : realIds){
+        for (String temp : realIds) {
             List<PropertiesValue> collect = valueList.stream().filter(f -> f.getPropertiesId().equals(temp)).collect(Collectors.toList());
-            if(ObjectUtil.isNotEmpty(collect)){
+            if (ObjectUtil.isNotEmpty(collect)) {
                 String value = collect.get(0).getValue();
                 conversionValue(engine, temp, value);
                 num++;
@@ -154,97 +159,70 @@ public class VirtualPropertiesHandle {
         // num==0 说明该虚拟变量关联的实际变量没有实时数据，不做计算
         // num.get() == realIds.size() 说明该虚拟变量关联的实际变量全部都有实时数据
         // num.get() != realIds.size() 说明该虚拟变量关联的实际变量缺失不是实时数据
-        if(num == 0){
+        if (num == 0) {
             return false;
         } else {
-            if(num == realIds.size()){
+            if (num == realIds.size()) {
                 try {
                     Object eval = engine.eval(expression);
-                    propertiesValue.setValue(conversionType(eval, type));
+                    propertiesValue.setValue(conversionType(eval, type, propertiesValue.getPropertiesId()));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    propertiesValue.setValue("error");
-                    logger.error("js引擎处理表达式报错", e);
+                    propertiesValue.setValue(ERROR);
+                    logger.error("js引擎处理表达式报错:虚拟点位ID为:{},报错信息:{}", propertiesValue.getPropertiesId(), e);
                 }
             } else {
                 propertiesValue.setValue(defaultValue);
             }
             return true;
-
         }
 
     }
 
     /**
      * 根据实际变量值转换对应的值对象
-     * @param engine js引擎操作对象
+     *
+     * @param engine           js引擎操作对象
      * @param realPropertiesId 实际变量ID
-     * @param value 实际变量值
+     * @param value            实际变量值
      */
     private static void conversionValue(ScriptEngine engine, String realPropertiesId, String value) {
 
         try {
-            if(value.indexOf(CHARACTER)>-1){
-                engine.put(PREFIX+"_"+realPropertiesId, Float.parseFloat(value));
-            } else if(TRUE.equals(value.toUpperCase()) || FALSE.equals(value.toUpperCase())){
-                engine.put(PREFIX+"_"+realPropertiesId, Boolean.valueOf(value));
+            if (value.indexOf(CHARACTER) > -1) {
+                engine.put(PREFIX + "_" + realPropertiesId, Float.parseFloat(value));
+            } else if (TRUE.equals(value.toUpperCase()) || FALSE.equals(value.toUpperCase())) {
+                engine.put(PREFIX + "_" + realPropertiesId, Boolean.valueOf(value));
             } else {
-                engine.put(PREFIX+"_"+realPropertiesId, Integer.valueOf(value));
+                engine.put(PREFIX + "_" + realPropertiesId, Integer.valueOf(value));
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            engine.put(PREFIX+"_"+realPropertiesId, value);
+            engine.put(PREFIX + "_" + realPropertiesId, value);
         }
 
     }
 
     /**
      * 结果值转换类型
+     *
      * @param eval js计算后的值
      * @param type 虚拟变量类型
      * @return
      */
-    private static String conversionType(Object eval, String type){
-        String value = "";
-        if(TRUE.equals(eval.toString().toUpperCase()) || FALSE.equals(eval.toString().toUpperCase())){
-            value = eval.toString();
+    private static String conversionType(Object eval, String type, String propertiesId) {
+        String value = eval.toString();
+        if (TRUE.equals(value.toUpperCase()) || FALSE.equals(value.toUpperCase())) {
+            return value;
         } else {
-            if(type.indexOf(INT) > -1 || type.indexOf(UINT) > -1){
-//                Double evalD = (Double)eval;
-                if(eval.toString().indexOf(CHARACTER) > -1){
-                    value = eval.toString().substring(0,eval.toString().indexOf(CHARACTER));
-                } else {
-                    value = eval.toString();
-                }
-            } else {
-                value = eval.toString();
+            try {
+                new BigDecimal(value);
+            } catch (Exception e) {
+                logger.error("js引擎处理计算错误值,虚拟点位ID为:{},值:{}", propertiesId, value);
+                value = ERROR;
             }
-//            if(type.indexOf(FLOAT32) > -1) {
-//                String evalStr = eval.toString();
-//                if(evalStr.length() > FLOAT32_MAX_LENGTH){
-//                    value = evalStr.substring(0,FLOAT32_MAX_LENGTH);
-//                } else {
-//                    value = eval.toString();
-//                }
-//            } else if(type.indexOf(FLOAT64) > -1) {
-//                String evalStr = eval.toString();
-//                if(evalStr.length() > FLOAT64_MAX_LENGTH){
-//                    value = evalStr.substring(0,FLOAT64_MAX_LENGTH);
-//                } else {
-//                    value = eval.toString();
-//                }
-//            }
         }
         return value;
-    }
-
-    public static void main(String[] args) throws ScriptException {
-        ScriptEngineManager sem = new ScriptEngineManager();
-        ScriptEngine engine = sem.getEngineByName("js");
-        String c1="a/b";
-        engine.put("a", 2);
-        Object eval = engine.eval(c1);
-        System.out.println(eval);
     }
 
 }
