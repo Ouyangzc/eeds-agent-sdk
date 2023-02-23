@@ -20,7 +20,6 @@ import java.util.List;
  */
 public class DataRealTimePropertiesMessage extends BaseMessage<List<SubDataRealTimePropertiesMessage>> {
 
-
     public static String getMessage(List<PropertiesValue> propertiesValueList) {
         DataRealTimePropertiesMessage message = new DataRealTimePropertiesMessage();
         message.setMethod(ConstantMethod.METHOD_DATA_REALTIME_PROPERTIES);

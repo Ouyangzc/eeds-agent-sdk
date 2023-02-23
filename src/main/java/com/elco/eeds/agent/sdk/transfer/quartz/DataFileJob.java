@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  * @ClassName DataFileJob
  * @Description 过期文件删除任务
  * @Author ouyang
- * @Date 2023/2/14 9:38
+ * @Date 2023/2/21 14:56
  * @Version 1.0
  */
 public class DataFileJob implements Job {
@@ -25,7 +25,6 @@ public class DataFileJob implements Job {
 		// 缓存周期
 		AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
 		String agentBaseFileCycle = agentBaseInfo.getDataCacheCycle();
-//		RealTimeDataMessageFileUtils.removeFile(agentBaseFileCycle);
 		RealTimeDataMessageFileUtils.removeDayFile(Integer.valueOf(agentBaseFileCycle));
 	}
 }

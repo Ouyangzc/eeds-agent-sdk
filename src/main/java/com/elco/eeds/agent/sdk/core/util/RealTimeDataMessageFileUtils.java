@@ -245,6 +245,10 @@ public class RealTimeDataMessageFileUtils {
 								logger.info("删除文件:{}", dataFile.getAbsolutePath());
 								FileUtils.deleteQuietly(dataFile);
 							}
+                            if (dataFiles.listFiles().length <= 0) {
+                                logger.info("文件目录为空，删除目录:{}", dataFiles.getAbsolutePath());
+                                FileUtils.deleteDirectory(dataFiles);
+                            }
 						}
 					}
 				}

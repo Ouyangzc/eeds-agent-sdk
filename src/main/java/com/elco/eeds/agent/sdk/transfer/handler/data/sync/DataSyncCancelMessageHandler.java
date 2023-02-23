@@ -25,7 +25,7 @@ public class DataSyncCancelMessageHandler implements IReceiverMessageHandler {
 
     @Override
     public void handleRecData(String topic, String recData) {
-        DataSyncCancelMessage message = JSON.parseObject(recData, DataSyncCancelMessage.class);
+        DataSyncCancelMessage message = JSONUtil.toBean(recData, DataSyncCancelMessage.class);
         SubDataSyncCancelMessage subMsg = message.getData();
         String queueId = subMsg.getQueueId();
         if (queueId.equals(dataSyncService.getQueueId())) {
