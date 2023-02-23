@@ -60,20 +60,20 @@ public class RealTimeDataMessageFileUtils {
 		fileMap.put(thingsId, newFile);
 		return newFile;
 	}
-    
-    private static String getNewFilePath(String thingsId) {
-        long timeMillis = System.currentTimeMillis();
-        String dateStr = DateUtil.date().toDateStr();
-        AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
-        String baseFolder = agentBaseInfo.getBaseFolder();
-        String fileFolder = baseFolder + ConstantFilePath.PROPERTIES_DATA_FOLDER + File.separator + thingsId + File.separator + dateStr;
-        File file = new File(fileFolder);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        String fileFullPath = fileFolder + File.separator + timeMillis + ConstantFilePath.FILE_FORMAT_JSON;
-        return fileFullPath;
-    }
+	
+	private static String getNewFilePath(String thingsId) {
+		long timeMillis = System.currentTimeMillis();
+		String dateStr = DateUtil.date().toDateStr();
+		AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
+		String baseFolder = agentBaseInfo.getBaseFolder();
+		String fileFolder = baseFolder + ConstantFilePath.PROPERTIES_DATA_FOLDER + File.separator + thingsId + File.separator + dateStr;
+		File file = new File(fileFolder);
+		if (!file.exists()) {
+			file.mkdirs();
+		}
+		String fileFullPath = fileFolder + File.separator + timeMillis + ConstantFilePath.FILE_FORMAT_JSON;
+		return fileFullPath;
+	}
 	
 	public static List<PropertiesValue> getFileData(String thingsId, Long startTime, Long endTime, List<PropertiesContext> propertiesContextList) {
 		List<PropertiesValue> result = new ArrayList<>();
@@ -133,20 +133,20 @@ public class RealTimeDataMessageFileUtils {
 			String dataCacheFileSize = agentBaseInfo.getDataCacheFileSize();
 			Long fileSize = FileUtil.getFileSize(dataCacheFileSize);
 			if (fileLength > fileSize) {
-                // 多并发下 再校验一下文件是不是被替换了
-                File oldFile = getCurrentWriteFile(thingsId);
-                if (oldFile.getName().equals(file.getName())) {
-                    //需创建新文件
-                    String filePath = getNewFilePath(thingsId);
-                    file = new File(filePath);
-                    fileMap.put(thingsId, file);
-                }
+				// 多并发下 再校验一下文件是不是被替换了
+				File oldFile = getCurrentWriteFile(thingsId);
+				if (oldFile.getName().equals(file.getName())) {
+					//需创建新文件
+					String filePath = getNewFilePath(thingsId);
+					file = new File(filePath);
+					fileMap.put(thingsId, file);
+				}
 			}
-            StringBuffer dataBuffer = new StringBuffer(data);
-            dataBuffer.append("\r\n");
-            NIOFileUtils fileUtils = new NIOFileUtils(file.getAbsolutePath());
-            fileUtils.writeLines(dataBuffer.toString(), dataBuffer.toString().getBytes().length, "UTF-8");
-        } catch (IOException e) {
+			StringBuffer dataBuffer = new StringBuffer(data);
+			dataBuffer.append("\r\n");
+			NIOFileUtils fileUtils = new NIOFileUtils(file.getAbsolutePath());
+			fileUtils.writeLines(dataBuffer.toString(), dataBuffer.toString().getBytes().length, "UTF-8");
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -204,14 +204,14 @@ public class RealTimeDataMessageFileUtils {
 			AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
 			String baseFolder = agentBaseInfo.getBaseFolder();
 			String fileFolder = baseFolder + ConstantFilePath.PROPERTIES_DATA_FOLDER;
-			removeFile(new File(fileFolder), dateEnd,nowTime);
+			removeFile(new File(fileFolder), dateEnd, nowTime);
 		} catch (Exception e) {
 			logger.error("删除数据文件失败，异常信息:{}", e.getMessage());
 		}
 	}
 	
 	
-	public static void removeFile(File dir, DateTime dateEnd,Long nowTime) throws IOException {
+	public static void removeFile(File dir, DateTime dateEnd, Long nowTime) throws IOException {
 		// 判断是否存在目录
 		if (!dir.exists() || !dir.isDirectory()) {
 			return;
@@ -237,6 +237,10 @@ public class RealTimeDataMessageFileUtils {
 								logger.info("删除文件:{}", dataFile.getAbsolutePath());
 								FileUtils.deleteQuietly(dataFile);
 							}
+						}
+						if (dataFiles.listFiles().length <= 0) {
+							logger.info("文件目录为空，删除目录:{}", dataFiles.getAbsolutePath());
+							FileUtils.deleteDirectory(dataFiles);
 						}
 					}
 				}
