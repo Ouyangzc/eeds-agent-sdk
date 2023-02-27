@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.core.util;
 
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
@@ -51,11 +52,22 @@ public class RealTimeDataMessageFileUtils {
 	 * @param thingsId 数据源ID
 	 * @return 文件对象
 	 */
-	private static File getCurrentWriteFile(String thingsId) throws IOException {
+	private static File getCurrentWriteFile(String thingsId, Long collectTime) {
 		File file = fileMap.get(thingsId);
 		if (!ObjectUtil.isEmpty(file)) {
-			//返回已有file对象
-			return file;
+			//文件名
+			String fileName = file.getName().replace(ConstantFilePath.FILE_FORMAT_JSON, "");
+			long between = DateUtil.between(DateUtil.date(Long.valueOf(fileName)), DateUtil.date(collectTime), DateUnit.DAY);
+			if (0 == between) {
+				//采集时间和文件归属于同一天,返回已有file对象
+				return file;
+			} else {
+				//采集时间和文件不归属于同一天
+				String filePath = getNewFilePath(thingsId);
+				File newFile = new File(filePath);
+				fileMap.put(thingsId, newFile);
+				return newFile;
+			}
 		}
 		String filePath = getNewFilePath(thingsId);
 		File newFile = new File(filePath);
@@ -130,10 +142,10 @@ public class RealTimeDataMessageFileUtils {
 	 * @param thingsId 数据源ID 文件目录
 	 * @param data     数据
 	 */
-	public static void writeAppend(String thingsId, String data) {
+	public static void writeAppend(String thingsId, String data, Long collectTime) {
 		//写文件
 		try {
-			File file = getCurrentWriteFile(thingsId);
+			File file = getCurrentWriteFile(thingsId, collectTime);
 			//文件大小
 			Long fileLength = FileUtil.getFileLength(file);
 
@@ -142,7 +154,7 @@ public class RealTimeDataMessageFileUtils {
 			Long fileSize = FileUtil.getFileSize(dataCacheFileSize);
 			if (fileLength > fileSize) {
 				// 多并发下 再校验一下文件是不是被替换了
-				File oldFile = getCurrentWriteFile(thingsId);
+				File oldFile = getCurrentWriteFile(thingsId, collectTime);
 				if (oldFile.getName().equals(file.getName())) {
 					//需创建新文件
 					String filePath = getNewFilePath(thingsId);
@@ -245,10 +257,10 @@ public class RealTimeDataMessageFileUtils {
 								logger.info("删除文件:{}", dataFile.getAbsolutePath());
 								FileUtils.deleteQuietly(dataFile);
 							}
-                            if (dataFiles.listFiles().length <= 0) {
-                                logger.info("文件目录为空，删除目录:{}", dataFiles.getAbsolutePath());
-                                FileUtils.deleteDirectory(dataFiles);
-                            }
+						}
+						if (dataFiles.listFiles().length <= 0) {
+							logger.info("文件目录为空，删除目录:{}", dataFiles.getAbsolutePath());
+							FileUtils.deleteDirectory(dataFiles);
 						}
 					}
 				}

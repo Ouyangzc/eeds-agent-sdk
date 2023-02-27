@@ -46,7 +46,7 @@ public class RealTimePropertiesValueService {
             OriginalPropertiesValueMessage originalPropertiesValueMessage = new OriginalPropertiesValueMessage();
             originalPropertiesValueMessage.setCollectTime(collectTime);
             originalPropertiesValueMessage.setMessage(message);
-            RealTimeDataMessageFileUtils.writeAppend(thingsId, JSONUtil.toJsonStr(originalPropertiesValueMessage));
+            RealTimeDataMessageFileUtils.writeAppend(thingsId, JSONUtil.toJsonStr(originalPropertiesValueMessage),collectTime);
 
             // 计算虚拟变量
             VirtualPropertiesHandle.creatVirtualProperties(propertiesContextList, propertiesValueList, collectTime);
