@@ -43,7 +43,7 @@ public class RealTimePropertiesValueService {
             OriginalPropertiesValueMessage originalPropertiesValueMessage = new OriginalPropertiesValueMessage();
             originalPropertiesValueMessage.setCollectTime(collectTime);
             originalPropertiesValueMessage.setMessage(message);
-            RealTimeDataMessageFileUtils.writeAppend(thingsId, JSONUtil.toJsonStr(originalPropertiesValueMessage));
+            RealTimeDataMessageFileUtils.writeAppend(thingsId, JSONUtil.toJsonStr(originalPropertiesValueMessage),collectTime);
             //调用统计接口
             ThingsDataCount dataCount = new ThingsDataCount();
             dataCount.setThingsId(thingsId);
