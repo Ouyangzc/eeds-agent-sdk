@@ -6,11 +6,13 @@ import com.elco.eeds.agent.mq.plugin.MQPluginManager;
 import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
+import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.util.RealTimeDataMessageFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.data.count.ThingsDataCount;
 import com.elco.eeds.agent.sdk.transfer.beans.message.data.realTime.DataRealTimePropertiesMessage;
+import com.elco.eeds.agent.sdk.transfer.handler.properties.VirtualPropertiesHandle;
 import com.elco.eeds.agent.sdk.transfer.service.data.count.DataCountServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +36,9 @@ public class RealTimePropertiesValueService {
      * @param thingsId            数据源ID
      * @param collectTime         采集时间戳
      * @param propertiesValueList 解析数据
+     * @param propertiesContextList 变量信息
      */
-    public static void recRealTimePropertiesValue(String message, String thingsId, Long collectTime, List<PropertiesValue> propertiesValueList) {
+    public static void recRealTimePropertiesValue(String message, String thingsId, Long collectTime, List<PropertiesValue> propertiesValueList, List<PropertiesContext> propertiesContextList) {
         if (!propertiesValueList.isEmpty()) {
             AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
             String agentId = agentBaseInfo.getAgentId();
@@ -44,6 +47,13 @@ public class RealTimePropertiesValueService {
             originalPropertiesValueMessage.setCollectTime(collectTime);
             originalPropertiesValueMessage.setMessage(message);
             RealTimeDataMessageFileUtils.writeAppend(thingsId, JSONUtil.toJsonStr(originalPropertiesValueMessage));
+
+            // 计算虚拟变量
+            long startTime1 = System.currentTimeMillis();
+            VirtualPropertiesHandle.creatVirtualProperties(propertiesContextList, propertiesValueList, collectTime);
+            long time1 = System.currentTimeMillis()-startTime1;
+            logger.info("虚拟变量数据处理总耗时，time:{}",time1);
+
             //调用统计接口
             ThingsDataCount dataCount = new ThingsDataCount();
             dataCount.setThingsId(thingsId);
