@@ -94,11 +94,8 @@ public class VirtualPropertiesHandle {
             virtualList.stream().forEach(virtualPro -> {
                 PropertiesValue propertiesValue = new PropertiesValue();
                 BeanUtil.copyProperties(virtualPro, propertiesValue);
-                long startTime1 = System.currentTimeMillis();
                 // 构建虚拟变量值
                 boolean flag = creatValue(virtualPro, propertiesValue, valueList);
-                long time1 = System.currentTimeMillis() - startTime1;
-                logger.info("虚拟变量数据js引擎处理耗时，time:{}", time1);
                 if (flag) {
                     propertiesValue.setTimestamp(collectTime);
                     propertiesValue.setIsVirtual(VIRTUAL);
@@ -224,5 +221,4 @@ public class VirtualPropertiesHandle {
         }
         return value;
     }
-
 }
