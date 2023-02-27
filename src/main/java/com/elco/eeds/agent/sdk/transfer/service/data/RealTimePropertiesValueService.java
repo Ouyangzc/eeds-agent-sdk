@@ -49,10 +49,7 @@ public class RealTimePropertiesValueService {
             RealTimeDataMessageFileUtils.writeAppend(thingsId, JSONUtil.toJsonStr(originalPropertiesValueMessage));
 
             // 计算虚拟变量
-            long startTime1 = System.currentTimeMillis();
             VirtualPropertiesHandle.creatVirtualProperties(propertiesContextList, propertiesValueList, collectTime);
-            long time1 = System.currentTimeMillis()-startTime1;
-            logger.info("虚拟变量数据处理总耗时，time:{}",time1);
 
             //调用统计接口
             ThingsDataCount dataCount = new ThingsDataCount();
