@@ -64,7 +64,7 @@ public class CountScheduler {
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity("dataFileTrigger", "dataJobGroup")
                 .startNow()
-                .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(1))
+                .withSchedule(SimpleScheduleBuilder.repeatHourlyForever(1))
                 .build();
         // 使用触发器调度任务的执行
         scheduler.scheduleJob(job, trigger);
