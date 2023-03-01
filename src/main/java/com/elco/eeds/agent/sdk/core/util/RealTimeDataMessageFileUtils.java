@@ -2,7 +2,6 @@ package com.elco.eeds.agent.sdk.core.util;
 
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
@@ -55,8 +54,8 @@ public class RealTimeDataMessageFileUtils {
 		if (!ObjectUtil.isEmpty(file)) {
 			//文件名
 			String fileName = file.getName().replace(ConstantFilePath.FILE_FORMAT_JSON, "");
-			long between = DateUtil.between(DateUtil.date(Long.valueOf(fileName)), DateUtil.date(collectTime), DateUnit.DAY);
-			if (0 == between) {
+			boolean sameDay = DateUtil.isSameDay(DateUtil.date(Long.valueOf(fileName)), DateUtil.date(collectTime));
+			if (sameDay) {
 				//采集时间和文件归属于同一天,返回已有file对象
 				return file;
 			} else {
