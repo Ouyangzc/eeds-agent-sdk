@@ -55,7 +55,7 @@ public class RealTimeDataMessageFileUtils {
 			//文件名
 			String fileName = file.getName().replace(ConstantFilePath.FILE_FORMAT_JSON, "");
 			boolean sameDay = DateUtil.isSameDay(DateUtil.date(Long.valueOf(fileName)), DateUtil.date(collectTime));
-			if (sameDay) {
+			if (sameDay && file.exists()) {
 				//采集时间和文件归属于同一天,返回已有file对象
 				return file;
 			} else {
@@ -258,6 +258,27 @@ public class RealTimeDataMessageFileUtils {
 				// 如果是目录，回调自身继续查询
 				removeFile(file, dateEnd, nowTime);
 			}
+		}
+	}
+	
+	
+	/**
+	 * 以分钟为周期删除文件
+	 *
+	 * @param agentBaseFileCycle
+	 */
+	public static void removeMinuteFile(Integer agentBaseFileCycle) {
+		try {
+			int offset = Integer.valueOf("-" + agentBaseFileCycle);
+			DateTime newDate2 = DateUtil.offsetMinute(new Date(), offset);
+			long nowTime = newDate2.getTime();
+			DateTime dateEnd = DateUtil.offset(DateUtil.date(), DateField.MINUTE, -agentBaseFileCycle);
+			AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
+			String baseFolder = agentBaseInfo.getBaseFolder();
+			String fileFolder = baseFolder + ConstantFilePath.PROPERTIES_DATA_FOLDER;
+			removeFile(new File(fileFolder), dateEnd, nowTime);
+		} catch (Exception e) {
+			logger.error("删除数据文件失败，异常信息:{}", e.getMessage());
 		}
 	}
 }
