@@ -103,7 +103,8 @@ public class ConnectManager {
 	public static void delConnection(String thingsId) {
 		ThingsConnectionHandler handler = getHandler(thingsId);
 		if (ObjectUtil.isNotEmpty(handler) && handler.getThingsConnection().disconnect()) {
-			handler.setConnectionStatus(ConnectionStatus.DISCONNECT);
+			ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
+			thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
 			CONNECTION_HANDLER_MAP.remove(thingsId);
 		}
 	}
@@ -114,24 +115,26 @@ public class ConnectManager {
 	 * @param driverContext
 	 */
 	public static void create(ThingsDriverContext driverContext, String connectKey) {
-		logger.info("连接协议：{}",connectKey);
+		logger.info("连接协议：{}", connectKey);
 		logger.info("开始创建连接，连接信息：{}", JSONUtil.toJsonStr(driverContext));
 		ThingsConnection connection = ConnectManager.getConnection(connectKey);
-		if(!connection.connect(driverContext)){
-			logger.error("创建连接失败，连接信息：{}", JSONUtil.toJsonStr(driverContext));
-			return;
-		}
 		ThingsConnectionHandler handler = (ThingsConnectionHandler) connection;
 		handler.setContext(driverContext);
 		handler.setThingsConnection(connection);
 		handler.setThingsId(driverContext.getThingsId());
-		handler.setConnectionStatus(ConnectionStatus.CONNECTED);
+		ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
+		if (!connection.connect(driverContext)) {
+			logger.error("创建连接失败，连接信息：{}", JSONUtil.toJsonStr(driverContext));
+			thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
+			return;
+		}
 		ConnectManager.addHandler(handler);
 		logger.info("创建连接成功，连接信息：{}", JSONUtil.toJsonStr(driverContext));
-		if(!connection.getReadType().equals(ReadTypeEnums.INITIATIVE)){
+		thingsStatus.setValue(handler, ConnectionStatus.CONNECTED);
+		if (!connection.getReadType().equals(ReadTypeEnums.INITIATIVE)) {
 			try {
-				jobManage.addJob(connection.getCorn(),handler,connection.getReadType());
-			}catch (Exception e){
+				jobManage.addJob(connection.getCorn(), handler, connection.getReadType());
+			} catch (Exception e) {
 				logger.error("添加定时任务失败，连接信息：{}", JSONUtil.toJsonStr(driverContext));
 			}
 
@@ -161,12 +164,11 @@ public class ConnectManager {
 		handler.getThingsConnection().disconnect();
 	}
 
-    public static void sendPropertiesEventNotify(String thingsId, PropertiesEvent propertiesEvent){
-        ThingsConnectionHandler handler = getHandler(thingsId);
-        if (ObjectUtil.isNotEmpty(handler)){
-            logger.info("发送变量变动通知,thingsId:{}",thingsId);
-            handler.getThingsConnection().propertiesEventNotify(propertiesEvent);
-        }
-    }
-
+	public static void sendPropertiesEventNotify(String thingsId, PropertiesEvent propertiesEvent) {
+		ThingsConnectionHandler handler = getHandler(thingsId);
+		if (ObjectUtil.isNotEmpty(handler)) {
+			logger.info("发送变量变动通知,thingsId:{}", thingsId);
+			handler.getThingsConnection().propertiesEventNotify(propertiesEvent);
+		}
+	}
 }
