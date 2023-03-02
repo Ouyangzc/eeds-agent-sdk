@@ -223,3 +223,7 @@
 # dev-1.1.0 feature</br>
 feature1 : 变量变动通知  
 说明：变量点位得增删,通知到客户端，适用于对变量得单独订阅  
+
+# dev-1.1.0.1 feature</br>
+feature1 : 数据源状态全部由SDK进行管理,CONNECTED,DISCONNECT
+feature2 : 客户端新增状态，INIT,READY,LOAD,RUNNING

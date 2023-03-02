@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
+import com.elco.eeds.agent.sdk.core.common.enums.AgentStatus;
 import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.connect.init.InitConnectFactory;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
@@ -42,6 +43,8 @@ public class AgentStarter {
 	private AgentConfigYamlReader configReader;
 	
 	private static void init(AgentStartProperties agentStartProperties) throws Exception {
+		//示例化Agent对象
+		Agent agent = Agent.getInstance();
 		try {
 			// 将协议注入
 			
