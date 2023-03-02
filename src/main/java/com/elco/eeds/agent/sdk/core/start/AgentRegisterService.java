@@ -7,6 +7,7 @@ import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentMqInfo;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
+import com.elco.eeds.agent.sdk.core.common.enums.AgentStatus;
 import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.core.util.AgentFileExtendUtils;
@@ -62,13 +63,14 @@ public class AgentRegisterService implements IAgentRegisterService {
 
     @Override
     public boolean register(String serverUrl, String name, String port, String token, String clientType) throws Exception {
+        Agent agent = Agent.getInstance();
         try {
             // 获取IP
             String clientIp = IpUtil.getLocalIpAddress();
-            Agent agent = Agent.getInstance();
             // 调用http接口的register方法
             agent = agentRequestHttpService.register(clientIp, port, name, token, AgentStartProperties.getInstance().getAgentClientType());
             if (agent == null) {
+                agent.setAgentStatus(AgentStatus.ERROR);
                 throw new SdkException(ErrorEnum.CLIENT_REGISTER_ERROR.code());
             }
             // 刷新token
@@ -79,8 +81,10 @@ public class AgentRegisterService implements IAgentRegisterService {
             loadMq(agent.getAgentMqInfo());
             // 数据源同步
             thingsSyncService.setupSyncThings();
+            agent.setAgentStatus(AgentStatus.READY);
             return true;
         } catch (Exception e) {
+            agent.setAgentStatus(AgentStatus.ERROR);
             e.printStackTrace();
             // throw new SdkException(ErrorEnum.CLIENT_REGISTER_ERROR.code());
             logger.error("客户端注册流程失败！{}", e.getMessage());
