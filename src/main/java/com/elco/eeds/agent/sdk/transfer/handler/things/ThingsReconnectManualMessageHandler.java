@@ -2,12 +2,13 @@ package com.elco.eeds.agent.sdk.transfer.handler.things;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
-import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
-import com.elco.eeds.agent.sdk.core.exception.SdkException;
+import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.message.things.ThingsReconnectManualMessage;
+import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import com.elco.eeds.agent.sdk.transfer.handler.IReceiverMessageHandler;
+import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,25 +21,32 @@ import org.slf4j.LoggerFactory;
  */
 public class ThingsReconnectManualMessageHandler implements IReceiverMessageHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(ThingsReconnectManualMessageHandler.class);
+  private static final Logger logger = LoggerFactory
+      .getLogger(ThingsReconnectManualMessageHandler.class);
 
-    @Override
-    public void handleRecData(String topic, String recData) {
-        logger.info("收到数据源手动重连报文：topic: {}, msg: {}", topic, recData);
+  @Override
+  public void handleRecData(String topic, String recData) {
+    logger.info("收到数据源手动重连报文：topic: {}, msg: {}", topic, recData);
 
-        try {
-            // 校验报文是否格式是否满足
-            ThingsReconnectManualMessage message = JSON.parseObject(recData, ThingsReconnectManualMessage.class);
-            // 获取handler
-            ThingsConnectionHandler handler = ConnectManager.getHandler(message.getData().getThingsId());
-            if(ObjectUtil.isEmpty(handler)){
-                throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
-            }
-            // 数据源重连
-            handler.reconnect();
-        } catch (Exception e) {
-            logger.error("数据源手动重连报文处理异常：", e);
-            e.printStackTrace();
-        }
+    try {
+      // 校验报文是否格式是否满足
+      ThingsReconnectManualMessage message = JSON
+          .parseObject(recData, ThingsReconnectManualMessage.class);
+      String thingsId = message.getData().getThingsId();
+      // 获取handler
+      ThingsConnectionHandler handler = ConnectManager.getHandler(thingsId);
+      if (ObjectUtil.isEmpty(handler)) {
+        //获取不到数据源Handler，重新连接
+        ThingsDriverContext thingsDriverContext = ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP
+            .get(thingsId);
+        ConnectManager
+            .create(thingsDriverContext, AgentStartProperties.getInstance().getAgentClientType());
+      }
+      // 数据源重连
+      handler.reconnect();
+    } catch (Exception e) {
+      logger.error("数据源手动重连报文处理异常：", e);
+      e.printStackTrace();
     }
+  }
 }
