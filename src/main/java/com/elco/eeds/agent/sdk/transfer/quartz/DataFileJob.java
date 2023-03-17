@@ -25,8 +25,8 @@ public class DataFileJob implements Job {
 		// 缓存周期
 		AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
 		String agentBaseFileCycle = agentBaseInfo.getDataCacheCycle();
-//		RealTimeDataMessageFileUtils.removeDayFile(Integer.valueOf(agentBaseFileCycle));
-		RealTimeDataMessageFileUtils.removeMinuteFile(Integer.valueOf(agentBaseFileCycle));
+		RealTimeDataMessageFileUtils.removeDayFile(Integer.valueOf(agentBaseFileCycle));
+//		RealTimeDataMessageFileUtils.removeMinuteFile(Integer.valueOf(agentBaseFileCycle));
 		
 	}
 }
