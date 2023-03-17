@@ -17,6 +17,7 @@ import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import com.elco.eeds.agent.sdk.transfer.handler.properties.VirtualPropertiesHandle;
+import com.elco.eeds.agent.sdk.transfer.quartz.DataFileJob;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -39,254 +40,261 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RealTimeDataMessageFileUtils {
 
-	public static final Logger logger = LoggerFactory.getLogger(RealTimeDataMessageFileUtils.class);
+    public static final Logger logger = LoggerFactory.getLogger(RealTimeDataMessageFileUtils.class);
 
-	public static Map<String, File> fileMap = new ConcurrentHashMap<>(128);
-	public static Map<String, Map<File, File>> fileReadMap = new ConcurrentHashMap<>();
-	private static final int REAL = 1;
+    public static Map<String, File> fileMap = new ConcurrentHashMap<>(128);
+    public static Map<String, Map<File, File>> fileReadMap = new ConcurrentHashMap<>();
+    private static final int REAL = 1;
 
-	/**
-	 * 获取该数据源的写文件
-	 *
-	 * @param thingsId 数据源ID
-	 * @return 文件对象
-	 */
-	private static File getCurrentWriteFile(String thingsId, Long collectTime) {
-		File file = fileMap.get(thingsId);
-		if (!ObjectUtil.isEmpty(file)) {
-			//文件名
-			String fileName = file.getName().replace(ConstantFilePath.FILE_FORMAT_JSON, "");
-			boolean sameDay = DateUtil.isSameDay(DateUtil.date(Long.valueOf(fileName)), DateUtil.date(collectTime));
-			if (sameDay && file.exists()) {
-				//采集时间和文件归属于同一天,返回已有file对象
-				return file;
-			} else {
-				//采集时间和文件不归属于同一天
-				String filePath = getNewFilePath(thingsId);
-				File newFile = new File(filePath);
-				fileMap.put(thingsId, newFile);
-				return newFile;
-			}
-		}
-		String filePath = getNewFilePath(thingsId);
-		File newFile = new File(filePath);
-		fileMap.put(thingsId, newFile);
-		return newFile;
-	}
+    /**
+     * 获取该数据源的写文件
+     *
+     * @param thingsId 数据源ID
+     * @return 文件对象
+     */
+    private static File getCurrentWriteFile(String thingsId, Long collectTime) {
+        File file = fileMap.get(thingsId);
+        if (!ObjectUtil.isEmpty(file)) {
+            //文件名
+            String fileName = file.getName().replace(ConstantFilePath.FILE_FORMAT_JSON, "");
+            boolean sameDay = DateUtil.isSameDay(DateUtil.date(Long.valueOf(fileName)), DateUtil.date(collectTime));
+            if (file.exists() && sameDay) {
+                //采集时间和文件归属于同一天,返回已有file对象
+                return file;
+            }
+//            else {
+//                //文件不存在，或者 不属于同一天
+//                DataFileJob.saveFileToMap(file);
+//                String filePath = getNewFilePath(thingsId);
+//                File newFile = new File(filePath);
+//                fileMap.put(thingsId, newFile);
+//                return newFile;
+//            }
+        }
+        //该数据源不存在缓存;存在缓存但文件不存在;缓存存在文件存在,但和上一个文件不归属一天
+        String filePath = getNewFilePath(thingsId);
+        File newFile = new File(filePath);
+        fileMap.put(thingsId, newFile);
+        DataFileJob.saveFileToMap(newFile);
+        return newFile;
+    }
 
-	private static String getNewFilePath(String thingsId) {
-		long timeMillis = System.currentTimeMillis();
-		String dateStr = DateUtil.date().toDateStr();
-		AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
-		String baseFolder = agentBaseInfo.getBaseFolder();
-		String fileFolder = baseFolder + ConstantFilePath.PROPERTIES_DATA_FOLDER + File.separator + thingsId + File.separator + dateStr;
-		File file = new File(fileFolder);
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-		String fileFullPath = fileFolder + File.separator + timeMillis + ConstantFilePath.FILE_FORMAT_JSON;
-		return fileFullPath;
-	}
+    private static String getNewFilePath(String thingsId) {
+        long timeMillis = System.currentTimeMillis();
+        String dateStr = DateUtil.date().toDateStr();
+        AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
+        String baseFolder = agentBaseInfo.getBaseFolder();
+        String fileFolder = baseFolder + ConstantFilePath.PROPERTIES_DATA_FOLDER + File.separator + thingsId + File.separator + dateStr;
+        File file = new File(fileFolder);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        String fileFullPath = fileFolder + File.separator + timeMillis + ConstantFilePath.FILE_FORMAT_JSON;
+        return fileFullPath;
+    }
 
-	public static List<PropertiesValue> getFileData(String thingsId, Long startTime, Long endTime, List<PropertiesContext> propertiesContextList) {
-		List<PropertiesValue> result = new ArrayList<>();
-		try {
-			Map<File, File> fileMap = fileReadMap.get(thingsId);
-			if (ObjectUtil.isEmpty(fileMap)) {
-				return result;
-			}
-			ThingsDriverContext driverContext = ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.get(thingsId);
-			for (File key : fileMap.keySet()) {
-				Long fileStartTime = Long.valueOf(key.getName().replace(ConstantFilePath.FILE_FORMAT_JSON, "")) - 1000L;
-				Long fileEndTime = key.lastModified() + 1000L;
-				if (startTime < fileEndTime && endTime > fileStartTime) {
-					//必定有重合
-					List<String> dataList = FileUtils.readLines(key, StandardCharsets.UTF_8);
-					for (String data : dataList) {
-						//调用解析方法
-						OriginalPropertiesValueMessage originalMessage = JSON.parseObject(data, OriginalPropertiesValueMessage.class);
-						Long collectTime = originalMessage.getCollectTime();
-						if (startTime <= collectTime && collectTime < endTime) {
-							String message = originalMessage.getMessage();
-							ThingsConnectionHandler handler = ConnectManager.getHandler(thingsId);
-							if (ObjectUtil.isEmpty(handler)) {
-								throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
-							}
-							List<PropertiesValue> propertiesValueList = handler.getParsing().parsing(driverContext, propertiesContextList, message);
-							propertiesValueList.forEach(pv -> {
-								pv.setTimestamp(collectTime);
-								pv.setIsVirtual(REAL);
-							});
-							VirtualPropertiesHandle.creatVirtualProperties(propertiesContextList, propertiesValueList, collectTime);
-							result.addAll(propertiesValueList);
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		logger.info("数据同步：同步数据源id:{},开始时间:{},结束时间：{},获取同步原始报文大小:{}", thingsId, startTime, endTime, result.size());
-		return result;
-	}
-
-
-	public static volatile boolean lock = false;
-
-	/**
-	 * 需求说明
-	 * 按照Server端设定文件大小，分割每个文件
-	 * 以时间戳为文件名（开始时间），文件的修改时间（截至时间）
-	 *
-	 * @param thingsId 数据源ID 文件目录
-	 * @param data     数据
-	 */
-	public static void writeAppend(String thingsId, String data, Long collectTime) {
-		//写文件
-		try {
-			File file = getCurrentWriteFile(thingsId, collectTime);
-			//文件大小
-			Long fileLength = FileUtil.getFileLength(file);
-
-			AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
-			String dataCacheFileSize = agentBaseInfo.getDataCacheFileSize();
-			Long fileSize = FileUtil.getFileSize(dataCacheFileSize);
-			if (fileLength > fileSize) {
-				// 多并发下 再校验一下文件是不是被替换了
-				File oldFile = getCurrentWriteFile(thingsId, collectTime);
-				if (oldFile.getName().equals(file.getName())) {
-					//需创建新文件
-					String filePath = getNewFilePath(thingsId);
-					file = new File(filePath);
-					fileMap.put(thingsId, file);
-				}
-			}
-			StringBuffer dataBuffer = new StringBuffer(data);
-			dataBuffer.append("\r\n");
-			NIOFileUtils fileUtils = new NIOFileUtils(file.getAbsolutePath());
-			fileUtils.writeLines(dataBuffer.toString(), dataBuffer.toString().getBytes().length, "UTF-8");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * 根据时间删除文件和缓存
-	 *
-	 * @param agentBaseFileCycle
-	 */
-	public static void removeFile(String agentBaseFileCycle) {
-		int offset = Integer.valueOf("-" + agentBaseFileCycle);
-		DateTime newDate2 = DateUtil.offsetDay(new Date(), offset);
-		long nowTime = newDate2.getTime();
-		AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
-		String baseFolder = agentBaseInfo.getBaseFolder();
-		String fileFolder = baseFolder + ConstantFilePath.PROPERTIES_DATA_FOLDER;
-		removeFile(new File(fileFolder), nowTime);
-	}
-
-	public static void removeFile(File dir, Long nowTime) {
-		// 判断是否存在目录
-		if (!dir.exists() || !dir.isDirectory()) {
-			return;
-		}
-		// 读取目录下的所有目录文件信息
-		String[] files = dir.list();
-		// 循环，添加文件名或回调自身
-		for (int i = 0; i < files.length; i++) {
-			File file = new File(dir, files[i]);
-			// 如果文件
-			if (file.isFile()) {
-				//文件名 时间戳
-				long fileEndTime = file.lastModified();
-				if (nowTime >= fileEndTime) {
-					FileUtils.deleteQuietly(file);
-				}
-			} else {
-				// 如果是目录，回调自身继续查询
-				removeFile(file, nowTime);
-			}
-		}
-	}
-
-	/**
-	 * 以天为周期删除文件
-	 *
-	 * @param agentBaseFileCycle
-	 */
-	public static void removeDayFile(Integer agentBaseFileCycle) {
-		try {
-			int offset = Integer.valueOf("-" + agentBaseFileCycle);
-			DateTime newDate2 = DateUtil.offsetDay(new Date(), offset);
-			long nowTime = newDate2.getTime();
-			DateTime dateEnd = DateUtil.offset(DateUtil.date(), DateField.DAY_OF_MONTH, -agentBaseFileCycle);
-			AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
-			String baseFolder = agentBaseInfo.getBaseFolder();
-			String fileFolder = baseFolder + ConstantFilePath.PROPERTIES_DATA_FOLDER;
-			removeFile(new File(fileFolder), dateEnd,nowTime);
-		} catch (Exception e) {
-			logger.error("删除数据文件失败，异常信息:{}", e.getMessage());
-		}
-	}
+    public static List<PropertiesValue> getFileData(String thingsId, Long startTime, Long endTime, List<PropertiesContext> propertiesContextList) {
+        List<PropertiesValue> result = new ArrayList<>();
+        try {
+            Map<File, File> fileMap = fileReadMap.get(thingsId);
+            if (ObjectUtil.isEmpty(fileMap)) {
+                return result;
+            }
+            ThingsDriverContext driverContext = ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.get(thingsId);
+            for (File key : fileMap.keySet()) {
+                Long fileStartTime = Long.valueOf(key.getName().replace(ConstantFilePath.FILE_FORMAT_JSON, "")) - 1000L;
+                Long fileEndTime = key.lastModified() + 1000L;
+                if (startTime < fileEndTime && endTime > fileStartTime) {
+                    //必定有重合
+                    List<String> dataList = FileUtils.readLines(key, StandardCharsets.UTF_8);
+                    for (String data : dataList) {
+                        //调用解析方法
+                        OriginalPropertiesValueMessage originalMessage = JSON.parseObject(data, OriginalPropertiesValueMessage.class);
+                        Long collectTime = originalMessage.getCollectTime();
+                        if (startTime <= collectTime && collectTime < endTime) {
+                            String message = originalMessage.getMessage();
+                            ThingsConnectionHandler handler = ConnectManager.getHandler(thingsId);
+                            if (ObjectUtil.isEmpty(handler)) {
+                                throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
+                            }
+                            List<PropertiesValue> propertiesValueList = handler.getParsing().parsing(driverContext, propertiesContextList, message);
+                            propertiesValueList.forEach(pv -> {
+                                pv.setTimestamp(collectTime);
+                                pv.setIsVirtual(REAL);
+                            });
+                            VirtualPropertiesHandle.creatVirtualProperties(propertiesContextList, propertiesValueList, collectTime);
+                            result.addAll(propertiesValueList);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        logger.info("数据同步：同步数据源id:{},开始时间:{},结束时间：{},获取同步原始报文大小:{}", thingsId, startTime, endTime, result.size());
+        return result;
+    }
 
 
-	public static void removeFile(File dir, DateTime dateEnd, Long nowTime) throws IOException {
-		// 判断是否存在目录
-		if (!dir.exists() || !dir.isDirectory()) {
-			return;
-		}
-		// 读取目录下的所有目录文件信息
-		String[] files = dir.list();
-		// 循环，添加文件名或回调自身
-		for (int i = 0; i < files.length; i++) {
-			File file = new File(dir, files[i]);
-			if (file.isDirectory()) {
-				// 如果是目录，
-				String name = file.getName();
-				if (name.contains("-")) {
-					DateTime dateTime = DateUtil.parse(name);
-					int compare = DateUtil.compare(dateTime, dateEnd);
-					if (compare < 1) {
-						File dataFiles = new File(dir, files[i]);
-						File[] listFiles = dataFiles.listFiles();
-						for (File dataFile : listFiles) {
-							//文件名 时间戳
-							long fileEndTime = dataFile.lastModified();
-							if (nowTime >= fileEndTime) {
-								logger.info("删除文件:{}", dataFile.getAbsolutePath());
-								FileUtils.deleteQuietly(dataFile);
-							}
-						}
-						if (dataFiles.listFiles().length <= 0) {
-							logger.info("文件目录为空，删除目录:{}", dataFiles.getAbsolutePath());
-							FileUtils.deleteDirectory(dataFiles);
-						}
-					}
-				}
-				// 如果是目录，回调自身继续查询
-				removeFile(file, dateEnd, nowTime);
-			}
-		}
-	}
-	
-	
-	/**
-	 * 以分钟为周期删除文件
-	 *
-	 * @param agentBaseFileCycle
-	 */
-	public static void removeMinuteFile(Integer agentBaseFileCycle) {
-		try {
-			int offset = Integer.valueOf("-" + agentBaseFileCycle);
-			DateTime newDate2 = DateUtil.offsetMinute(new Date(), offset);
-			long nowTime = newDate2.getTime();
-			DateTime dateEnd = DateUtil.offset(DateUtil.date(), DateField.MINUTE, -agentBaseFileCycle);
-			AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
-			String baseFolder = agentBaseInfo.getBaseFolder();
-			String fileFolder = baseFolder + ConstantFilePath.PROPERTIES_DATA_FOLDER;
-			removeFile(new File(fileFolder), dateEnd, nowTime);
-		} catch (Exception e) {
-			logger.error("删除数据文件失败，异常信息:{}", e.getMessage());
-		}
-	}
+    public static volatile boolean lock = false;
+
+    /**
+     * 需求说明
+     * 按照Server端设定文件大小，分割每个文件
+     * 以时间戳为文件名（开始时间），文件的修改时间（截至时间）
+     *
+     * @param thingsId 数据源ID 文件目录
+     * @param data     数据
+     */
+    public static void writeAppend(String thingsId, String data, Long collectTime) {
+        //写文件
+        try {
+            File file = getCurrentWriteFile(thingsId, collectTime);
+            //文件大小
+            Long fileLength = FileUtil.getFileLength(file);
+
+            AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
+            String dataCacheFileSize = agentBaseInfo.getDataCacheFileSize();
+            Long fileSize = FileUtil.getFileSize(dataCacheFileSize);
+            if (fileLength > fileSize) {
+                //分割文件，将该文件存入缓存
+                DataFileJob.saveFileToMap(file);
+                // 多并发下 再校验一下文件是不是被替换了
+                File oldFile = getCurrentWriteFile(thingsId, collectTime);
+                if (oldFile.getName().equals(file.getName())) {
+                    //需创建新文件
+                    String filePath = getNewFilePath(thingsId);
+                    file = new File(filePath);
+                    fileMap.put(thingsId, file);
+                    DataFileJob.saveFileToMap(file);
+                }
+            }
+            StringBuffer dataBuffer = new StringBuffer(data);
+            dataBuffer.append("\r\n");
+            NIOFileUtils fileUtils = new NIOFileUtils(file.getAbsolutePath());
+            fileUtils.writeLines(dataBuffer.toString(), dataBuffer.toString().getBytes().length, "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 根据时间删除文件和缓存
+     *
+     * @param agentBaseFileCycle
+     */
+    public static void removeFile(String agentBaseFileCycle) {
+        int offset = Integer.valueOf("-" + agentBaseFileCycle);
+        DateTime newDate2 = DateUtil.offsetDay(new Date(), offset);
+        long nowTime = newDate2.getTime();
+        AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
+        String baseFolder = agentBaseInfo.getBaseFolder();
+        String fileFolder = baseFolder + ConstantFilePath.PROPERTIES_DATA_FOLDER;
+        removeFile(new File(fileFolder), nowTime);
+    }
+
+    public static void removeFile(File dir, Long nowTime) {
+        // 判断是否存在目录
+        if (!dir.exists() || !dir.isDirectory()) {
+            return;
+        }
+        // 读取目录下的所有目录文件信息
+        String[] files = dir.list();
+        // 循环，添加文件名或回调自身
+        for (int i = 0; i < files.length; i++) {
+            File file = new File(dir, files[i]);
+            // 如果文件
+            if (file.isFile()) {
+                //文件名 时间戳
+                long fileEndTime = file.lastModified();
+                if (nowTime >= fileEndTime) {
+                    FileUtils.deleteQuietly(file);
+                }
+            } else {
+                // 如果是目录，回调自身继续查询
+                removeFile(file, nowTime);
+            }
+        }
+    }
+
+    /**
+     * 以天为周期删除文件
+     *
+     * @param agentBaseFileCycle
+     */
+    public static void removeDayFile(Integer agentBaseFileCycle) {
+        try {
+            int offset = Integer.valueOf("-" + agentBaseFileCycle);
+            DateTime newDate2 = DateUtil.offsetDay(new Date(), offset);
+            long nowTime = newDate2.getTime();
+            DateTime dateEnd = DateUtil.offset(DateUtil.date(), DateField.DAY_OF_MONTH, -agentBaseFileCycle);
+            AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
+            String baseFolder = agentBaseInfo.getBaseFolder();
+            String fileFolder = baseFolder + ConstantFilePath.PROPERTIES_DATA_FOLDER;
+            removeFile(new File(fileFolder), dateEnd, nowTime);
+        } catch (Exception e) {
+            logger.error("删除数据文件失败，异常信息:{}", e.getMessage());
+        }
+    }
+
+
+    public static void removeFile(File dir, DateTime dateEnd, Long nowTime) throws IOException {
+        // 判断是否存在目录
+        if (!dir.exists() || !dir.isDirectory()) {
+            return;
+        }
+        // 读取目录下的所有目录文件信息
+        String[] files = dir.list();
+        // 循环，添加文件名或回调自身
+        for (int i = 0; i < files.length; i++) {
+            File file = new File(dir, files[i]);
+            if (file.isDirectory()) {
+                // 如果是目录，
+                String name = file.getName();
+                if (name.contains("-")) {
+                    DateTime dateTime = DateUtil.parse(name);
+                    int compare = DateUtil.compare(dateTime, dateEnd);
+                    if (compare < 1) {
+                        File dataFiles = new File(dir, files[i]);
+                        File[] listFiles = dataFiles.listFiles();
+                        for (File dataFile : listFiles) {
+                            //文件名 时间戳
+                            long fileEndTime = dataFile.lastModified();
+                            if (nowTime >= fileEndTime) {
+                                logger.info("删除文件:{}", dataFile.getAbsolutePath());
+                                FileUtils.deleteQuietly(dataFile);
+                            }
+                        }
+                        if (dataFiles.listFiles().length <= 0) {
+                            logger.info("文件目录为空，删除目录:{}", dataFiles.getAbsolutePath());
+                            FileUtils.deleteDirectory(dataFiles);
+                        }
+                    }
+                }
+                // 如果是目录，回调自身继续查询
+                removeFile(file, dateEnd, nowTime);
+            }
+        }
+    }
+
+
+    /**
+     * 以分钟为周期删除文件
+     *
+     * @param agentBaseFileCycle
+     */
+    public static void removeMinuteFile(Integer agentBaseFileCycle) {
+        try {
+            int offset = Integer.valueOf("-" + agentBaseFileCycle);
+            DateTime newDate2 = DateUtil.offsetMinute(new Date(), offset);
+            long nowTime = newDate2.getTime();
+            DateTime dateEnd = DateUtil.offset(DateUtil.date(), DateField.MINUTE, -agentBaseFileCycle);
+            AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
+            String baseFolder = agentBaseInfo.getBaseFolder();
+            String fileFolder = baseFolder + ConstantFilePath.PROPERTIES_DATA_FOLDER;
+            removeFile(new File(fileFolder), dateEnd, nowTime);
+        } catch (Exception e) {
+            logger.error("删除数据文件失败，异常信息:{}", e.getMessage());
+        }
+    }
 }
