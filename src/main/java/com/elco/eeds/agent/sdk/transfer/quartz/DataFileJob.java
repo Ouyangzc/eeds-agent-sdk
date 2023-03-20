@@ -40,7 +40,7 @@ public class DataFileJob implements Job {
 //        RealTimeDataMessageFileUtils.removeDayFile(Integer.valueOf(agentBaseFileCycle));
 //		RealTimeDataMessageFileUtils.removeMinuteFile(Integer.valueOf(agentBaseFileCycle));
 //        delExpireMinuteFile(agentBaseFileCycle);
-        delExpireDayFile(agentBaseFileCycle);
+        delExpireHourFile(agentBaseFileCycle);
 
     }
 
@@ -50,8 +50,20 @@ public class DataFileJob implements Job {
      * @param agentBaseFileCycle
      */
     public static void delExpireDayFile(Integer agentBaseFileCycle) {
+        delExpireFile(agentBaseFileCycle, DateField.DAY_OF_MONTH);
+    }
+
+    public static void delExpireHourFile(Integer agentBaseFileCycle) {
+        delExpireFile(agentBaseFileCycle, DateField.HOUR);
+    }
+
+    public static void delExpireMinuteFile(Integer agentBaseFileCycle) {
+        delExpireFile(agentBaseFileCycle, DateField.MINUTE);
+    }
+
+    public static void delExpireFile(Integer agentBaseFileCycle, DateField dateField) {
         try {
-            DateTime dateEnd = DateUtil.offset(DateUtil.date(), DateField.DAY_OF_MONTH, -agentBaseFileCycle);
+            DateTime dateEnd = DateUtil.offset(DateUtil.date(), dateField, -agentBaseFileCycle);
             long nowTimestamp = dateEnd.getTime();
             ExpireFileKey expireFileKey = new ExpireFileKey(nowTimestamp);
             Iterator<Map.Entry<ExpireFileKey, List<File>>> entryIterator = expireFileMap.entrySet().iterator();
@@ -79,43 +91,6 @@ public class DataFileJob implements Job {
                         entryIterator.remove();
                     }
                 }
-            }
-        } catch (IOException e) {
-            logger.error("删除文件发生异常，异常信息：{}", e);
-        }
-    }
-
-    public static void delExpireMinuteFile(Integer agentBaseFileCycle) {
-        try {
-            DateTime dateEnd = DateUtil.offset(DateUtil.date(), DateField.MINUTE, -agentBaseFileCycle);
-            long nowTimestamp = dateEnd.getTime();
-            ExpireFileKey expireFileKey = new ExpireFileKey(nowTimestamp);
-            Iterator<Map.Entry<ExpireFileKey, List<File>>> entryIterator = expireFileMap.entrySet().iterator();
-            while (entryIterator.hasNext()) {
-                Map.Entry<ExpireFileKey, List<File>> fileKeyListEntry = entryIterator.next();
-                ExpireFileKey key = fileKeyListEntry.getKey();
-//                if (key.compare(expireFileKey)) {
-                List<File> fileList = fileKeyListEntry.getValue();
-                if (ObjectUtil.isNotEmpty(fileList)) {
-                    for (File file : fileList) {
-                        if (nowTimestamp >= file.lastModified()) {
-                            logger.info("删除文件:{}", file.getAbsolutePath());
-                            FileUtils.deleteQuietly(file);
-                            //空文件夹删除
-                            if (file.getParentFile().listFiles().length == 0) {
-                                logger.info("文件目录为空，删除目录:{}", file.getParentFile());
-                                FileUtils.deleteDirectory(file.getParentFile());
-                            }
-                        }
-                    }
-                    //删除缓存
-                    fileList.removeIf(file -> nowTimestamp >= file.lastModified());
-
-                }
-                if (fileList.size() <= 0) {
-                    entryIterator.remove();
-                }
-//                }
             }
         } catch (IOException e) {
             logger.error("删除文件发生异常，异常信息：{}", e);
