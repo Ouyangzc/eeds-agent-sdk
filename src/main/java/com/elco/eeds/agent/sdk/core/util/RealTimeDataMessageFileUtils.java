@@ -61,15 +61,14 @@ public class RealTimeDataMessageFileUtils {
             if (file.exists() && sameDay) {
                 //采集时间和文件归属于同一天,返回已有file对象
                 return file;
+            } else {
+                //文件不存在，或者 不属于同一天
+                String filePath = getNewFilePath(thingsId);
+                File newFile = new File(filePath);
+                fileMap.put(thingsId, newFile);
+                DataFileJob.saveFileToMap(newFile);
+                return newFile;
             }
-//            else {
-//                //文件不存在，或者 不属于同一天
-//                DataFileJob.saveFileToMap(file);
-//                String filePath = getNewFilePath(thingsId);
-//                File newFile = new File(filePath);
-//                fileMap.put(thingsId, newFile);
-//                return newFile;
-//            }
         }
         //该数据源不存在缓存;存在缓存但文件不存在;缓存存在文件存在,但和上一个文件不归属一天
         String filePath = getNewFilePath(thingsId);
