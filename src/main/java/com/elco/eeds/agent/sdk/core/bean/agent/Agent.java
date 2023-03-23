@@ -1,9 +1,11 @@
 package com.elco.eeds.agent.sdk.core.bean.agent;
 
 import com.elco.eeds.agent.sdk.core.common.enums.AgentStatus;
-import java.io.Serializable;
+import com.elco.eeds.agent.sdk.core.parsing.DataParsing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
 
 /**
  * @title: Agent
@@ -23,6 +25,16 @@ public class Agent implements Serializable {
   private AgentMqInfo agentMqInfo;
 
   private AgentStatus agentStatus;
+
+  public DataParsing getDataParsing() {
+    return dataParsing;
+  }
+
+  public void setDataParsing(DataParsing dataParsing) {
+    this.dataParsing = dataParsing;
+  }
+
+  private DataParsing dataParsing;
 
   public static Agent getInstance() {
     if (agent == null) {

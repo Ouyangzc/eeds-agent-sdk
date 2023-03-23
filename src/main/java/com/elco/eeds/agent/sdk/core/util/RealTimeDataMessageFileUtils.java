@@ -14,6 +14,7 @@ import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
+import com.elco.eeds.agent.sdk.core.parsing.DataParsing;
 import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import com.elco.eeds.agent.sdk.transfer.handler.properties.VirtualPropertiesHandle;
@@ -109,10 +110,16 @@ public class RealTimeDataMessageFileUtils {
 						if (startTime <= collectTime && collectTime < endTime) {
 							String message = originalMessage.getMessage();
 							ThingsConnectionHandler handler = ConnectManager.getHandler(thingsId);
+							DataParsing dataParsing;
 							if (ObjectUtil.isEmpty(handler)) {
-								throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
+								dataParsing = Agent.getInstance().getDataParsing();
+								if(ObjectUtil.isEmpty(dataParsing)){
+									throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
+								}
+							}else{
+								dataParsing = handler.getParsing();
 							}
-							List<PropertiesValue> propertiesValueList = handler.getParsing().parsing(driverContext, propertiesContextList, message);
+							List<PropertiesValue> propertiesValueList = dataParsing.parsing(driverContext, propertiesContextList, message);
 							propertiesValueList.forEach(pv -> {
 								pv.setTimestamp(collectTime);
 								pv.setIsVirtual(REAL);
