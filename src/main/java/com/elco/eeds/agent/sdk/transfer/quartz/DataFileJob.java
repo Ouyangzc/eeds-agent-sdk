@@ -77,15 +77,20 @@ public class DataFileJob implements Job {
                         FileInfo fileInfo = fileInfoIterator.next();
                         Long fileCreatTimeStamp = fileInfo.getFileName();
                         if (nowTimestamp >= fileCreatTimeStamp) {
-                            FileUtils.deleteQuietly(new File(fileInfo.getFilePath()));
-                            logger.info("删除文件:{},当前时间KEY:{},文件Key:{},时间戳：{},文件生成时间戳:{}", fileInfo.getFilePath(), expireFileKey.getKey(), key.getKey(), nowTimestamp, fileInfo.getFileName());
-                            //空文件夹删除
-                            if (new File(fileInfo.getParentFilePath()).listFiles().length == 0) {
-                                logger.info("文件目录为空，删除目录:{}", fileInfo.getParentFilePath());
-                                FileUtils.deleteDirectory(new File(fileInfo.getParentFilePath()));
+                            File file = new File(fileInfo.getFilePath());
+                            if (!file.exists()) {
+                                //删除缓存
+                                fileInfoIterator.remove();
+                            } else {
+                                FileUtils.deleteQuietly(file);
+                                logger.info("删除文件:{},当前时间KEY:{},文件Key:{},时间戳：{},文件生成时间戳:{}", fileInfo.getFilePath(), expireFileKey.getKey(), key.getKey(), nowTimestamp, fileInfo.getFileName());
+                                //空文件夹删除
+                                if (new File(fileInfo.getParentFilePath()).listFiles().length == 0) {
+                                    logger.info("文件目录为空，删除目录:{}", fileInfo.getParentFilePath());
+                                    FileUtils.deleteDirectory(new File(fileInfo.getParentFilePath()));
+                                }
+                                fileInfoIterator.remove();
                             }
-                            //删除缓存
-                            fileInfoIterator.remove();
                         }
                     }
                     if (fileList.size() <= 0) {
