@@ -1,11 +1,14 @@
 package com.elco.eeds.agent.sdk.core.start;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
 import com.elco.eeds.agent.sdk.core.common.enums.AgentStatus;
 import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
+import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
+import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.init.InitConnectFactory;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.AgentConfigYamlReader;
@@ -16,9 +19,10 @@ import com.elco.eeds.agent.sdk.transfer.service.data.count.DataCountServiceImpl;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsServiceImpl;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
-import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 /**
  * @title: AgentStarter
@@ -44,11 +48,15 @@ public class AgentStarter {
   private AgentConfigYamlReader configReader;
 
   private static void init(AgentStartProperties agentStartProperties) throws Exception {
-    //示例化Agent对象
+    // 实例化Agent对象
     Agent agent = Agent.getInstance();
     try {
-      // 将协议注入
+      // 存储解析对象实例
+      ThingsConnection connection = ReflectUtil.newInstance(agentStartProperties.getProtocolPackage());
+      ThingsConnectionHandler handler = (ThingsConnectionHandler) connection;
+      agent.setDataParsing(handler.getParsing());
 
+      // 将协议注入
       InitConnectFactory.addConnectPackagePath(agentStartProperties.getProtocolPackage());
       InitConnectFactory.initConnect();
 
