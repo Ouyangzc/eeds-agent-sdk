@@ -65,10 +65,10 @@ public class AgentStarter {
       registerService.register(agentStartProperties.getServerUrl(), agentStartProperties.getName(),
           agentStartProperties.getPort(), agentStartProperties.getToken(),
           agentStartProperties.getAgentClientType());
-      // 定时任务
-      countScheduler.scheduleJobs();
       // 加载数据文件
       com.elco.eeds.agent.sdk.core.util.FileUtil.getLastDataFile();
+      // 定时任务
+      countScheduler.scheduleJobs();
       agent.setAgentStatus(AgentStatus.LOAD);
 
       // 加载统计
