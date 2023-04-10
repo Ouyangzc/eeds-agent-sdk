@@ -219,10 +219,10 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                     //新增
                     PROPERTIES_CONTEXT_MAP.put(addProperties.getPropertiesId(), addProperties);
                     EedsProperties eedsProperties = getEedsProperties(syncThingsList, addProperties);
+                    thingsService.addProperties(addProperties.getThingsId(), eedsProperties, syncThingsList);
                     PropertiesEvent propertiesEvent = new PropertiesEvent();
                     BeanUtil.copyProperties(addProperties, propertiesEvent);
                     ConnectManager.sendPropertiesEventNotify(addProperties.getThingsId(), propertiesEvent);
-                    thingsService.addProperties(addProperties.getThingsId(), eedsProperties, syncThingsList);
                 }
             }
         } catch (Exception e) {
