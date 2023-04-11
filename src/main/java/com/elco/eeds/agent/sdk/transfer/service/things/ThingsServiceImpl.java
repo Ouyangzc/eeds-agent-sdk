@@ -120,6 +120,14 @@ public class ThingsServiceImpl implements ThingsService {
                 }
                 if (currentThingsProperties.isEmpty()) {
                     thingsIterators.remove();
+                    //增量新增数据源
+                    ThingsDriverContext driverContext = new ThingsDriverContext();
+                    BeanUtil.copyProperties(currentThings, driverContext);
+                    if (!checkThingsExist(thingsId)) {
+                        //该数据源不存在，则删除数据源
+                        ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.remove(thingsId);
+                        ConnectManager.delConnection(thingsId);
+                    }
                 }
             }
         }
