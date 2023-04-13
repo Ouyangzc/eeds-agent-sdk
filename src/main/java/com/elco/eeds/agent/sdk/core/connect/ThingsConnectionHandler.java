@@ -222,7 +222,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
         thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
         if (handler.getConnectionStatus().equals(ConnectionStatus.DISCONNECT) || ObjectUtil
                 .isEmpty(connection)) {
-            ThingsDriverContext info = this.getContext();
+            ThingsDriverContext info = ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.get(getThingsId());;
             ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
                 Integer num = 1;
 
