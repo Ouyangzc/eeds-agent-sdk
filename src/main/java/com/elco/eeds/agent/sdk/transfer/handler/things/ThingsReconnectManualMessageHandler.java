@@ -41,9 +41,10 @@ public class ThingsReconnectManualMessageHandler implements IReceiverMessageHand
             .get(thingsId);
         ConnectManager
             .create(thingsDriverContext, AgentStartProperties.getInstance().getAgentClientType());
+      }else{
+        // 数据源重连
+        handler.reconnect();
       }
-      // 数据源重连
-      handler.reconnect();
     } catch (Exception e) {
       logger.error("数据源手动重连报文处理异常：", e);
       e.printStackTrace();
