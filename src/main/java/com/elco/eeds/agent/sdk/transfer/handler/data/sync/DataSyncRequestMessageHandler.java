@@ -48,6 +48,7 @@ public class DataSyncRequestMessageHandler implements IReceiverMessageHandler {
         this.postConfirMsg(agentId, queueId);
         dataSyncService.setQueueId(queueId);
         dataSyncService.setStatus(true);
+        dataSyncService.setSyncFlag(false);
         List<DataSyncServerRequest> dataThingsList = data.getDataThingsList();
         for (DataSyncServerRequest request : dataThingsList) {
             String thingsId = request.getThingsId();
