@@ -168,15 +168,16 @@ public class ConnectManager {
     }
 
     public static void sendPropertiesEventNotify(String thingsId, PropertiesEvent propertiesEvent) {
-        try {
-            ThingsConnectionHandler handler = getHandler(thingsId);
-            if (ObjectUtil.isNotEmpty(handler)) {
-                logger.info("发送变量变动通知,thingsId:{}", thingsId);
-                handler.getThingsConnection().propertiesEventNotify(propertiesEvent);
+        if (propertiesEvent.getIsVirtual() == 1) {
+            try {
+                ThingsConnectionHandler handler = getHandler(thingsId);
+                if (ObjectUtil.isNotEmpty(handler)) {
+                    logger.info("发送变量变动通知,thingsId:{}", thingsId);
+                    handler.getThingsConnection().propertiesEventNotify(propertiesEvent);
+                }
+            } catch (Exception e) {
+                logger.error("发送变量变动通知异常，异常信息:{}", e);
             }
-        } catch (Exception e) {
-            logger.error("发送变量变动通知异常，异常信息:{}", e);
         }
-
     }
 }
