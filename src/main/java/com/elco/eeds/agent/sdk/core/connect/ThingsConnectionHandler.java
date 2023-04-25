@@ -222,7 +222,6 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
         thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
         if (handler.getConnectionStatus().equals(ConnectionStatus.DISCONNECT) || ObjectUtil
                 .isEmpty(connection)) {
-            ThingsDriverContext info = ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.get(getThingsId());;
             ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
                 Integer num = 1;
 
@@ -235,6 +234,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
                                 scheduledTaskMap.get(thingsId).cancel(true);
                                 logger.debug("删除定时任务：{}", thingsId);
                             } else {
+                                ThingsDriverContext info = ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.get(getThingsId());
                                 //连接中
                                 thingsStatus.setValue(handler, ConnectionStatus.CONNECTING);
                                 Optional<PropertiesContext> optional = ThingsSyncServiceImpl.PROPERTIES_CONTEXT_MAP.values().stream().filter(p -> p.getThingsId().equals(context.getThingsId())).findAny();
