@@ -35,7 +35,7 @@ public class FileUtil {
         // 读取目录下的所有目录文件信息
         String[] files = dir.list();
         //缓存file时间
-        Map<File, File> map = new HashMap<>();
+        Map<File, File> map  = null;
         // 循环，添加文件名或回调自身
         for (int i = 0; i < files.length; i++) {
             File file = new File(dir, files[i]);
@@ -54,6 +54,11 @@ public class FileUtil {
                     }
                 }
                 DataFileJob.saveFileToMap(file);
+                if (ObjectUtil.isNotEmpty(RealTimeDataMessageFileUtils.fileReadMap.get(thingsId))) {
+                    map = RealTimeDataMessageFileUtils.fileReadMap.get(thingsId);
+                } else {
+                    map = new HashMap<>();
+                }
                 map.put(file, file);
                 fileNames.add(dir + File.separator + file.getName());
                 RealTimeDataMessageFileUtils.fileReadMap.put(thingsId, map);
