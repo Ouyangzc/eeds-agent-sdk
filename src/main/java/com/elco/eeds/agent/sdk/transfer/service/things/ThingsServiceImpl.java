@@ -1,12 +1,17 @@
 package com.elco.eeds.agent.sdk.transfer.service.things;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantThings;
+import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
+import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
+import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 import com.elco.eeds.agent.sdk.core.util.ThingsFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsThings;
+import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +89,15 @@ public class ThingsServiceImpl implements ThingsService {
             List<EedsProperties> eedsPropertiesList = things.getProperties().stream().filter(p -> p.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_ADD)).collect(Collectors.toList());
             things.setProperties(eedsPropertiesList);
             this.addThings(things);
+            ThingsConnection connection = ConnectManager.getConnection(AgentStartProperties.getInstance().getAgentClientType());
+            if (connection.checkThingsConnectParams(things)) {
+                //增量新增数据源
+                ThingsDriverContext driverContext = new ThingsDriverContext();
+                BeanUtil.copyProperties(things, driverContext);
+                ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
+                ConnectManager.delConnection(thingsId);
+                ConnectManager.create(driverContext, AgentStartProperties.getInstance().getAgentClientType());
+            }
         } else {
             //新增点位
             saveThingsFile(JSONUtil.toJsonStr(currentThingsList));
@@ -106,6 +120,14 @@ public class ThingsServiceImpl implements ThingsService {
                 }
                 if (currentThingsProperties.isEmpty()) {
                     thingsIterators.remove();
+                    //增量新增数据源
+                    ThingsDriverContext driverContext = new ThingsDriverContext();
+                    BeanUtil.copyProperties(currentThings, driverContext);
+                    if (!checkThingsExist(thingsId)) {
+                        //该数据源不存在，则删除数据源
+                        ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.remove(thingsId);
+                        ConnectManager.delConnection(thingsId);
+                    }
                 }
             }
         }

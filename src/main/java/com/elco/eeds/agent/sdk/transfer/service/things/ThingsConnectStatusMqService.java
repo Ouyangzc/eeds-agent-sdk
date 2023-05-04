@@ -15,29 +15,36 @@ import org.slf4j.LoggerFactory;
  * @description：
  */
 public class ThingsConnectStatusMqService {
-    public static final Logger logger = LoggerFactory.getLogger(ThingsConnectStatusMqService.class);
 
-    private static final String CONNECT = "2";
-    private static final String DIS_CONNECT = "3";
+  public static final Logger logger = LoggerFactory.getLogger(ThingsConnectStatusMqService.class);
 
-    private static void send(String thingsId, String status,String msg) {
-        ThreadUtil.execute(new Runnable() {
-            @Override
-            public void run() {
-                String json = ThingsConnectStatusMessage.create(thingsId, status, msg).toJson();
-                MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
-                mqPlugin.publish(ConstantTopic.TOPIC_THINGS_CONNECTSTATUS_REQUEST + thingsId
-                        , json, null);
-                logger.info("发送数据源连接状态报文：{}",json);
-            }
-        });
-    }
+  private static final String CONNECT = "2";
+  private static final String DIS_CONNECT = "3";
 
-    public static void sendConnectMsg(String thingsId) {
-        send(thingsId, CONNECT,"数据源已连接");
-    }
+  private static final String CONNECTING = "5";
 
-    public static void sendDisConnectMsg(String thingsId) {
-        send(thingsId, DIS_CONNECT,"数据源已断开");
-    }
+  private static void send(String thingsId, String status, String msg) {
+    ThreadUtil.execute(new Runnable() {
+      @Override
+      public void run() {
+        String json = ThingsConnectStatusMessage.create(thingsId, status, msg).toJson();
+        MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
+        mqPlugin.publish(ConstantTopic.TOPIC_THINGS_CONNECTSTATUS_REQUEST + thingsId
+            , json, null);
+        logger.info("发送数据源连接状态报文：{}", json);
+      }
+    });
+  }
+
+  public static void sendConnectMsg(String thingsId) {
+    send(thingsId, CONNECT, "数据源已连接");
+  }
+
+  public static void sendDisConnectMsg(String thingsId) {
+    send(thingsId, DIS_CONNECT, "数据源已断开");
+  }
+
+  public static void sendConnectingMsg(String thingsId) {
+    send(thingsId, CONNECTING, "数据源连接中");
+  }
 }

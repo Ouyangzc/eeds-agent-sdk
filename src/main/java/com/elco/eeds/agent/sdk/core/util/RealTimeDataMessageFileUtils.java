@@ -14,6 +14,7 @@ import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
+import com.elco.eeds.agent.sdk.core.parsing.DataParsing;
 import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import com.elco.eeds.agent.sdk.transfer.handler.properties.VirtualPropertiesHandle;
@@ -93,6 +94,7 @@ public class RealTimeDataMessageFileUtils {
 		try {
 			Map<File, File> fileMap = fileReadMap.get(thingsId);
 			if (ObjectUtil.isEmpty(fileMap)) {
+				logger.info("数据同步：未获取到数据源文件:{}", thingsId);
 				return result;
 			}
 			ThingsDriverContext driverContext = ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.get(thingsId);
@@ -109,10 +111,18 @@ public class RealTimeDataMessageFileUtils {
 						if (startTime <= collectTime && collectTime < endTime) {
 							String message = originalMessage.getMessage();
 							ThingsConnectionHandler handler = ConnectManager.getHandler(thingsId);
+							DataParsing dataParsing;
 							if (ObjectUtil.isEmpty(handler)) {
-								throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
+								dataParsing = Agent.getInstance().getDataParsing();
+								logger.info("数据同步：数据源已断开:{},获取默认解析实例:{}", thingsId, dataParsing.toString());
+								if(ObjectUtil.isEmpty(dataParsing)){
+									throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
+								}
+							}else{
+								dataParsing = handler.getParsing();
 							}
-							List<PropertiesValue> propertiesValueList = handler.getParsing().parsing(driverContext, propertiesContextList, message);
+							List<PropertiesValue> propertiesValueList = dataParsing.parsing(driverContext, propertiesContextList, message);
+							logger.info("数据同步：原始数据文件,file:{},数据源:{},获取数据大小，size:{}，", key, thingsId, propertiesValueList.size());
 							propertiesValueList.forEach(pv -> {
 								pv.setTimestamp(collectTime);
 								pv.setIsVirtual(REAL);
@@ -124,7 +134,7 @@ public class RealTimeDataMessageFileUtils {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("数据同步：获取原始报文解析错误,error:{}", e);
 		}
 		logger.info("数据同步：同步数据源id:{},开始时间:{},结束时间：{},获取同步原始报文大小:{}", thingsId, startTime, endTime, result.size());
 		return result;
@@ -268,8 +278,8 @@ public class RealTimeDataMessageFileUtils {
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * 以分钟为周期删除文件
 	 *

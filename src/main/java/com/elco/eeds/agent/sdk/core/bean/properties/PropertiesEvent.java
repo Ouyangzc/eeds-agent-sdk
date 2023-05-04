@@ -21,6 +21,10 @@ public class PropertiesEvent {
 	 */
 	private String propertiesId;
 	/**
+	 * 1.实际变量  2.虚拟变量
+	 */
+	private int isVirtual;
+	/**
 	 * 变量地址
 	 */
 	private String address;
@@ -72,5 +76,13 @@ public class PropertiesEvent {
 	
 	public void setAttributes(Map<String, Map<String, String>> attributes) {
 		this.attributes = attributes;
+	}
+
+	public int getIsVirtual() {
+		return isVirtual;
+	}
+
+	public void setIsVirtual(int isVirtual) {
+		this.isVirtual = isVirtual;
 	}
 }

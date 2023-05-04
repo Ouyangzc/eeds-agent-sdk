@@ -9,7 +9,6 @@ import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
 import com.elco.eeds.agent.sdk.core.parsing.DataParsing;
 import com.elco.eeds.agent.sdk.transfer.beans.message.order.OrderPropertiesValue;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
-import com.elco.eeds.agent.sdk.transfer.handler.properties.VirtualPropertiesHandle;
 import com.elco.eeds.agent.sdk.transfer.service.data.RealTimePropertiesValueService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsConnectStatusMqService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
@@ -20,6 +19,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.*;
 
 /**
@@ -71,7 +71,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
      * 数据解析实现类
      */
     private M parsing;
-    
+
     public static int num = 0;
 
 
@@ -100,6 +100,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
 
     /**
      * 被动获取数据方法，抽象方法，需用户实现，SDK定时调用该方法
+     *
      * @param properties 变量点位集合
      */
     public abstract String read(List<PropertiesContext> properties);
@@ -107,6 +108,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
 
     /**
      * 下发指令
+     *
      * @param propertiesValueList
      * @param msgSeqNo
      */
@@ -114,27 +116,30 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
 
 
     /**
-     * 执行模板方法
-     * 主动，被动获取原始报文后都需调用该方法，传入原始报文，由SDK调用解析方法，解析出点位数据
-     * @param thingsId 数据源ID
-     * @param msg 原始报文
+     * 执行模板方法 主动，被动获取原始报文后都需调用该方法，传入原始报文，由SDK调用解析方法，解析出点位数据
+     *
+     * @param thingsId    数据源ID
+     * @param msg         原始报文
      * @param collectTime 采集时间戳
      */
     public void execute(String thingsId, String msg, Long collectTime) {
         long startTime = System.currentTimeMillis();
-        List<PropertiesContext> propertiesContextList = ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId);
-        if(CollectionUtil.isNotEmpty(propertiesContextList)){
+        List<PropertiesContext> propertiesContextList = ThingsSyncServiceImpl
+                .getThingsPropertiesContextList(thingsId);
+        if (CollectionUtil.isNotEmpty(propertiesContextList)) {
             List<PropertiesValue> valueList = this.getParsing()
-                    .parsing(this.context, ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId), msg);
+                    .parsing(this.context, ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId),
+                            msg);
             valueList.stream().forEach(pv -> {
                 pv.setTimestamp(collectTime);
                 pv.setIsVirtual(REAL);
             });
-            RealTimePropertiesValueService.recRealTimePropertiesValue(msg, thingsId, collectTime, valueList, propertiesContextList);
-            long time = System.currentTimeMillis()-startTime;
+            RealTimePropertiesValueService
+                    .recRealTimePropertiesValue(msg, thingsId, collectTime, valueList, propertiesContextList);
+            long time = System.currentTimeMillis() - startTime;
             num++;
-            logger.info("数据处理耗时，time:{},推送数据量:{}",time,num);
-    
+            logger.info("数据处理耗时，time:{},推送数据量:{}", time, num);
+
         }
     }
 
@@ -149,10 +154,6 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
 
     public ConnectionStatus getConnectionStatus() {
         return connectionStatus;
-    }
-
-    public void setConnectionStatus(ConnectionStatus connectionStatus) {
-        this.connectionStatus = connectionStatus;
     }
 
 
@@ -212,15 +213,15 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
      * 执行重连
      */
     public void reconnect() {
-        ThingsConnectStatusMqService.sendDisConnectMsg(this.getThingsId());
         Integer reconnectNum = Integer.valueOf(this.context.getReconnectNum());
         Long reconnectInterval = Long.valueOf(this.context.getReconnectInterval()) * 1000;
         ThingsConnection connection = this.getThingsConnection();
         ThingsConnectionHandler handler = this;
-//        if (!handler.getConnectionStatus().equals(ConnectionStatus.CONNECTED) || ObjectUtil.isEmpty(connection)) {
-        if (handler.getConnectionStatus().equals(ConnectionStatus.DISCONNECT) || ObjectUtil.isEmpty(connection)) {
-
-            ThingsDriverContext info = this.getContext();
+        //设置为断开状态
+        ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
+        thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
+        if (handler.getConnectionStatus().equals(ConnectionStatus.DISCONNECT) || ObjectUtil
+                .isEmpty(connection)) {
             ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
                 Integer num = 1;
 
@@ -228,27 +229,35 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
                 public void run() {
                     try {
                         if (num <= reconnectNum) {
-//                            if (!handler.getConnectionStatus().equals(ConnectionStatus.CONNECTED) || ObjectUtil.isEmpty(connection)) {
-//                                scheduledTaskMap.get(thingsId).cancel(true);
-//                            } else {
-//                                connection.connect(info);
-//                            }
-                            if(!handler.getConnectionStatus().equals(ConnectionStatus.DISCONNECT) || ObjectUtil.isEmpty(connection)) {
+                            if (!handler.getConnectionStatus().equals(ConnectionStatus.DISCONNECT) || ObjectUtil
+                                    .isEmpty(connection)) {
                                 scheduledTaskMap.get(thingsId).cancel(true);
                                 logger.debug("删除定时任务：{}", thingsId);
-                            }else {
-                                if (!connection.connect(info)) {
+                            } else {
+                                ThingsDriverContext info = ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.get(getThingsId());
+                                //连接中
+                                thingsStatus.setValue(handler, ConnectionStatus.CONNECTING);
+                                Optional<PropertiesContext> optional = ThingsSyncServiceImpl.PROPERTIES_CONTEXT_MAP.values().stream().filter(p -> p.getThingsId().equals(context.getThingsId())).findAny();
+                                if (optional.isPresent() && connection.connect(info)) {
+                                    ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
+                                    thingsStatus.setValue(handler, ConnectionStatus.CONNECTED);
+                                    scheduledTaskMap.get(thingsId).cancel(true);
+                                    logger.info("数据源重连成功,删除定时任务：数据源ID:{}", thingsId);
+                                } else {
+                                    //断开连接
+                                    thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
                                     num++;
+                                    logger.info("自定义重连，尝试连接，连接次数:{}", num - 1);
                                 }
                             }
 
-                        }else {
+                        } else {
                             scheduledTaskMap.get(thingsId).cancel(true);
                             logger.debug("设定次数：{}，已抵达，删除定时任务：{}", reconnectNum, thingsId);
                         }
                     } catch (Throwable e) {
                         num++;
-                        logger.error("自定义重连失败，失败原因，msg:{}", e.getMessage());
+                        logger.info("自定义重连失败，失败原因，msg:{}", e.getMessage());
                     }
                 }
             }, 1000, reconnectInterval, TimeUnit.MILLISECONDS);
@@ -258,4 +267,24 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
 
     }
 
+    public class ThingsStatus {
+
+        /**
+         * 设置数据源的状态
+         *
+         * @param handler
+         * @param connectionStatus
+         */
+        public void setValue(ThingsConnectionHandler handler, ConnectionStatus connectionStatus) {
+            handler.connectionStatus = connectionStatus;
+            logger.info("客户端状态改变：数据源ID:{}，连接状态:{}", handler.thingsId, connectionStatus);
+            if (connectionStatus.equals(ConnectionStatus.CONNECTED)) {
+                ThingsConnectStatusMqService.sendConnectMsg(thingsId);
+            } else if (connectionStatus.equals(ConnectionStatus.CONNECTING)) {
+                ThingsConnectStatusMqService.sendConnectingMsg(thingsId);
+            } else {
+                ThingsConnectStatusMqService.sendDisConnectMsg(thingsId);
+            }
+        }
+    }
 }

@@ -21,7 +21,7 @@ public class SubThingsConnectStatusMessage {
      */
     private String thingsId;
     /**
-     * 状态（0：已断开；1：已连接）
+     * 状态（2：已连接 3：已断开 5:连接中）
      */
     private String connectStatus;
 

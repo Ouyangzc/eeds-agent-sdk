@@ -95,6 +95,8 @@ public class DataCountServiceImpl implements DataCountService {
 		} catch (Exception e) {
 			logger.error("统计实时数据出现异常，异常信息:{}", e);
 			e.printStackTrace();
+		}catch (Error error){
+			logger.error("统计实时数据出现异常，异常信息:{}", error);
 		}
 	}
 

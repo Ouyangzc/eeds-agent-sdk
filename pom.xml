@@ -6,7 +6,7 @@
 
     <groupId>com.elco</groupId>
     <artifactId>eeds-agent-sdk</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.0.1-SNAPSHOT</version>
 
     <description>宜科边缘服务代理端SDK</description>
 
@@ -83,6 +83,11 @@
             <groupId>org.codehaus.janino</groupId>
             <artifactId>janino</artifactId>
             <version>2.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.iiot.core</groupId>
+            <artifactId>timewheel</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <distributionManagement>

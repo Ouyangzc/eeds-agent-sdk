@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.core.util;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
+import com.elco.eeds.agent.sdk.transfer.quartz.DataFileJob;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class FileUtil {
         // 读取目录下的所有目录文件信息
         String[] files = dir.list();
         //缓存file时间
-        Map<File, File> map = new HashMap<>();
+        Map<File, File> map  = null;
         // 循环，添加文件名或回调自身
         for (int i = 0; i < files.length; i++) {
             File file = new File(dir, files[i]);
@@ -51,6 +52,12 @@ public class FileUtil {
                     if (currentFileName > currentTime) {
                         RealTimeDataMessageFileUtils.fileMap.put(thingsId, file);
                     }
+                }
+                DataFileJob.saveFileToMap(file);
+                if (ObjectUtil.isNotEmpty(RealTimeDataMessageFileUtils.fileReadMap.get(thingsId))) {
+                    map = RealTimeDataMessageFileUtils.fileReadMap.get(thingsId);
+                } else {
+                    map = new HashMap<>();
                 }
                 map.put(file, file);
                 fileNames.add(dir + File.separator + file.getName());
@@ -81,7 +88,7 @@ public class FileUtil {
      * @return 字节 1*1024*1024
      */
     public static Long getFileSize(String fileSize) {
-        long size = Long.valueOf(fileSize) * 1024*1024;
+        long size = Long.valueOf(fileSize) * 1024 * 1024;
         return size;
     }
 
