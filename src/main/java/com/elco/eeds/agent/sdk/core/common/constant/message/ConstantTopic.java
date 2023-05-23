@@ -109,6 +109,11 @@ public class ConstantTopic {
      */
     public static final String TOPIC_SERVER_AGENT_ORDER_REQUEST = "server.agent.order.request.{agentId}";
 
+    /**
+     * 指令下发请求报文(功能)
+     * server.cmd.service.request.{agentId}
+     */
+    public static final String TOPIC_SERVER_CMD_SERVICE_REQUEST = "server.cmd.service.request.{agentId}";
 
 
     /**
