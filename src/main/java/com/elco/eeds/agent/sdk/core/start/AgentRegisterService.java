@@ -15,6 +15,7 @@ import com.elco.eeds.agent.sdk.core.util.ReplaceTopicAgentId;
 import com.elco.eeds.agent.sdk.core.util.http.IpUtil;
 import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentTokenRequest;
 import com.elco.eeds.agent.sdk.transfer.handler.agent.*;
+import com.elco.eeds.agent.sdk.transfer.handler.cmd.CmdRequestMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.data.count.DataCountConfirmMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.data.sync.DataSyncCancelMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.data.sync.DataSyncRequestMessageHandler;
@@ -46,6 +47,8 @@ public class AgentRegisterService implements IAgentRegisterService {
     private AgentLinkTestMessageHandler agentLinkTestMessageHandler = new AgentLinkTestMessageHandler();
     private DataCountConfirmMessageHandler dataCountConfirmMessageHandler = new DataCountConfirmMessageHandler();
     private ThingsReconnectManualMessageHandler thingsReconnectManualMessageHandler = new ThingsReconnectManualMessageHandler();
+
+    private CmdRequestMessageHandler cmdRequestMessageHandler = new CmdRequestMessageHandler();
 
     private DataSyncService dataSyncService = new DataSyncService();
 
@@ -137,6 +140,9 @@ public class AgentRegisterService implements IAgentRegisterService {
 
             // 数据源重新连接
             natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_SERVER_THINGS_RECONNECT_MANUAL, agentId), thingsReconnectManualMessageHandler);
+
+            // 指令下发--功能
+            natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_SERVER_CMD_SERVICE_REQUEST, agentId), cmdRequestMessageHandler);
 
             // 订阅其他topic...
             // 待补充

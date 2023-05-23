@@ -7,6 +7,8 @@ import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
 import com.elco.eeds.agent.sdk.core.parsing.DataParsing;
+import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdResult;
+import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.SubCmdRequestMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.message.order.OrderPropertiesValue;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import com.elco.eeds.agent.sdk.transfer.service.data.RealTimePropertiesValueService;
@@ -113,6 +115,13 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
      * @param msgSeqNo
      */
     public abstract boolean write(List<OrderPropertiesValue> propertiesValueList, String msgSeqNo);
+
+    /**
+     * 下发功能指令
+     * @param cmdMsg
+     * @return
+     */
+    public abstract CmdResult write(SubCmdRequestMessage cmdMsg);
 
 
     /**
