@@ -118,6 +118,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
 
     /**
      * 下发功能指令
+     *
      * @param cmdMsg
      * @return
      */
@@ -229,51 +230,52 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
         //设置为断开状态
         ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
         thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
-        if (handler.getConnectionStatus().equals(ConnectionStatus.DISCONNECT) || ObjectUtil
-                .isEmpty(connection)) {
-            ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
-                Integer num = 1;
+        synchronized (thingsId) {
+            if (ObjectUtil.isEmpty(scheduledTaskMap.get(this.thingsId)) && (this.getConnectionStatus().equals(ConnectionStatus.DISCONNECT) || ObjectUtil.isEmpty(connection))) {
+                ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+                    Integer num = 1;
 
-                @Override
-                public void run() {
-                    try {
-                        if (num <= reconnectNum) {
-                            if (!handler.getConnectionStatus().equals(ConnectionStatus.DISCONNECT) || ObjectUtil
-                                    .isEmpty(connection)) {
-                                scheduledTaskMap.get(thingsId).cancel(true);
-                                logger.debug("删除定时任务：{}", thingsId);
-                            } else {
-                                ThingsDriverContext info = ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.get(getThingsId());
-                                //连接中
-                                thingsStatus.setValue(handler, ConnectionStatus.CONNECTING);
-                                Optional<PropertiesContext> optional = ThingsSyncServiceImpl.PROPERTIES_CONTEXT_MAP.values().stream().filter(p -> p.getThingsId().equals(context.getThingsId())).findAny();
-                                if (optional.isPresent() && connection.connect(info)) {
-                                    ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
-                                    thingsStatus.setValue(handler, ConnectionStatus.CONNECTED);
+                    @Override
+                    public void run() {
+                        try {
+                            if (num <= reconnectNum) {
+                                if (!handler.getConnectionStatus().equals(ConnectionStatus.DISCONNECT) || ObjectUtil
+                                        .isEmpty(connection)) {
                                     scheduledTaskMap.get(thingsId).cancel(true);
-                                    logger.info("数据源重连成功,删除定时任务：数据源ID:{}", thingsId);
+                                    logger.debug("删除定时任务：{}", thingsId);
                                 } else {
-                                    //断开连接
-                                    thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
-                                    num++;
-                                    logger.info("自定义重连，尝试连接，连接次数:{}", num - 1);
+                                    ThingsDriverContext info = ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.get(getThingsId());
+                                    //连接中
+                                    thingsStatus.setValue(handler, ConnectionStatus.CONNECTING);
+                                    Optional<PropertiesContext> optional = ThingsSyncServiceImpl.PROPERTIES_CONTEXT_MAP.values().stream().filter(p -> p.getThingsId().equals(context.getThingsId())).findAny();
+                                    if (optional.isPresent() && connection.connect(info)) {
+                                        ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
+                                        thingsStatus.setValue(handler, ConnectionStatus.CONNECTED);
+                                        scheduledTaskMap.get(thingsId).cancel(true);
+                                        scheduledTaskMap.remove(thingsId);
+                                        logger.info("数据源重连成功,删除定时任务：数据源ID:{}", thingsId);
+                                    } else {
+                                        //断开连接
+                                        thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
+                                        num++;
+                                        logger.info("自定义重连，尝试连接，连接次数:{}", num - 1);
+                                    }
                                 }
+
+                            } else {
+                                scheduledTaskMap.get(thingsId).cancel(true);
+                                scheduledTaskMap.remove(thingsId);
+                                logger.debug("设定次数：{}，已抵达，删除定时任务：{}", reconnectNum, thingsId);
                             }
-
-                        } else {
-                            scheduledTaskMap.get(thingsId).cancel(true);
-                            logger.debug("设定次数：{}，已抵达，删除定时任务：{}", reconnectNum, thingsId);
+                        } catch (Throwable e) {
+                            num++;
+                            logger.info("自定义重连失败，失败原因，msg:{}", e.getMessage());
                         }
-                    } catch (Throwable e) {
-                        num++;
-                        logger.info("自定义重连失败，失败原因，msg:{}", e.getMessage());
                     }
-                }
-            }, 1000, reconnectInterval, TimeUnit.MILLISECONDS);
-            scheduledTaskMap.put(thingsId, future);
-
+                }, 1000, reconnectInterval, TimeUnit.MILLISECONDS);
+                scheduledTaskMap.put(thingsId, future);
+            }
         }
-
     }
 
     public class ThingsStatus {
