@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.core.connect.scheduler;
 
 
 import cn.hutool.core.thread.ThreadFactoryBuilder;
+import cn.hutool.core.util.StrUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * @Description 自定义任务实现，可以定义N个来执行不同的业务
@@ -56,6 +58,8 @@ public class SchedulerJob implements Job {
                 String thingsId = handler.getThingsId();
                 if (handler.getConnectionStatus().equals(ConnectionStatus.CONNECTED)) {
                     List<PropertiesContext> propertiesContexts = ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId);
+                    //排除虚拟变量
+                    propertiesContexts = propertiesContexts.stream().filter(p -> StrUtil.isNotEmpty(p.getAddress())).collect(Collectors.toList());
                     handler.read(propertiesContexts);
                 }
             }
