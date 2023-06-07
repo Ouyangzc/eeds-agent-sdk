@@ -16,9 +16,7 @@ import com.elco.eeds.agent.sdk.core.util.read.parameterfile.ResourceLoader;
 import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsSyncIncrMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.quartz.CountScheduler;
 import com.elco.eeds.agent.sdk.transfer.service.data.count.DataCountServiceImpl;
-import com.elco.eeds.agent.sdk.transfer.service.things.ThingsServiceImpl;
-import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncService;
-import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
+import com.elco.eeds.agent.sdk.transfer.service.things.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,12 +34,15 @@ public class AgentStarter {
   private static Logger logger = LoggerFactory.getLogger(AgentStarter.class);
 
   private static ThingsServiceImpl thingsService = new ThingsServiceImpl();
+  private static ThingsPropertiesService thingsPropertiesService = new ThingsPropertiesService();
   private static ThingsSyncService thingsSyncService = new ThingsSyncServiceImpl(thingsService);
 
-  private static ThingsSyncIncrMessageHandler thingsSyncIncrMessageHandler = new ThingsSyncIncrMessageHandler(
-      thingsSyncService);
+  private static ThingsSyncNewServiceImpl thingsSyncNewService = new ThingsSyncNewServiceImpl(thingsPropertiesService);
 
-  private static AgentRegisterService registerService = new AgentRegisterService(thingsSyncService,
+  private static ThingsSyncIncrMessageHandler thingsSyncIncrMessageHandler = new ThingsSyncIncrMessageHandler(
+          thingsSyncNewService);
+
+  private static AgentRegisterService registerService = new AgentRegisterService(thingsSyncNewService,
       thingsSyncIncrMessageHandler);
 
   private static CountScheduler countScheduler = new CountScheduler();

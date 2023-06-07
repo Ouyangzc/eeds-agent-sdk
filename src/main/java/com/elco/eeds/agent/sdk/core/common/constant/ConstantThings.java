@@ -19,4 +19,6 @@ public class ConstantThings {
      * 变量点位操作类型--删除
      */
     public static final String P_OPERATOR_TYPE_DEL = "del";
+
+    public static final String P_OPERATOR_TYPE_UNCHANGE = "unchange";
 }

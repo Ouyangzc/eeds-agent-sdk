@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @ClassName RealTimePropertiesValueService
@@ -42,6 +43,11 @@ public class RealTimePropertiesValueService {
         if (!propertiesValueList.isEmpty()) {
             AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
             String agentId = agentBaseInfo.getAgentId();
+            Optional<Long> minOptional = DataCountServiceImpl.thingsDataCountMap.keySet().stream().min(Long::compareTo);
+            if (collectTime < minOptional.get()) {
+                logger.error("丢弃该消息,时间戳：{},统计开始时间:{}", collectTime, minOptional.get());
+                return;
+            }
             //存储原始数据
             OriginalPropertiesValueMessage originalPropertiesValueMessage = new OriginalPropertiesValueMessage();
             originalPropertiesValueMessage.setCollectTime(collectTime);

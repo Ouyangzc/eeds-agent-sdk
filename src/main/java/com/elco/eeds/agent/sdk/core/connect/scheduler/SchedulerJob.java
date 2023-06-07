@@ -2,10 +2,12 @@ package com.elco.eeds.agent.sdk.core.connect.scheduler;
 
 
 import cn.hutool.core.thread.ThreadFactoryBuilder;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
-import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
+import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncNewServiceImpl;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * @Description 自定义任务实现，可以定义N个来执行不同的业务
@@ -55,8 +58,12 @@ public class SchedulerJob implements Job {
                 ThingsConnectionHandler handler = (ThingsConnectionHandler) data.get("handler");
                 String thingsId = handler.getThingsId();
                 if (handler.getConnectionStatus().equals(ConnectionStatus.CONNECTED)) {
-                    List<PropertiesContext> propertiesContexts = ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId);
-                    handler.read(propertiesContexts);
+                    List<PropertiesContext> propertiesContexts = ThingsSyncNewServiceImpl.getThingsPropertiesContextList(thingsId);
+                    if (ObjectUtil.isNotEmpty(propertiesContexts)) {
+                        //排除虚拟变量
+                        propertiesContexts = propertiesContexts.stream().filter(p -> StrUtil.isNotEmpty(p.getAddress())).collect(Collectors.toList());
+                        handler.read(propertiesContexts);
+                    }
                 }
             }
         });
