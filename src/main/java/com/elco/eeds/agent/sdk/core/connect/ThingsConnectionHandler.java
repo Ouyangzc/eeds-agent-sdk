@@ -11,8 +11,10 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdResult;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.SubCmdRequestMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.message.order.OrderPropertiesValue;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
+import com.elco.eeds.agent.sdk.transfer.handler.cmd.CmdCallback;
 import com.elco.eeds.agent.sdk.transfer.service.data.RealTimePropertiesValueService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsConnectStatusMqService;
+import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncNewServiceImpl;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +38,16 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
     private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(4);
 
     public static Map<String, ScheduledFuture> scheduledTaskMap = new ConcurrentHashMap();
+
+    private CmdCallback cmdCallback;
+
+    public void registerCallback(CmdCallback callback) {
+        this.cmdCallback = callback;
+    }
+
+    public CmdCallback getCmdCallback() {
+        return cmdCallback;
+    }
 
     /**
      * 1：虚拟变量
@@ -134,11 +146,11 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
      */
     public void execute(String thingsId, String msg, Long collectTime) {
         long startTime = System.currentTimeMillis();
-        List<PropertiesContext> propertiesContextList = ThingsSyncServiceImpl
+        List<PropertiesContext> propertiesContextList = ThingsSyncNewServiceImpl
                 .getThingsPropertiesContextList(thingsId);
         if (CollectionUtil.isNotEmpty(propertiesContextList)) {
             List<PropertiesValue> valueList = this.getParsing()
-                    .parsing(this.context, ThingsSyncServiceImpl.getThingsPropertiesContextList(thingsId),
+                    .parsing(this.context, ThingsSyncNewServiceImpl.getThingsPropertiesContextList(thingsId),
                             msg);
             valueList.stream().forEach(pv -> {
                 pv.setTimestamp(collectTime);
@@ -244,10 +256,10 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
                                     scheduledTaskMap.get(thingsId).cancel(true);
                                     logger.debug("删除定时任务：{}", thingsId);
                                 } else {
-                                    ThingsDriverContext info = ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.get(getThingsId());
+                                    ThingsDriverContext info = ThingsSyncNewServiceImpl.THINGS_DRIVER_CONTEXT_MAP.get(getThingsId());
                                     //连接中
                                     thingsStatus.setValue(handler, ConnectionStatus.CONNECTING);
-                                    Optional<PropertiesContext> optional = ThingsSyncServiceImpl.PROPERTIES_CONTEXT_MAP.values().stream().filter(p -> p.getThingsId().equals(context.getThingsId())).findAny();
+                                    Optional<PropertiesContext> optional = ThingsSyncNewServiceImpl.PROPERTIES_CONTEXT_MAP.values().stream().filter(p -> p.getThingsId().equals(context.getThingsId())).findAny();
                                     if (optional.isPresent() && connection.connect(info)) {
                                         ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
                                         thingsStatus.setValue(handler, ConnectionStatus.CONNECTED);

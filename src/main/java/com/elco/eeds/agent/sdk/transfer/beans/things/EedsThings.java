@@ -61,6 +61,10 @@ public class EedsThings extends BaseThings{
      */
     private String extendFieldMap;
 
+    private String operatorType;
+
+    private Long timestamp;
+
     public String getThingsCode() {
         return thingsCode;
     }
@@ -148,5 +152,19 @@ public class EedsThings extends BaseThings{
     public void setExtendFieldMap(String extendFieldMap) throws Exception {
         this.extendFieldMap = extendFieldMap;
     }
+    public Long getTimestamp() {
+        return timestamp;
+    }
 
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getOperatorType() {
+        return operatorType;
+    }
+
+    public void setOperatorType(String operatorType) {
+        this.operatorType = operatorType;
+    }
 }

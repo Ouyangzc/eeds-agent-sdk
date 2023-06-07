@@ -24,6 +24,7 @@ import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsReconnectManualMess
 import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsSyncIncrMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.service.agent.AgentRequestHttpService;
 import com.elco.eeds.agent.sdk.transfer.service.data.sync.DataSyncService;
+import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncNewServiceImpl;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

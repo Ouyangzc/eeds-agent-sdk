@@ -23,6 +23,11 @@ public class ConstantHttpApiPath {
      * 数据源启动同步url路径
      */
     public static final String THINGS_SETUP_SYNC_API = "/eeds-sys-config/things/getThingsBySync";
+
+    /**
+     * 数据源启动同步url路径
+     */
+    public static final String THINGS_SETUP_SYNC_NEW_API = "/eeds-sys-config/things/getThingsSyncInfo";
     /**
      * 数据源增量同步url路径
      */

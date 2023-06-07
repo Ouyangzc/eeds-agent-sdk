@@ -21,6 +21,7 @@ import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessag
 import com.elco.eeds.agent.sdk.transfer.beans.data.sync.DataSyncServerRequest;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import com.elco.eeds.agent.sdk.transfer.handler.properties.VirtualPropertiesHandle;
+import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncNewServiceImpl;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -101,7 +102,7 @@ public class RealTimeDataMessageFileUtils {
                 logger.info("数据同步：未获取到数据源文件:{}", thingsId);
                 return result;
             }
-            ThingsDriverContext driverContext = ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.get(thingsId);
+            ThingsDriverContext driverContext = ThingsSyncNewServiceImpl.THINGS_DRIVER_CONTEXT_MAP.get(thingsId);
             for (File key : fileMap.keySet()) {
                 Long fileStartTime = Long.valueOf(key.getName().replace(ConstantFilePath.FILE_FORMAT_JSON, "")) - 1000L;
                 Long fileEndTime = key.lastModified() + 1000L;
