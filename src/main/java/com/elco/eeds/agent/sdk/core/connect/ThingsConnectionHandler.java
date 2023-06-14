@@ -3,19 +3,21 @@ package com.elco.eeds.agent.sdk.core.connect;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
+import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
+import com.elco.eeds.agent.sdk.core.connect.scheduler.IJobManageService;
 import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
 import com.elco.eeds.agent.sdk.core.parsing.DataParsing;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdResult;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.SubCmdRequestMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.message.order.OrderPropertiesValue;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
-import com.elco.eeds.agent.sdk.transfer.handler.cmd.CmdCallback;
 import com.elco.eeds.agent.sdk.transfer.service.data.RealTimePropertiesValueService;
+import com.elco.eeds.agent.sdk.transfer.service.order.OrderResultMqService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsConnectStatusMqService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncNewServiceImpl;
-import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,16 +40,6 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
     private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(4);
 
     public static Map<String, ScheduledFuture> scheduledTaskMap = new ConcurrentHashMap();
-
-    private CmdCallback cmdCallback;
-
-    public void registerCallback(CmdCallback callback) {
-        this.cmdCallback = callback;
-    }
-
-    public CmdCallback getCmdCallback() {
-        return cmdCallback;
-    }
 
     /**
      * 1：虚拟变量
@@ -135,6 +127,15 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
      * @return
      */
     public abstract CmdResult write(SubCmdRequestMessage cmdMsg);
+
+    /**
+     * 校验下发指令是否合法
+     *
+     * @param identifier 下发功能标识
+     * @param inputData  下发内容
+     * @return true 校验通过 false:检验不通过
+     */
+    public abstract boolean writeCheck(String identifier, String inputData);
 
 
     /**
@@ -230,6 +231,13 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
 //    public void command(EedsThings things,String command){
 //        this.write(things,this.parsing.parsingCommand(command));
 //    }
+
+    public void sendCmdResult(CmdResult result) {
+        IJobManageService jobManage = ConnectManager.getJobManage();
+        jobManage.removeCmdTimeOutJob(result.getMsgSeqNo());
+        logger.info("指令功能下发，异步执行结果：{}", JSONUtil.toJsonStr(result));
+        OrderResultMqService.sendResult(result.isResult(), result.getThingsId(), result.getMsgSeqNo(), result.getResultMsg());
+    }
 
     /**
      * 执行重连

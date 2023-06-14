@@ -1,10 +1,15 @@
 package com.elco.eeds.agent.sdk.core.connect.scheduler;
 
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.elco.eeds.agent.sdk.core.common.constant.ReadTypeEnums;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
+import com.elco.eeds.agent.sdk.transfer.quartz.CmdTimeoutJob;
 import org.quartz.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
@@ -16,8 +21,9 @@ import java.util.Date;
  */
 
 public class JobManageService implements IJobManageService {
+    public static final Logger logger = LoggerFactory.getLogger(JobManageService.class);
 
-    public JobManageService(Scheduler scheduler){
+    public JobManageService(Scheduler scheduler) {
         this.scheduler = scheduler;
     }
 
@@ -25,6 +31,7 @@ public class JobManageService implements IJobManageService {
 
     /**
      * 添加任务
+     *
      * @param sysTask
      * @return
      */
@@ -45,7 +52,7 @@ public class JobManageService implements IJobManageService {
         CronTrigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(sysTask.getJobName(), sysTask.getJobGroup())
                 .startAt(startDate)
-                .endAt(ObjectUtil.isNotEmpty(sysTask.getEndTime())?sysTask.getEndTime():null)
+                .endAt(ObjectUtil.isNotEmpty(sysTask.getEndTime()) ? sysTask.getEndTime() : null)
                 .withSchedule(scheduleBuilder).build();
 
         //传递参数 这里可以传递参数，在任务执行的时候可以获取参数
@@ -67,7 +74,7 @@ public class JobManageService implements IJobManageService {
 
     @Override
     public boolean addJob(String cron, ThingsConnectionHandler handler, ReadTypeEnums enums) throws SchedulerException {
-        String jobName = "read_job_"+System.currentTimeMillis();
+        String jobName = "read_job_" + System.currentTimeMillis();
         String jobGroup = "read_job_group";
         Date startDate = new Date();
 
@@ -75,18 +82,18 @@ public class JobManageService implements IJobManageService {
         JobDetail jobDetail = null;
         jobDetail = JobBuilder.newJob(SchedulerJob.class).withIdentity(jobName, jobGroup).build();
         Trigger trigger;
-        if(enums.equals(ReadTypeEnums.PASSIVE_CORN)){
+        if (enums.equals(ReadTypeEnums.PASSIVE_CORN)) {
             if (!CronExpression.isValidExpression(cron)) {
                 throw new RuntimeException("表达式不正确");   //表达式格式不正确
             }
             //表达式调度构建器(即任务执行的时间,不立即执行)
             CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cron).withMisfireHandlingInstructionDoNothing();
             trigger = TriggerBuilder.newTrigger()
-                    .withIdentity(jobName,jobGroup)
+                    .withIdentity(jobName, jobGroup)
                     .startAt(startDate)
                     .endAt(null)
                     .withSchedule(scheduleBuilder).build();
-        }else{
+        } else {
             trigger = TriggerBuilder.newTrigger().withIdentity(jobName, jobGroup).startAt(startDate)
                     .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(Integer.parseInt(cron))
                             .withRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY)).build();
@@ -120,9 +127,9 @@ public class JobManageService implements IJobManageService {
     }
 
 
-
     /**
      * 获取任务状态
+     *
      * @param jobName
      * @param jobGroup
      * @return
@@ -135,7 +142,7 @@ public class JobManageService implements IJobManageService {
     }
 
     @Override
-    public JobDetail getJobDetail(String jobName , String jobGroup) throws SchedulerException {
+    public JobDetail getJobDetail(String jobName, String jobGroup) throws SchedulerException {
         JobKey jobKey = new JobKey(jobName, jobGroup);
         JobDetail jobDetail = scheduler.getJobDetail(jobKey);
         return jobDetail;
@@ -143,6 +150,7 @@ public class JobManageService implements IJobManageService {
 
     /**
      * 暂停所有任务
+     *
      * @return
      * @throws SchedulerException
      */
@@ -153,10 +161,9 @@ public class JobManageService implements IJobManageService {
     }
 
 
-
-
     /**
      * 暂停任务
+     *
      * @param jobName
      * @param jobGroup
      * @return
@@ -177,6 +184,7 @@ public class JobManageService implements IJobManageService {
 
     /**
      * 回复所有任务
+     *
      * @return
      * @throws SchedulerException
      */
@@ -188,6 +196,7 @@ public class JobManageService implements IJobManageService {
 
     /**
      * 回复任务
+     *
      * @param jobName
      * @param jobGroup
      * @return
@@ -207,6 +216,7 @@ public class JobManageService implements IJobManageService {
 
     /**
      * 删除任务
+     *
      * @param sysTask
      * @return
      * @throws SchedulerException
@@ -230,6 +240,7 @@ public class JobManageService implements IJobManageService {
 
     /**
      * 修改任务
+     *
      * @param sysTask
      * @return
      * @throws Exception
@@ -260,5 +271,47 @@ public class JobManageService implements IJobManageService {
             return false;
         }
 
+    }
+
+    public boolean addCmdTimeOutJob(String msgSeqNo, String thingsId, Integer timeout) {
+        try {
+            JobDataMap dataMap = new JobDataMap();
+            dataMap.put("msgSeqNo", msgSeqNo);
+            dataMap.put("thingsId", thingsId);
+            JobDetail jobDetail = JobBuilder.newJob(CmdTimeoutJob.class)
+                    .withIdentity(msgSeqNo, msgSeqNo)
+                    .setJobData(dataMap)
+                    .build();
+            DateTime date = DateUtil.offsetMinute(DateUtil.date(), timeout);
+            System.out.println(date);
+            // 定义触发器, 会马上执行一次, 接着5秒执行一次
+            Trigger trigger = TriggerBuilder.newTrigger()
+                    .withIdentity(msgSeqNo, msgSeqNo)
+                    .startAt(date)
+                    .build();
+            scheduler.scheduleJob(jobDetail, trigger);
+        } catch (SchedulerException e) {
+            logger.error("定时任务,添加任务失败,流水号:{},所属任务:{},错误信息:{}", msgSeqNo, "指令下发超时任务", e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    public boolean removeCmdTimeOutJob(String msgSeqNo) {
+        try {
+            TriggerKey triggerKey = TriggerKey.triggerKey(msgSeqNo, msgSeqNo);
+            Trigger trigger = scheduler.getTrigger(triggerKey);
+            if (trigger == null) {
+                return false;
+            }
+            scheduler.pauseTrigger(triggerKey);
+            scheduler.unscheduleJob(triggerKey);
+            scheduler.deleteJob(JobKey.jobKey(msgSeqNo, msgSeqNo));
+        } catch (SchedulerException e) {
+            logger.error("定时任务,移除任务失败,流水号:{},所属任务:{},错误信息:{}", msgSeqNo, "指令下发超时任务", e.getMessage());
+            return false;
+        }
+        logger.info("定时任务,移除任务成功,流水号:{}", msgSeqNo);
+        return true;
     }
 }

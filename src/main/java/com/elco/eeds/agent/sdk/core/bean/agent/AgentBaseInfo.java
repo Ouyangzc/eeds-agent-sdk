@@ -40,6 +40,8 @@ public class AgentBaseInfo {
     // 缓存周期
     private String dataCacheCycle;
 
+    private Integer orderTimeOut;
+
     public String getPort() {
         return port;
     }
@@ -115,6 +117,14 @@ public class AgentBaseInfo {
 
     public void setDataCacheCycle(String dataCacheCycle) {
         this.dataCacheCycle = dataCacheCycle;
+    }
+
+    public Integer getOrderTimeOut() {
+        return orderTimeOut;
+    }
+
+    public void setOrderTimeOut(Integer orderTimeOut) {
+        this.orderTimeOut = orderTimeOut;
     }
 
     @Override

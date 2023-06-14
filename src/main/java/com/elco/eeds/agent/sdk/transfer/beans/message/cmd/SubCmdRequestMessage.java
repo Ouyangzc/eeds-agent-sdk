@@ -16,6 +16,12 @@ public class SubCmdRequestMessage {
      * 功能标识,供客户端识别
      */
     private String identifier;
+
+    /**
+     * 指令下发方式
+     * 顺序下发: SERIAL 响应:RESPONSE 无响应:NO_RESPONSE
+     */
+    private String orderType;
     /**
      * 消息ID
      */
@@ -55,5 +61,13 @@ public class SubCmdRequestMessage {
 
     public void setInputData(String inputData) {
         this.inputData = inputData;
+    }
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
     }
 }

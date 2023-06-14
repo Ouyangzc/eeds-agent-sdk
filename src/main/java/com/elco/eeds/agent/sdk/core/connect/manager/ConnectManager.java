@@ -180,4 +180,8 @@ public class ConnectManager {
             }
         }
     }
+
+    public static IJobManageService getJobManage() {
+        return jobManage;
+    }
 }
