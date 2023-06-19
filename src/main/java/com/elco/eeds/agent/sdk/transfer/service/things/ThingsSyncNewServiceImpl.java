@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -203,17 +204,30 @@ public class ThingsSyncNewServiceImpl implements ThingsSyncService {
 
     private void handleEditThings(EedsThings syncThings, String localThingsData) {
         String thingsId = syncThings.getThingsId();
-        thingsService.editThings(syncThings);
-        List<EedsProperties> properties = syncThings.getProperties();
-        for (EedsProperties p : properties) {
-            String operatorType = p.getOperatorType();
-            if (ConstantThings.P_OPERATOR_TYPE_ADD.equals(operatorType)) {
-                thingsService.addProperties(thingsId, p);
-            } else if (ConstantThings.P_OPERATOR_TYPE_DEL.equals(operatorType)) {
-                thingsService.delProperties(thingsId, p);
-                PROPERTIES_CONTEXT_MAP.remove(p.getPropertiesId());
+        List<EedsThings> currentThingsList = thingsService.getCurrentThingsList();
+        if (ObjectUtil.isEmpty(currentThingsList)) {
+            //新增数据源
+            handleAddThings(syncThings, localThingsData);
+        } else {
+            Optional<EedsThings> first = currentThingsList.stream().filter(things -> things.getThingsId().equals(syncThings.getThingsId())).findFirst();
+            if (!first.isPresent()) {
+                //新增数据源
+                handleAddThings(syncThings, localThingsData);
+            } else {
+                thingsService.editThings(syncThings);
+                List<EedsProperties> properties = syncThings.getProperties();
+                for (EedsProperties p : properties) {
+                    String operatorType = p.getOperatorType();
+                    if (ConstantThings.P_OPERATOR_TYPE_ADD.equals(operatorType)) {
+                        thingsService.addProperties(thingsId, p);
+                    } else if (ConstantThings.P_OPERATOR_TYPE_DEL.equals(operatorType)) {
+                        thingsService.delProperties(thingsId, p);
+                        PROPERTIES_CONTEXT_MAP.remove(p.getPropertiesId());
+                    }
+                }
             }
         }
+
     }
 
     private void loadThingDriver() {

@@ -160,4 +160,7 @@ public class ThingsPropertiesService {
         return optional.isPresent();
     }
 
+    public List<EedsThings> getCurrentThingsList() {
+        return currentThingsList;
+    }
 }
