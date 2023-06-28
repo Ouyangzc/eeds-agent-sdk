@@ -11,6 +11,7 @@ import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.scheduler.IJobManageService;
 import com.elco.eeds.agent.sdk.core.connect.scheduler.JobManageService;
 import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
+import com.elco.eeds.agent.sdk.core.exception.EedsConnectException;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
@@ -104,9 +105,14 @@ public class ConnectManager {
      */
     public static void delConnection(String thingsId) {
         ThingsConnectionHandler handler = getHandler(thingsId);
-        if (ObjectUtil.isNotEmpty(handler) && handler.getThingsConnection().disconnect()) {
+        if (ObjectUtil.isNotEmpty(handler)) {
             ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
-            thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
+            try {
+                handler.getThingsConnection().disconnect();
+                thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
+            } catch (Exception e) {
+                thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT, e.getMessage());
+            }
             CONNECTION_HANDLER_MAP.remove(thingsId);
         }
     }
@@ -126,9 +132,15 @@ public class ConnectManager {
         handler.setThingsId(driverContext.getThingsId());
         ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
         thingsStatus.setValue(handler, ConnectionStatus.CONNECTING);
-        if (!connection.connect(driverContext)) {
-            logger.error("创建连接失败，连接信息：{}", JSONUtil.toJsonStr(driverContext));
-            thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
+        try {
+         connection.connect(driverContext);
+        } catch (EedsConnectException e) {
+            logger.error("创建连接失败,发生可知异常,连接信息：{}", JSONUtil.toJsonStr(driverContext));
+            thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT, e.getMessage());
+            return;
+        } catch (Exception e) {
+            logger.error("创建连接失败，发生未知异常,连接信息：{}", JSONUtil.toJsonStr(driverContext));
+            thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT, e.getMessage());
             return;
         }
         ConnectManager.addHandler(handler);
