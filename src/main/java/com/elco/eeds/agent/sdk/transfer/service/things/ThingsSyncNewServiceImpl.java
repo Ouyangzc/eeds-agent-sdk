@@ -9,7 +9,9 @@ import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantThings;
 import com.elco.eeds.agent.sdk.core.common.constant.http.ConstantHttpApiPath;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
+import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
+import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.message.things.SubThingsSyncIncrMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsProperties;
@@ -135,7 +137,7 @@ public class ThingsSyncNewServiceImpl implements ThingsSyncService {
                     handleAddThings(syncThings, localThingsData);
                     //建立连接
                     ThingsConnection connection = ConnectManager.getConnection(AgentStartProperties.getInstance().getAgentClientType());
-                    if (connection.checkThingsConnectParams(syncThings)) {
+                    if (checkThingsConnectParams(connection, syncThings)) {
                         //增量新增数据源
                         ThingsDriverContext driverContext = new ThingsDriverContext();
                         BeanUtil.copyProperties(syncThings, driverContext);
@@ -208,6 +210,16 @@ public class ThingsSyncNewServiceImpl implements ThingsSyncService {
         if (ObjectUtil.isEmpty(currentThingsList)) {
             //新增数据源
             handleAddThings(syncThings, localThingsData);
+            //建立连接
+            ThingsConnection connection = ConnectManager.getConnection(AgentStartProperties.getInstance().getAgentClientType());
+            if (checkThingsConnectParams(connection, syncThings)) {
+                //增量新增数据源
+                ThingsDriverContext driverContext = new ThingsDriverContext();
+                BeanUtil.copyProperties(syncThings, driverContext);
+                THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
+                ConnectManager.delConnection(thingsId);
+                ConnectManager.create(driverContext, AgentStartProperties.getInstance().getAgentClientType());
+            }
         } else {
             Optional<EedsThings> first = currentThingsList.stream().filter(things -> things.getThingsId().equals(syncThings.getThingsId())).findFirst();
             if (!first.isPresent()) {
@@ -237,7 +249,7 @@ public class ThingsSyncNewServiceImpl implements ThingsSyncService {
                 List<EedsThings> eedsThings = JSON.parseArray(localThings, EedsThings.class);
                 for (EedsThings things : eedsThings) {
                     ThingsConnection connection = ConnectManager.getConnection(AgentStartProperties.getInstance().getAgentClientType());
-                    if (connection.checkThingsConnectParams(things)) {
+                    if (checkThingsConnectParams(connection, things)) {
                         ThingsDriverContext driverContext = new ThingsDriverContext();
                         BeanUtil.copyProperties(things, driverContext);
                         String agentId = things.getAgentId();
@@ -289,6 +301,17 @@ public class ThingsSyncNewServiceImpl implements ThingsSyncService {
     public static List<PropertiesContext> getThingsPropertiesContextList(String thingsId) {
         Map<String, List<PropertiesContext>> thingsPropertiesMap = PROPERTIES_CONTEXT_MAP.values().stream().collect(Collectors.groupingBy(PropertiesContext::getThingsId));
         return thingsPropertiesMap.get(thingsId);
+    }
+
+    private boolean checkThingsConnectParams(ThingsConnection connection, EedsThings things) {
+        if (!connection.checkThingsConnectParams(things)) {
+            ThingsConnectionHandler handler = (ThingsConnectionHandler) connection;
+            handler.setThingsId(things.getThingsId());
+            ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
+            thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT, "连接参数校验失败,请检查数据源连接参数");
+            return false;
+        }
+        return true;
     }
 
 

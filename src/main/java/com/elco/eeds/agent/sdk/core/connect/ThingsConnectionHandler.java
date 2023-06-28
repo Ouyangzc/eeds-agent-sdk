@@ -3,19 +3,19 @@ package com.elco.eeds.agent.sdk.core.connect;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
+import com.elco.eeds.agent.sdk.core.exception.EedsConnectException;
 import com.elco.eeds.agent.sdk.core.parsing.DataParsing;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdResult;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.SubCmdRequestMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.message.order.OrderPropertiesValue;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
-import com.elco.eeds.agent.sdk.transfer.handler.cmd.CmdCallback;
 import com.elco.eeds.agent.sdk.transfer.service.data.RealTimePropertiesValueService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsConnectStatusMqService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncNewServiceImpl;
-import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,16 +38,6 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
     private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(4);
 
     public static Map<String, ScheduledFuture> scheduledTaskMap = new ConcurrentHashMap();
-
-    private CmdCallback cmdCallback;
-
-    public void registerCallback(CmdCallback callback) {
-        this.cmdCallback = callback;
-    }
-
-    public CmdCallback getCmdCallback() {
-        return cmdCallback;
-    }
 
     /**
      * 1：虚拟变量
@@ -260,7 +250,18 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
                                     //连接中
                                     thingsStatus.setValue(handler, ConnectionStatus.CONNECTING);
                                     Optional<PropertiesContext> optional = ThingsSyncNewServiceImpl.PROPERTIES_CONTEXT_MAP.values().stream().filter(p -> p.getThingsId().equals(context.getThingsId())).findAny();
-                                    if (optional.isPresent() && connection.connect(info)) {
+                                    if (optional.isPresent()) {
+                                        try {
+                                            connection.connect(info);
+                                        } catch (EedsConnectException e) {
+                                            logger.error("创建连接失败,发生可知异常,连接信息：{}", JSONUtil.toJsonStr(info));
+                                            thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT, e.getMessage());
+                                            return;
+                                        } catch (Exception e) {
+                                            logger.error("创建连接失败，发生未知异常,连接信息：{}", JSONUtil.toJsonStr(info));
+                                            thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT, e.getMessage());
+                                            return;
+                                        }
                                         ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
                                         thingsStatus.setValue(handler, ConnectionStatus.CONNECTED);
                                         scheduledTaskMap.get(thingsId).cancel(true);
@@ -307,6 +308,18 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
                 ThingsConnectStatusMqService.sendConnectingMsg(thingsId);
             } else {
                 ThingsConnectStatusMqService.sendDisConnectMsg(thingsId);
+            }
+        }
+
+        public void setValue(ThingsConnectionHandler handler, ConnectionStatus connectionStatus,String msg) {
+            handler.connectionStatus = connectionStatus;
+            logger.info("客户端状态改变：数据源ID:{}，连接状态:{}", handler.thingsId, connectionStatus);
+            if (connectionStatus.equals(ConnectionStatus.CONNECTED)) {
+                ThingsConnectStatusMqService.sendConnectMsg(thingsId);
+            } else if (connectionStatus.equals(ConnectionStatus.CONNECTING)) {
+                ThingsConnectStatusMqService.sendConnectingMsg(thingsId);
+            } else {
+                ThingsConnectStatusMqService.sendDisConnectMsg(thingsId,msg);
             }
         }
     }
