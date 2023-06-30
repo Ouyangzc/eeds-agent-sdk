@@ -23,7 +23,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.*;
 
 /**
@@ -249,30 +248,34 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
                                     ThingsDriverContext info = ThingsSyncNewServiceImpl.THINGS_DRIVER_CONTEXT_MAP.get(getThingsId());
                                     //连接中
                                     thingsStatus.setValue(handler, ConnectionStatus.CONNECTING);
-                                    Optional<PropertiesContext> optional = ThingsSyncNewServiceImpl.PROPERTIES_CONTEXT_MAP.values().stream().filter(p -> p.getThingsId().equals(context.getThingsId())).findAny();
-                                    if (optional.isPresent()) {
-                                        try {
-                                            connection.connect(info);
-                                        } catch (EedsConnectException e) {
-                                            logger.error("创建连接失败,发生可知异常,连接信息：{}", JSONUtil.toJsonStr(info));
-                                            thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT, e.getMessage());
-                                            return;
-                                        } catch (Exception e) {
-                                            logger.error("创建连接失败，发生未知异常,连接信息：{}", JSONUtil.toJsonStr(info));
-                                            thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT, e.getMessage());
-                                            return;
-                                        }
-                                        ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
-                                        thingsStatus.setValue(handler, ConnectionStatus.CONNECTED);
-                                        scheduledTaskMap.get(thingsId).cancel(true);
-                                        scheduledTaskMap.remove(thingsId);
-                                        logger.info("数据源重连成功,删除定时任务：数据源ID:{}", thingsId);
-                                    } else {
-                                        //断开连接
-                                        thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
+//                                    Optional<PropertiesContext> optional = ThingsSyncNewServiceImpl.PROPERTIES_CONTEXT_MAP.values().stream().filter(p -> p.getThingsId().equals(context.getThingsId())).findAny();
+//                                    if (optional.isPresent()) {
+                                    try {
+                                        connection.connect(info);
+                                    } catch (EedsConnectException e) {
+                                        logger.error("创建连接失败,发生可知异常,连接信息：{}", JSONUtil.toJsonStr(info));
+                                        thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT, e.getMessage());
                                         num++;
                                         logger.info("自定义重连，尝试连接，连接次数:{}", num - 1);
+                                        return;
+                                    } catch (Exception e) {
+                                        logger.error("创建连接失败，发生未知异常,连接信息：{}", JSONUtil.toJsonStr(info));
+                                        thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT, e.getMessage());
+                                        num++;
+                                        logger.info("自定义重连，尝试连接，连接次数:{}", num - 1);
+                                        return;
                                     }
+                                    ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
+                                    thingsStatus.setValue(handler, ConnectionStatus.CONNECTED);
+                                    scheduledTaskMap.get(thingsId).cancel(true);
+                                    scheduledTaskMap.remove(thingsId);
+                                    logger.info("数据源重连成功,删除定时任务：数据源ID:{}", thingsId);
+//                                    } else {
+//                                        //断开连接
+//                                        thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
+//                                        num++;
+//                                        logger.info("自定义重连，尝试连接，连接次数:{}", num - 1);
+//                                    }
                                 }
 
                             } else {
@@ -311,7 +314,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
             }
         }
 
-        public void setValue(ThingsConnectionHandler handler, ConnectionStatus connectionStatus,String msg) {
+        public void setValue(ThingsConnectionHandler handler, ConnectionStatus connectionStatus, String msg) {
             handler.connectionStatus = connectionStatus;
             logger.info("客户端状态改变：数据源ID:{}，连接状态:{}", handler.thingsId, connectionStatus);
             if (connectionStatus.equals(ConnectionStatus.CONNECTED)) {
@@ -319,7 +322,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
             } else if (connectionStatus.equals(ConnectionStatus.CONNECTING)) {
                 ThingsConnectStatusMqService.sendConnectingMsg(thingsId);
             } else {
-                ThingsConnectStatusMqService.sendDisConnectMsg(thingsId,msg);
+                ThingsConnectStatusMqService.sendDisConnectMsg(thingsId, msg);
             }
         }
     }
