@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.order;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Map;
  * @date ：Created in 2022/12/23 14:45
  * @description：
  */
-public class OrderPropertiesValue {
+public class OrderPropertiesValue implements Serializable {
     private String name;
     private String dataType;
     private String type;

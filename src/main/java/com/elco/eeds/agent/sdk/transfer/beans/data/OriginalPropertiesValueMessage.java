@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.data;
 
+import java.io.Serializable;
+
 /**
  * @ClassName OriginalMessage
  * @Description 原始变量报文
  * @Author OUYANG
  * @Date 2022/12/21 10:54
  */
-public class OriginalPropertiesValueMessage {
+public class OriginalPropertiesValueMessage implements Serializable {
     /**
      * 采集时间
      */

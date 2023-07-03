@@ -1,11 +1,13 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.order;
 
+import java.io.Serializable;
+
 /**
  * @author ：ytl
  * @date ：Created in 2022/12/23 13:38
  * @description：下发指令确认报文
  */
-public class SubOrderConfirmMessage {
+public class SubOrderConfirmMessage implements Serializable {
 
     public SubOrderConfirmMessage(String thingsId, String msgSeqNo) {
         this.thingsId = thingsId;

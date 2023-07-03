@@ -2,13 +2,15 @@ package com.elco.eeds.agent.sdk.transfer.beans.message;
 
 import cn.hutool.json.JSONUtil;
 
+import java.io.Serializable;
+
 /**
  * @title: BaseMessage
  * @Author wl
  * @Date: 2022/12/5 16:21
  * @Version 1.0
  */
-public class BaseMessage<T> {
+public class BaseMessage<T> implements Serializable {
 
     /**
      * 报文类型

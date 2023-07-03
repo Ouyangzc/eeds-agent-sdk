@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.agent.linktest;
 
+import java.io.Serializable;
+
 /**
  * @title: SubAgentLinkTestThingsData
  * @Author wl
  * @Date: 2022/12/20 15:59
  * @Version 1.0
  */
-public class SubAgentLinkTestThingsData {
+public class SubAgentLinkTestThingsData implements Serializable {
 
     /**
      * 变量地址

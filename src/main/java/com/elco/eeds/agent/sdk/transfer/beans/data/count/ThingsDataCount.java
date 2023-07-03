@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.data.count;
 
+import java.io.Serializable;
+
 /**
  * @ClassName ThingsDataCount
  * @Description 数据源发送数据统计
  * @Author OUYANG
  * @Date 2022/12/9 10:11
  */
-public class ThingsDataCount {
+public class ThingsDataCount implements Serializable {
     /**
      * 数据源id
      */

@@ -10,13 +10,15 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
+
 /**
  * @ClassName DataCountMessage
  * @Description 数据统计报文
  * @Author OUYANG
  * @Date 2022/12/9 13:27
  */
-public class DataCountMessage extends BaseMessage<SubDataCountMessage> {
+public class DataCountMessage extends BaseMessage<SubDataCountMessage> implements Serializable {
     public static final Logger logger = LoggerFactory.getLogger(DataCountMessage.class);
 
     /**

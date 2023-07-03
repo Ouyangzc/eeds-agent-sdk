@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.finish;
 
 import com.elco.eeds.agent.sdk.transfer.beans.data.sync.DataSyncFinishResult;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ import java.util.List;
  * @Author OUYANG
  * @Date 2022/12/9 14:34
  */
-public class SubDataSyncFinishMessage {
+public class SubDataSyncFinishMessage implements Serializable {
     /**
      * 同步队列Id
      */

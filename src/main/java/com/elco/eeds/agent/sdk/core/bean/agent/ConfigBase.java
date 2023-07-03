@@ -1,6 +1,6 @@
 package com.elco.eeds.agent.sdk.core.bean.agent;
 
-import java.lang.reflect.Field;
+import java.io.Serializable;
 
 /**
  * @title: GlobalConfig
@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
  * @Version 1.0
  * @Description: 配置实体类
  */
-public class ConfigBase {
+public class ConfigBase implements Serializable {
 
     private String syncPeriod;
 

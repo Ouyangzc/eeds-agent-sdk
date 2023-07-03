@@ -1,10 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.things;
 
-import cn.hutool.core.util.ObjectUtil;
-import com.alibaba.fastjson.JSONObject;
-
+import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @ClassName EedsThings
@@ -12,7 +9,7 @@ import java.util.Map;
  * @Author OUYANG
  * @Date 2022/12/16 9:08
  */
-public class EedsThings extends BaseThings{
+public class EedsThings extends BaseThings implements Serializable {
     /**
      * 设备编号
      */

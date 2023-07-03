@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.agent;
 
+import java.io.Serializable;
+
 /**
  * @title: AgentRegisterRequest
  * @Author wl
  * @Date: 2022/12/7 13:36
  * @Version 1.0
  */
-public class AgentRegisterRequest {
+public class AgentRegisterRequest implements Serializable {
 
     /**
      * 客户端名称

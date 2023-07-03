@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.things;
 
+import java.io.Serializable;
+
 /**
  * @Projectname: eeds-agent-core
  * @Filename: SubConnectStatusInfoDataMessage
@@ -7,7 +9,7 @@ package com.elco.eeds.agent.sdk.transfer.beans.message.things;
  * @Data:2022/11/18 9:29
  * @Description: 连接状态信息上报,子报文结构
  */
-public class SubThingsConnectStatusMessage {
+public class SubThingsConnectStatusMessage implements Serializable {
 
 
     public SubThingsConnectStatusMessage(String thingsId, String connectStatus, String msg) {

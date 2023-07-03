@@ -2,6 +2,8 @@ package com.elco.eeds.agent.sdk.transfer.beans.message.heart;
 
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantOperation;
 
+import java.io.Serializable;
+
 /**
  * @title: SubAgentHeartMessage
  * @Author wl
@@ -9,7 +11,7 @@ import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantOperation;
  * @Version 1.0
  * @Discription: 客户端心跳子报文结构
  */
-public class SubAgentHeartMessage {
+public class SubAgentHeartMessage implements Serializable {
 
     private String operation;
 

@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.transfer.beans.data.sync;
 
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ import java.util.List;
  * @Author OUYANG
  * @Date 2022/12/9 14:17
  */
-public class DataSyncServerRequest {
+public class DataSyncServerRequest implements Serializable {
     /**
      * 数据源ID
      */

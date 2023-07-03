@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.agent.linktest;
 
+import java.io.Serializable;
+
 /**
  * @title: ExtraMap
  * @Author wl
  * @Date: 2022/12/20 16:01
  * @Version 1.0
  */
-public class ExtraMap {
+public class ExtraMap implements Serializable {
 
     /**
      * 过滤条件

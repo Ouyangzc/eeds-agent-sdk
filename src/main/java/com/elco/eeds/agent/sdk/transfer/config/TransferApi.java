@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.config;
 
+import java.io.Serializable;
+
 /**
  * @title: TransferApi
  * @Author wl
  * @Date: 2022/12/6 11:51
  * @Version 1.0
  */
-public class TransferApi {
+public class TransferApi implements Serializable {
 
     public String method;
 

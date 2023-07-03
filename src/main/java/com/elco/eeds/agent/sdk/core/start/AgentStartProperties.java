@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.core.start;
 
+import java.io.Serializable;
+
 /**
  * @title: AgentStartProperties
  * @Author wl
@@ -7,7 +9,7 @@ package com.elco.eeds.agent.sdk.core.start;
  * @Version 1.0
  * @Description: 客户端启动参数
  */
-public class AgentStartProperties {
+public class AgentStartProperties implements Serializable {
 
     /**
      * server地址

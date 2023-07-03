@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.transfer.config;
 
 import cn.hutool.core.collection.CollectionUtil;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
  * @Version 1.0
  * @Description: 客户端请求Server Api类
  */
-public class TransferApiProperties {
+public class TransferApiProperties implements Serializable {
 
     private String serverUrl;
 

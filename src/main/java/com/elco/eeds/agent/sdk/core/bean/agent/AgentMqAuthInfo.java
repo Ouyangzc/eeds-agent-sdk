@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.core.bean.agent;
 
+import java.io.Serializable;
+
 /**
  * @title: AgentMqAuthInfo
  * @Author wl
@@ -7,7 +9,7 @@ package com.elco.eeds.agent.sdk.core.bean.agent;
  * @Version 1.0
  * @Description: 客户端mq认证类
  */
-public class AgentMqAuthInfo {
+public class AgentMqAuthInfo implements Serializable {
 
     /**
      * token

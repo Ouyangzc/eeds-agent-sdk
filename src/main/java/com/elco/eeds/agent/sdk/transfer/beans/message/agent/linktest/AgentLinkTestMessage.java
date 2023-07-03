@@ -5,6 +5,7 @@ import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
 import com.elco.eeds.agent.sdk.core.util.DateUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.Map;
  * @Version 1.0
  * @Description: 客户端链路测试
  */
-public class AgentLinkTestMessage extends BaseMessage<SubAgentLinkTestMessage> {
+public class AgentLinkTestMessage extends BaseMessage<SubAgentLinkTestMessage> implements Serializable {
 
     public static AgentLinkTestMessage getRspMessage(String pkUser, String socketId) {
         AgentLinkTestMessage message = new AgentLinkTestMessage();
