@@ -7,6 +7,8 @@ import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
 import com.elco.eeds.agent.sdk.core.util.DateUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 
+import java.io.Serializable;
+
 /**
  * @title: AgentHeartMessage
  * @Author wl
@@ -14,7 +16,7 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
  * @Version 1.0
  * @Description: 客户端心跳报文结构
  */
-public class ThingsStatusMessage extends BaseMessage<SubThingsConnectStatusMessage> {
+public class ThingsStatusMessage extends BaseMessage<SubThingsConnectStatusMessage> implements Serializable {
 
     public ThingsStatusMessage(String thingsId,String status,String msg){
         this.setMethod("things_connect_status");

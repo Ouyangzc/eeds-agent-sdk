@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.core.bean.agent;
 
+import java.io.Serializable;
+
 /**
  * @title: AgentMqSecurityInfo
  * @Author wl
@@ -7,7 +9,7 @@ package com.elco.eeds.agent.sdk.core.bean.agent;
  * @Version 1.0
  * @Description: 客户端mq安全类
  */
-public class AgentMqSecurityInfo {
+public class AgentMqSecurityInfo implements Serializable {
 
     private String keystore;
 

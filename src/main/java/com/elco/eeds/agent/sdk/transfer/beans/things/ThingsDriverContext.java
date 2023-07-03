@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.transfer.beans.things;
 
 import com.alibaba.fastjson.JSONObject;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Map;
  * @Author OUYANG
  * @Date 2022/12/19 11:00
  */
-public class ThingsDriverContext {
+public class ThingsDriverContext implements Serializable {
     /**
      * 数据源ID
      */

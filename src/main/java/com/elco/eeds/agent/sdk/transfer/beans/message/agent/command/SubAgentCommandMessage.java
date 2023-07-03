@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.agent.command;
 
+import java.io.Serializable;
+
 /**
  * @title: SubAgentCommandMessage
  * @Author wl
@@ -7,7 +9,7 @@ package com.elco.eeds.agent.sdk.transfer.beans.message.agent.command;
  * @Version 1.0
  * @Description: 客户端指令下发子报文结构
  */
-public class SubAgentCommandMessage {
+public class SubAgentCommandMessage implements Serializable {
 
     /**
      * 消息流水号

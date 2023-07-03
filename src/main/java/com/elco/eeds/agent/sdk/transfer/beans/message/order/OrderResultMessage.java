@@ -2,13 +2,15 @@ package com.elco.eeds.agent.sdk.transfer.beans.message.order;
 
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 
+import java.io.Serializable;
+
 /**
  * @title: OrderResultMessage
  * @Author wl
  * @Date: 2022/12/29 11:33
  * @Version 1.0
  */
-public class OrderResultMessage extends BaseMessage<SubOrderResultMessage> {
+public class OrderResultMessage extends BaseMessage<SubOrderResultMessage> implements Serializable {
 
     public static final String SUCCESS = "success";
     public static final String FAIL = "fail";

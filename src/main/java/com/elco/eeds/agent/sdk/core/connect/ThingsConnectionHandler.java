@@ -19,6 +19,7 @@ import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncNewServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -30,7 +31,7 @@ import java.util.concurrent.*;
  * @date ：Created in 2022/12/2 15:25
  * @description： 数据源连接抽象类，需用户自己实现该客户端的连接方法，然后交由SDK对连接进行管理
  */
-public abstract class ThingsConnectionHandler<T, M extends DataParsing> {
+public abstract class ThingsConnectionHandler<T, M extends DataParsing> implements Serializable {
 
     public static final Logger logger = LoggerFactory.getLogger(ThingsConnectionHandler.class);
 

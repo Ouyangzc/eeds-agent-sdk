@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.data;
 
+import java.io.Serializable;
+
 /**
  * @ClassName SubDataSyncPropertiesValueMessage
  * @Description 数据同步--同步数据结构体
  * @Author OUYANG
  * @Date 2022/12/9 14:31
  */
-public class SubDataSyncPropertiesValueMessage {
+public class SubDataSyncPropertiesValueMessage implements Serializable {
     /**
      * 客户端Id
      */

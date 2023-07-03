@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.confirm;
 
+import java.io.Serializable;
+
 /**
  * @ClassName SubDataSyncConfirmMessage
  * @Description 数据同步--确认报文--结构体
  * @Author OUYANG
  * @Date 2022/12/9 14:23
  */
-public class SubDataSyncConfirmMessage {
+public class SubDataSyncConfirmMessage implements Serializable {
     /**
      * 同步队列ID
      */

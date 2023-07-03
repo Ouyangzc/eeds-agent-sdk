@@ -2,6 +2,8 @@ package com.elco.eeds.agent.sdk.core.bean.agent;
 
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 
+import java.io.Serializable;
+
 /**
  * @title: AgentBaseInfo
  * @Author wl
@@ -9,7 +11,7 @@ import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
  * @Version 1.0
  * @Description: 客户端基础信息类
  */
-public class AgentBaseInfo {
+public class AgentBaseInfo implements Serializable {
 
     public AgentBaseInfo(){}
 

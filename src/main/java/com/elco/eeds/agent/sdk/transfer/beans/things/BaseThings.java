@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.things;
 
+import java.io.Serializable;
+
 /**
  * @ClassName BaseThings
  * @Description 数据源基类
  * @Author OUYANG
  * @Date 2022/12/16 9:07
  */
-public class BaseThings {
+public class BaseThings implements Serializable {
     /**
      * 客户端ID
      */

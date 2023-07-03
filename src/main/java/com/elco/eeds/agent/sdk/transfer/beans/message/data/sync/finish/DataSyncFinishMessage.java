@@ -8,6 +8,7 @@ import com.elco.eeds.agent.sdk.core.util.DateUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.data.sync.DataSyncFinishResult;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ import java.util.List;
  * @Author OUYANG
  * @Date 2022/12/9 14:34
  */
-public class DataSyncFinishMessage extends BaseMessage<SubDataSyncFinishMessage> {
+public class DataSyncFinishMessage extends BaseMessage<SubDataSyncFinishMessage> implements Serializable {
     public static String getMessage(String queueId, Boolean syncFlag, List<DataSyncFinishResult> datas) {
         DataSyncFinishMessage message = new DataSyncFinishMessage();
         message.setMethod(ConstantMethod.METHOD_DATA_SYNC_FINISH);

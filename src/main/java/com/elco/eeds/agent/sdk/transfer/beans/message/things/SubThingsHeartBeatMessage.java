@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.things;
 
+import java.io.Serializable;
+
 /**
  * @Projectname: eeds-agent-core
  * @Filename: SubStatusInfoDataMessage
@@ -7,7 +9,7 @@ package com.elco.eeds.agent.sdk.transfer.beans.message.things;
  * @Data:2022/9/7 9:29
  * @Description: 状态信息上报,子报文结构
  */
-public class SubThingsHeartBeatMessage {
+public class SubThingsHeartBeatMessage implements Serializable {
 
     public SubThingsHeartBeatMessage(String thingsId, String status) {
         this.thingsId = thingsId;

@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.token;
 
+import java.io.Serializable;
+
 /**
  * @title: SubAgentTokenMessage
  * @Author wl
@@ -7,7 +9,7 @@ package com.elco.eeds.agent.sdk.transfer.beans.message.token;
  * @Version 1.0
  * @Description: 客户端token子报文结构
  */
-public class SubAgentTokenMessage {
+public class SubAgentTokenMessage implements Serializable {
 
     private String token;
 

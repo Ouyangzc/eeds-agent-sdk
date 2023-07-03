@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.transfer.beans.data.count;
 
 import cn.hutool.json.JSONUtil;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ import java.util.List;
  * @Author OUYANG
  * @Date 2022/12/9 10:13
  */
-public class PostDataCount {
+public class PostDataCount implements Serializable {
 	/**
 	 * 统计id
 	 */

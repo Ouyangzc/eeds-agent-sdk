@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.order;
 
+import java.io.Serializable;
+
 /**
  * @title: SubOrderResultMessage
  * @Author wl
  * @Date: 2022/12/29 11:36
  * @Version 1.0
  */
-public class SubOrderResultMessage {
+public class SubOrderResultMessage implements Serializable {
 
     /**
      * 数据源Id

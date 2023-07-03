@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.cmd;
 
+import java.io.Serializable;
+
 /**
  * @ClassName WriteResult
  * @Description 下发执行结果
@@ -7,7 +9,7 @@ package com.elco.eeds.agent.sdk.transfer.beans.message.cmd;
  * @Date 2023/5/17 9:18
  * @Version 1.0
  */
-public class CmdResult {
+public class CmdResult implements Serializable {
     private String thingsId;
     private String msgSeqNo;
     private boolean result;

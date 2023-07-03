@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.things;
 
+import java.io.Serializable;
+
 /**
  * @ClassName SubThingsSyncIncrMessage
  * @Description 数据源增量同步报文结构体
  * @Author OUYANG
  * @Date 2022/12/19 14:29
  */
-public class SubThingsSyncIncrMessage {
+public class SubThingsSyncIncrMessage implements Serializable {
     /**
      * 同步任务ID
      */

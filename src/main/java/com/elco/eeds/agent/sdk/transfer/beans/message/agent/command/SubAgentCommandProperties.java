@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.agent.command;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -8,7 +9,7 @@ import java.util.Map;
  * @Date: 2022/12/22 13:44
  * @Version 1.0
  */
-public class SubAgentCommandProperties {
+public class SubAgentCommandProperties implements Serializable {
 
     /**
      * 点位名称

@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.data.sync;
 
+import java.io.Serializable;
+
 /**
  * @ClassName DataSyncFinishResult
  * @Description 数据同步完成报文结构体--数据源结果
  * @Author OUYANG
  * @Date 2022/12/9 14:35
  */
-public class DataSyncFinishResult {
+public class DataSyncFinishResult implements Serializable {
     /**
      * 数据源ID
      */

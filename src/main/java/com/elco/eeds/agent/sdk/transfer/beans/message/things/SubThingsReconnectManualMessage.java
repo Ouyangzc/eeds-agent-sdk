@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.things;
 
+import java.io.Serializable;
+
 /**
  * @title: SubThingsReconnectManualMessage
  * @Author wl
  * @Date: 2023/1/6 14:31
  * @Version 1.0
  */
-public class SubThingsReconnectManualMessage {
+public class SubThingsReconnectManualMessage implements Serializable {
 
     private String agentId;
 
