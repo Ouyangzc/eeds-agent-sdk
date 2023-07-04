@@ -6,17 +6,17 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
-import com.elco.eeds.agent.sdk.core.common.constant.ConstantThings;
-import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
 import com.elco.eeds.agent.sdk.core.util.ThingsFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsThings;
-import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -64,26 +64,13 @@ public class ThingsPropertiesService {
         Optional<EedsThings> first = currentThingsList.stream().filter(things -> things.getThingsId().equals(editThings.getThingsId())).findFirst();
         if (first.isPresent()) {
             EedsThings sourceThings = first.get();
+            EedsThings eedsThings = new EedsThings();
+            BeanUtil.copyProperties(editThings, eedsThings);
             //原有点位
             List<EedsProperties> sourceProperties = sourceThings.getProperties();
-
-            Map<String, List<EedsProperties>> operatorTypeMap = editThings.getProperties().stream().collect(Collectors.groupingBy(EedsProperties::getOperatorType));
-            for (String operatorType : operatorTypeMap.keySet()) {
-                List<EedsProperties> editProperties = operatorTypeMap.get(operatorType);
-                if (ConstantThings.P_OPERATOR_TYPE_ADD.equals(operatorType)) {
-                    //新增点位
-                    sourceProperties.addAll(editProperties);
-                } else {
-                    //删除点位，匹配删除
-                    for (EedsProperties properties : editProperties) {
-                        sourceProperties = sourceProperties.stream().filter(p -> !p
-                                .getPropertiesId().equals(properties.getPropertiesId())).collect(Collectors.toList());
-                    }
-                }
-            }
-            editThings.setProperties(sourceProperties);
-            currentThingsList = currentThingsList.stream().filter(things -> !things.getThingsId().equals(editThings.getThingsId())).collect(Collectors.toList());
-            currentThingsList.add(editThings);
+            eedsThings.setProperties(sourceProperties);
+            currentThingsList = currentThingsList.stream().filter(things -> !things.getThingsId().equals(eedsThings.getThingsId())).collect(Collectors.toList());
+            currentThingsList.add(eedsThings);
             saveToFile(JSONUtil.toJsonStr(currentThingsList));
         }
     }
