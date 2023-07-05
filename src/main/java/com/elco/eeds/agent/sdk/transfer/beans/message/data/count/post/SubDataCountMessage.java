@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.elco.eeds.agent.sdk.transfer.beans.data.count.PostDataCount;
 import com.elco.eeds.agent.sdk.transfer.beans.data.count.ThingsDataCount;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ import java.util.List;
  * @Author OUYANG
  * @Date 2022/12/9 13:22
  */
-public class SubDataCountMessage {
+public class SubDataCountMessage implements Serializable {
 
     /**
      * 客户端ID

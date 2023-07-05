@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.order;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -7,7 +8,7 @@ import java.util.List;
  * @date ：Created in 2022/12/23 13:38
  * @description：下发指令确认报文
  */
-public class SubOrderRequestMessage {
+public class SubOrderRequestMessage implements Serializable {
     private String msgSeqNo;
 
     public String getMsgSeqNo() {

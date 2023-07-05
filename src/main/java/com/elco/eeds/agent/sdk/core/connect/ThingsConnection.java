@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.core.connect;
 
 import com.elco.eeds.agent.sdk.core.common.constant.ReadTypeEnums;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesEvent;
+import com.elco.eeds.agent.sdk.core.exception.EedsConnectException;
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsThings;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
@@ -30,7 +31,7 @@ public interface ThingsConnection {
      * @param info
      * @return
      */
-    boolean connect(ThingsDriverContext info) ;
+    boolean connect(ThingsDriverContext info) throws EedsConnectException;
 
 
 
@@ -38,7 +39,7 @@ public interface ThingsConnection {
      * 断开数据源
      * @return
      */
-    boolean disconnect();
+    boolean disconnect() throws EedsConnectException;;
     
     
     /**

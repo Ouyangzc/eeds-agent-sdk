@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.agent.linktest;
 
+import java.io.Serializable;
+
 /**
  * @title: SubAgentLinkTestMessage
  * @Author wl
@@ -7,7 +9,7 @@ package com.elco.eeds.agent.sdk.transfer.beans.message.agent.linktest;
  * @Version 1.0
  * @Description: 客户端链路测试子报文
  */
-public class SubAgentLinkTestMessage {
+public class SubAgentLinkTestMessage implements Serializable {
 
     /**
      * 用户ID

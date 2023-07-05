@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.cmd;
 
+import java.io.Serializable;
+
 /**
  * @ClassName SubCmdRequestMessage
  * @Description 指令下发内容
@@ -7,7 +9,7 @@ package com.elco.eeds.agent.sdk.transfer.beans.message.cmd;
  * @Date 2023/5/17 9:02
  * @Version 1.0
  */
-public class SubCmdRequestMessage {
+public class SubCmdRequestMessage implements Serializable {
     /**
      * 数据源ID
      */

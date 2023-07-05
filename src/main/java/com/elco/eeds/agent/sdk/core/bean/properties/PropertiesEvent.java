@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.core.bean.properties;
 
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantThings;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Map;
  * @Date 2023/1/28 9:45
  * @Version 1.0
  */
-public class PropertiesEvent {
+public class PropertiesEvent implements Serializable {
 	/**
 	 * 主数据源Id
 	 */

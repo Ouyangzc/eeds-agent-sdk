@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.config;
 
+import java.io.Serializable;
+
 /**
  * @title: SubAgentConfigMessage
  * @Author wl
@@ -7,7 +9,7 @@ package com.elco.eeds.agent.sdk.transfer.beans.message.config;
  * @Version 1.0
  * @Description: 客户端配置子报文结构
  */
-public class SubAgentConfigMessage {
+public class SubAgentConfigMessage implements Serializable {
 
     private String dataCacheFileSize;
 

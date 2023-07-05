@@ -9,6 +9,7 @@ import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
 import com.elco.eeds.agent.sdk.core.util.DateUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
  * @Author OUYANG
  * @Date 2022/12/9 14:31
  */
-public class DataSyncPropertiesValueMessage extends BaseMessage<List<SubDataSyncPropertiesValueMessage>> {
+public class DataSyncPropertiesValueMessage extends BaseMessage<List<SubDataSyncPropertiesValueMessage>> implements Serializable {
 
     public static String getMessage(List<PropertiesValue> datas) {
         DataSyncPropertiesValueMessage message = new DataSyncPropertiesValueMessage();

@@ -4,6 +4,8 @@ import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.util.DateUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 
+import java.io.Serializable;
+
 /**
  * @title: AgentTokenRspMessage
  * @Author wl
@@ -11,7 +13,7 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
  * @Version 1.0
  * @Description: 客户端更新token后反馈的报文
  */
-public class AgentTokenRspMessage extends BaseMessage<SubAgentTokenRspMessage>  {
+public class AgentTokenRspMessage extends BaseMessage<SubAgentTokenRspMessage>  implements Serializable {
 
     /**
      * 返回更新token成功的报文

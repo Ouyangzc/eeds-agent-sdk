@@ -1,6 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.beans.things;
 
-import java.util.Map;
+import java.io.Serializable;
 
 /**
  * @ClassName BaseProperties
@@ -8,7 +8,7 @@ import java.util.Map;
  * @Author OUYANG
  * @Date 2022/12/16 9:11
  */
-public class BaseProperties {
+public class BaseProperties implements Serializable {
     /**
      * 变量ID
      */
