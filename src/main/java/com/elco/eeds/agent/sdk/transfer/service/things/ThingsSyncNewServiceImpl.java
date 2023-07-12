@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
  * @Date 2023/5/29 9:09
  * @Version 1.0
  */
-public class ThingsSyncNewServiceImpl implements ThingsSyncService {
+public class ThingsSyncNewServiceImpl implements ThingsSyncService, Serializable {
     private static final Logger logger = LoggerFactory.getLogger(ThingsSyncNewServiceImpl.class);
 
     private ThingsPropertiesService thingsService;

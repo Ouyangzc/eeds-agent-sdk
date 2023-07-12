@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.core.common.constant;
 
+import java.io.Serializable;
+
 /**
  * @ClassName ConstantThings
- * @Description TODO
+ * @Description 数据源常量
  * @Author OUYANG
  * @Date 2022/12/16 14:03
  */
-public class ConstantThings {
+public class ConstantThings implements Serializable {
     /**
      * 变量点位操作类型--新增
      */
