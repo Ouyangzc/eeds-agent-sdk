@@ -24,4 +24,7 @@ public class ConstantCommon {
 
 
     public static final String INITIATIVE = "application.yml";
+
+    //采样频率
+    public static final String SamplingInterval = "SamplingInterval";
 }
