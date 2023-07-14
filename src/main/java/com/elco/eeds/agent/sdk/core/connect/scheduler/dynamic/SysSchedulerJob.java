@@ -7,9 +7,9 @@ import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncNewServiceImpl;
 import org.quartz.Job;
-import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,13 +29,15 @@ public class SysSchedulerJob implements Job {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
-        SysJob sysJob = (SysJob) jobDataMap.get("job");
-        //job业务类型为读取点位类型
-        if (sysJob.getJobGroup().equals(QuartzGroupEnum.READ_PROPERTIES)) {
-            handReadProperties(sysJob);
+        Trigger trigger = context.getTrigger();
+        Object job = trigger.getJobDataMap().get("job");
+        if (ObjectUtil.isNotEmpty(job)) {
+            SysJob sysJob = (SysJob) job;
+            //job业务类型为读取点位类型
+            if (sysJob.getJobGroup().equals(QuartzGroupEnum.READ_PROPERTIES)) {
+                handReadProperties(sysJob);
+            }
         }
-
     }
 
 
