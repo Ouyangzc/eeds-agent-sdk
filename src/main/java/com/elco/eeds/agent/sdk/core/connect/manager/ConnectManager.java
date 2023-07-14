@@ -159,7 +159,7 @@ public class ConnectManager {
             }
             try {
                 SysJob sysJob = new SysJob(handler.getThingsId(), connection.getReadType(), corn, QuartzGroupEnum.READ_PROPERTIES);
-                sysJob.getExtraMap().put("handler", ((ThingsConnectionHandler<?, ?>) connection).getThingsConnection());
+                sysJob.getExtraMap().put("handler",  ConnectManager.getHandler(handler.getThingsId()));
                 jobManage.addJob(sysJob);
             } catch (Exception e) {
                 logger.error("添加定时任务失败，连接信息：{}", JSONUtil.toJsonStr(driverContext));

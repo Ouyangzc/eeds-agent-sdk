@@ -40,14 +40,11 @@ public class JobManageService implements IJobManageService {
             logger.info("新增定时任务,任务信息:{}", JSONUtil.toJsonStr(sysJob));
             //执行新增逻辑
             ReadTypeEnums readTypeEnums = sysJob.getReadTypeEnums();
-            JobDataMap jobDataMap = new JobDataMap();
-            jobDataMap.put("job", sysJob);
 
             //定义一个JobDetail
             JobDetail jobDetail = null;
             jobDetail = JobBuilder.newJob(SysSchedulerJob.class)
                     .withIdentity(jobName, jobGroup)
-                    .setJobData(jobDataMap)
                     .build();
 
             DateTime startDate = DateUtil.date();
@@ -75,6 +72,7 @@ public class JobManageService implements IJobManageService {
                 trigger = newTrigger().withIdentity(jobName, jobGroup).startAt(startDate)
                         .withSchedule(scheduleBuilder).build();
             }
+            trigger.getJobDataMap().put("job", sysJob);
             scheduler.scheduleJob(jobDetail, trigger);
         }
     }
@@ -111,9 +109,10 @@ public class JobManageService implements IJobManageService {
 
     @Override
     public void modifyJob(SysJob sysJob) throws Exception {
-        logger.info("删除定时任务,任务信息:{}", JSONUtil.toJsonStr(sysJob));
+        logger.info("修改定时任务,任务信息:{}", JSONUtil.toJsonStr(sysJob));
         String jobName = sysJob.getJobName();
         String jobGroup = sysJob.getJobGroup().getValue();
+
         TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
         Trigger oldTrigger = scheduler.getTrigger(triggerKey);
         if (null == oldTrigger) {
@@ -146,6 +145,7 @@ public class JobManageService implements IJobManageService {
                     .build();
         }
         Trigger newTrigger = triggerBuilder.build();
+        newTrigger.getJobDataMap().put("job", sysJob);
         //按新的trigger重新设置job执行
         scheduler.rescheduleJob(triggerKey, newTrigger);
     }
