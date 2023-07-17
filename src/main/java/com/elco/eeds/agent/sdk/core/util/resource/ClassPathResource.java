@@ -31,12 +31,9 @@ public class ClassPathResource implements Resource, Serializable {
 
     @Override
     public InputStream getStream() throws IOException {
-        ClassLoader[] classLoaders = ClassUtils.getClassLoader();
-        for (ClassLoader loader : classLoaders) {
-            InputStream inputStream = loader.getResourceAsStream(path);
-            if (null != inputStream) {
-                return inputStream;
-            }
+        InputStream inputStream = classLoader.getResourceAsStream(path);
+        if (null != inputStream) {
+            return inputStream;
         }
         throw new FileNotFoundException(this.path + "cannot be opened because it does not exist");
     }
