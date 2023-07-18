@@ -21,6 +21,7 @@ public class AgentBaseInfo implements Serializable {
         this.port = startProperties.getPort();
         this.serverUrl = startProperties.getServerUrl();
         this.name = startProperties.getName();
+        this.ssl = startProperties.getSsl();
     }
 
 
@@ -41,6 +42,8 @@ public class AgentBaseInfo implements Serializable {
     private String dataCacheFileSize;
     // 缓存周期
     private String dataCacheCycle;
+
+    private AgentSSLProperties ssl;
 
     public String getPort() {
         return port;
@@ -117,6 +120,14 @@ public class AgentBaseInfo implements Serializable {
 
     public void setDataCacheCycle(String dataCacheCycle) {
         this.dataCacheCycle = dataCacheCycle;
+    }
+
+    public AgentSSLProperties getSsl() {
+        return ssl;
+    }
+
+    public void setSsl(AgentSSLProperties ssl) {
+        this.ssl = ssl;
     }
 
     @Override

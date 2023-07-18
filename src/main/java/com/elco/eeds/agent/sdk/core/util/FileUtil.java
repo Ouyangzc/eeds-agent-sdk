@@ -1,6 +1,8 @@
 package com.elco.eeds.agent.sdk.core.util;
 
+import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
 import com.elco.eeds.agent.sdk.transfer.quartz.DataFileJob;
 
@@ -19,6 +21,8 @@ import java.util.Map;
  **/
 public class FileUtil {
 
+    public static final char C_SLASH = CharUtil.SLASH;
+
 
     /**
      * 读取目录下的所有文件
@@ -35,7 +39,7 @@ public class FileUtil {
         // 读取目录下的所有目录文件信息
         String[] files = dir.list();
         //缓存file时间
-        Map<File, File> map  = null;
+        Map<File, File> map = null;
         // 循环，添加文件名或回调自身
         for (int i = 0; i < files.length; i++) {
             File file = new File(dir, files[i]);
@@ -97,5 +101,20 @@ public class FileUtil {
         List<String> fileNames = new ArrayList<String>();
         String fileFolder = AgentFileUtils.getBaseFolder() + ConstantFilePath.PROPERTIES_DATA_FOLDER;
         FileUtil.loadFile(new File(fileFolder), fileNames);
+    }
+
+    /**
+     * 判断路径是否为绝对路径
+     *
+     * @param path
+     * @return
+     */
+    public static boolean isAbsolutePath(String path) {
+        if (StrUtil.isEmpty(path)) {
+            return false;
+        }
+
+        // 给定的路径已经是绝对路径了
+        return C_SLASH == path.charAt(0) || path.matches("^[a-zA-Z]:([/\\\\].*)?");
     }
 }
