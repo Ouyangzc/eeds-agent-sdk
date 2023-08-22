@@ -9,9 +9,15 @@ package com.elco.eeds.agent.sdk.core.common.constant;
  */
 public class CmdConstant {
 
-    public static final String ORDER_TYPE_SERIAL = "SERIAL";
-    public static final String ORDER_TYPE_RESPONSE = "RESPONSE";
-    public static final String ORDER_TYPE_NO_RESPONSE = "NO_RESPONSE";
+    public static final String ORDER_TYPE_SERIAL = "11001";
+    public static final String ORDER_TYPE_RESPONSE = "11002";
+    /**
+     * 指令类型对照:
+     *  顺序下发 : 11001 -- SERIAL
+     *  响应    : 11002 -- RESPONSE
+     *  无响应  : 11003 -- NO_RESPONSE
+     */
+    public static final String ORDER_TYPE_NO_RESPONSE = "11003";
 
     public static final Integer WAITING = 0;
 
