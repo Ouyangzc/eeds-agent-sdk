@@ -74,15 +74,4 @@ public class ThingsCmdRequestList implements Serializable {
         this.status = CmdConstant.READY;
     }
 
-
-    public static void main(String[] args) {
-        ArrayDeque<String> deque = new ArrayDeque<>();
-        deque.add("1");
-        deque.add("2");
-        deque.add("3");
-        System.out.println(deque.poll() + " last: " + deque.toString());
-        System.out.println(deque.poll() + " last: " + deque.toString());
-        System.out.println(deque.poll() + " last: " + deque.toString());
-        System.out.println(deque.poll() + " last: " + deque.toString());
-    }
 }

@@ -41,10 +41,10 @@ public class Agent implements Serializable {
       synchronized (Agent.class) {
         if (agent == null) {
           agent = new Agent();
-          agent.setAgentStatus(AgentStatus.INTI);
         }
       }
     }
+    agent.setAgentStatus(AgentStatus.INTI);
     return agent;
   }
 

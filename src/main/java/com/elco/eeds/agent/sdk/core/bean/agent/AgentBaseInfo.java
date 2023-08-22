@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.bean.agent;
 
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 
 import java.io.Serializable;
@@ -132,16 +133,6 @@ public class AgentBaseInfo implements Serializable {
 
     @Override
     public String toString() {
-        return "AgentBaseInfo{" +
-                "agentId='" + agentId + '\'' +
-                ", name='" + name + '\'' +
-                ", token='" + token + '\'' +
-                ", serverUrl='" + serverUrl + '\'' +
-                ", baseFolder='" + baseFolder + '\'' +
-                ", syncPeriod='" + syncPeriod + '\'' +
-                ", dataCacheFileSize='" + dataCacheFileSize + '\'' +
-                ", dataCacheCycle='" + dataCacheCycle + '\'' +
-                ", port='" + port + '\'' +
-                '}';
+        return JSONUtil.toJsonStr(this);
     }
 }

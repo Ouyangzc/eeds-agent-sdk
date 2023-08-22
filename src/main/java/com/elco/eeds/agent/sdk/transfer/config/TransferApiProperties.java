@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.config;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 
 import java.io.Serializable;
@@ -53,6 +54,6 @@ public class TransferApiProperties implements Serializable {
      */
     private String getApi(String methods) {
         List<TransferApi> apiList = apis.stream().filter(transferApi -> transferApi.getMethod().equals(methods)).collect(Collectors.toList());
-        return CollectionUtil.isNotEmpty(apiList) ? apiList.get(0).getApi() : "";
+        return CollUtil.isNotEmpty(apiList) ? apiList.get(0).getApi() : "";
     }
 }

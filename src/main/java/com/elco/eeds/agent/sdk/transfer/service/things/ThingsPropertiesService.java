@@ -44,7 +44,7 @@ public class ThingsPropertiesService {
         try {
             ThingsFileUtils.saveThingsFileToLocal(data);
         } catch (IOException e) {
-            logger.error("存储数据源文件异常,信息:{}", e);
+            logger.error("存储数据源文件异常,信息:", e);
         }
     }
 
@@ -125,7 +125,11 @@ public class ThingsPropertiesService {
             }
             Long maxTimeStamp = 0L;
             List<EedsThings> eedsThings = JSON.parseArray(localThings, EedsThings.class);
-            maxTimeStamp = eedsThings.stream().map(EedsThings::getTimestamp).max(Long::compareTo).get();
+            Optional<Long> optional = eedsThings.stream().map(EedsThings::getTimestamp).max(Long::compareTo);
+            if (!optional.isPresent()) {
+                return maxTimeStamp;
+            }
+            maxTimeStamp = optional.get();
             for (EedsThings things : eedsThings) {
                 List<EedsProperties> properties = things.getProperties();
                 if (ObjectUtil.isNotEmpty(properties)) {
@@ -137,7 +141,7 @@ public class ThingsPropertiesService {
             }
             return maxTimeStamp;
         } catch (Exception e) {
-            logger.error("获取数据源文件失败，异常：{}", e);
+            logger.error("获取数据源文件失败，异常：", e);
             return 0L;
         }
     }

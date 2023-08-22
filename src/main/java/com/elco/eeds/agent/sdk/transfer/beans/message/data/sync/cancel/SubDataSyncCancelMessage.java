@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.cancel;
 
+import cn.hutool.json.JSONUtil;
+
 import java.io.Serializable;
 
 /**
@@ -32,5 +34,10 @@ public class SubDataSyncCancelMessage implements Serializable {
 
     public void setAgentId(String agentId) {
         this.agentId = agentId;
+    }
+
+    @Override
+    public String toString() {
+        return JSONUtil.toJsonStr(this);
     }
 }

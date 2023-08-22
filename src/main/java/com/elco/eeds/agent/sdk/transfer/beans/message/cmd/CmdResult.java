@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.cmd;
 
+import cn.hutool.json.JSONUtil;
+
 /**
  * @ClassName WriteResult
  * @Description 下发执行结果
@@ -44,5 +46,10 @@ public class CmdResult {
 
     public void setResultMsg(String resultMsg) {
         this.resultMsg = resultMsg;
+    }
+
+    @Override
+    public String toString() {
+        return JSONUtil.toJsonStr(this);
     }
 }

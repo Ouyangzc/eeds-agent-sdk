@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.start;
 
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentSSLProperties;
 
 import java.io.Serializable;
@@ -71,14 +72,6 @@ public class AgentStartProperties implements Serializable {
         return agentStartProperties;
     }
 
-    /*private AgentStartProperties(String serverUrl, String name, String port, String token, String baseFolder) {
-        this.serverUrl = serverUrl;
-        this.name = name;
-        this.port = port;
-        this.token = token;
-        this.baseFolder = baseFolder;
-    }*/
-
     public String getServerUrl() {
         return serverUrl;
     }
@@ -137,13 +130,6 @@ public class AgentStartProperties implements Serializable {
 
     @Override
     public String toString() {
-        return "AgentStartProperties{" +
-                "serverUrl='" + serverUrl + '\'' +
-                ", name='" + name + '\'' +
-                ", port='" + port + '\'' +
-                ", token='" + token + '\'' +
-                ", baseFolder='" + baseFolder + '\'' +
-                ", agentClientType='" + agentClientType + '\'' +
-                '}';
+        return JSONUtil.toJsonStr(this);
     }
 }

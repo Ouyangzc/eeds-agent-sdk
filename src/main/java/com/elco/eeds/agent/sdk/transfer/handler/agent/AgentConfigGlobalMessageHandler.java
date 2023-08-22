@@ -41,8 +41,8 @@ public class AgentConfigGlobalMessageHandler implements IReceiverMessageHandler 
         // 从agent.json中取出config信息
         try {
             String config = AgentFileExtendUtils.getConfigFromLocalAgentFile();
-            JSONArray jsonArray = JSONObject.parseArray(config);
-            List<BaseConfigEntity> list = JSONObject.parseArray(jsonArray.toJSONString(), BaseConfigEntity.class);
+            JSONArray jsonArray = JSON.parseArray(config);
+            List<BaseConfigEntity> list = JSON.parseArray(jsonArray.toJSONString(), BaseConfigEntity.class);
             List<BaseConfigEntity> listTemp = list.stream().collect(Collectors.toList());
             listTemp.forEach(e -> {
                 String configFieldName = e.getConfigFieldName();
@@ -68,11 +68,11 @@ public class AgentConfigGlobalMessageHandler implements IReceiverMessageHandler 
             });
             agent.setAgentBaseInfo(agentBaseInfo);
             // 将新的客户端生效的配置，写入agent.json
-            JSONArray writeAgentFileJsonArray = JSONArray.parseArray(JSONUtil.toJsonStr(waitWriteJsonList));
+            JSONArray writeAgentFileJsonArray = JSON.parseArray(JSONUtil.toJsonStr(waitWriteJsonList));
             AgentFileExtendUtils.setConfigToLocalAgentFile(writeAgentFileJsonArray);
-            logger.debug("客户端更新全局配置成功，新的客户端配置为：{}", agent.getAgentBaseInfo().toString());
+            logger.debug("客户端更新全局配置成功，新的客户端配置为：{}", agent.getAgentBaseInfo());
         } catch (SdkException e) {
-            logger.error("客户端更新全局配置报文处理异常：{}", e);
+            logger.error("客户端更新全局配置报文处理异常:", e);
             e.printStackTrace();
         }
     }

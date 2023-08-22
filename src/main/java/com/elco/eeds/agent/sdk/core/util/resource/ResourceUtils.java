@@ -34,9 +34,4 @@ public class ResourceUtils {
         }
         return new ClassPathResource(path);
     }
-
-    public static void main(String[] args) throws IOException {
-        InputStream inputStream = ResourceUtil.getStream("/client.jks");
-//        InputStream stream = ResourceUtils.getStream("D:\\ProjectCode\\eeds\\client.jks");
-    }
 }

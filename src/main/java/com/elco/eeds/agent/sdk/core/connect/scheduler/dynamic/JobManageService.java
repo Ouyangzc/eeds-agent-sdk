@@ -38,7 +38,7 @@ public class JobManageService implements IJobManageService {
             //执行修改逻辑
             modifyJob(sysJob);
         } else {
-            logger.info("新增定时任务,任务信息:{}", JSONUtil.toJsonStr(sysJob));
+            logger.info("新增定时任务,任务信息:{}", sysJob);
             //执行新增逻辑
             ReadTypeEnums readTypeEnums = sysJob.getReadTypeEnums();
 
@@ -110,14 +110,14 @@ public class JobManageService implements IJobManageService {
 
     @Override
     public void modifyJob(SysJob sysJob) throws Exception {
-        logger.info("修改定时任务,任务信息:{}", JSONUtil.toJsonStr(sysJob));
+        logger.info("修改定时任务,任务信息:{}", sysJob);
         String jobName = sysJob.getJobName();
         String jobGroup = sysJob.getJobGroup().getValue();
 
         TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
         Trigger oldTrigger = scheduler.getTrigger(triggerKey);
         if (null == oldTrigger) {
-            logger.error("修改定时任务,未找到该任务的Trigger,任务信息:{}", JSONUtil.toJsonStr(sysJob));
+            logger.error("修改定时任务,未找到该任务的Trigger,任务信息:{}",sysJob);
             return;
         }
         //构建新的Trigger
@@ -162,7 +162,6 @@ public class JobManageService implements IJobManageService {
                     .setJobData(dataMap)
                     .build();
             DateTime date = DateUtil.offsetSecond(DateUtil.date(), timeout);
-            System.out.println(date);
             // 定义触发器, 会马上执行一次, 接着5秒执行一次
             Trigger trigger = TriggerBuilder.newTrigger()
                     .withIdentity(msgSeqNo, msgSeqNo)

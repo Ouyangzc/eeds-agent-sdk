@@ -56,15 +56,14 @@ public class AgentRequestHttpService {
             if(SysCodeEnum.SUCCESS.getCode().equals(responseResult.getCode())){
                 // 将server-config反馈的data赋值给Agent对象
                 agent = copyFieldToAgent(JSONUtil.toJsonStr(responseResult.getData()));
-                logger.info("rpc register interfaces,result:{}", JSONUtil.toJsonStr(response));
+                logger.info("rpc register interfaces,result:{}", response);
                 return agent;
             }else{
-                logger.error("request rpc register error,msg:{}", JSONUtil.toJsonStr(response));
+                logger.error("request rpc register error,msg:{}", response);
                 return null;
             }
         } catch (Exception e) {
-            logger.error("调用server自动注册接口异常, 形参为：{}", JSONUtil.toJsonStr(agentRegisterRequest));
-            logger.error("请求地址为：{}", requestUrl);
+            logger.error("调用server自动注册接口异常, 请求地址为：{}，形参为：{}", requestUrl,agentRegisterRequest);
             e.printStackTrace();
         }
         return null;
@@ -107,7 +106,6 @@ public class AgentRequestHttpService {
         Map<String, Object> map = (Map<String, Object>) JSON.parse(data);
 
         for (Map.Entry<String, Object> entry : map.entrySet()) {
-            // logger.debug("key={},value={}", entry.getKey(), entry.getValue());
             // 反射赋值
             if (ReflectUtils.isContainKey(agentBaseInfo, entry.getKey())) {
                 ReflectUtils.invokeSet(agentBaseInfo, entry.getKey(), entry.getValue());
