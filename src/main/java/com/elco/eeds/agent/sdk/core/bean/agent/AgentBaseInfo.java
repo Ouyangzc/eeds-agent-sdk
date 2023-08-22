@@ -42,6 +42,8 @@ public class AgentBaseInfo implements Serializable {
     // 缓存周期
     private String dataCacheCycle;
 
+    private Integer orderTimeOut;
+
     public String getPort() {
         return port;
     }
@@ -117,6 +119,14 @@ public class AgentBaseInfo implements Serializable {
 
     public void setDataCacheCycle(String dataCacheCycle) {
         this.dataCacheCycle = dataCacheCycle;
+    }
+
+    public Integer getOrderTimeOut() {
+        return orderTimeOut;
+    }
+
+    public void setOrderTimeOut(Integer orderTimeOut) {
+        this.orderTimeOut = orderTimeOut;
     }
 
     @Override

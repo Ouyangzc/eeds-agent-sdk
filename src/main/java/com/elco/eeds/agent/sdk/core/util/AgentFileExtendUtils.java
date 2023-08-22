@@ -34,7 +34,6 @@ public class AgentFileExtendUtils {
             return jsonObject.get("token").toString();
         } catch (Exception e) {
             logger.debug("从json文件读取token失败");
-            e.printStackTrace();
             throw new SdkException(ErrorEnum.READ_TOKEN_ERROR.code());
         }
     }

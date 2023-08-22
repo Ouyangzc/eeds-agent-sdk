@@ -6,6 +6,8 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
+import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
+import com.elco.eeds.agent.sdk.core.connect.scheduler.IJobManageService;
 import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
 import com.elco.eeds.agent.sdk.core.exception.EedsConnectException;
 import com.elco.eeds.agent.sdk.core.parsing.DataParsing;
@@ -13,7 +15,9 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdResult;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.SubCmdRequestMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.message.order.OrderPropertiesValue;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
+import com.elco.eeds.agent.sdk.transfer.service.cmd.CmdService;
 import com.elco.eeds.agent.sdk.transfer.service.data.RealTimePropertiesValueService;
+import com.elco.eeds.agent.sdk.transfer.service.order.OrderResultMqService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsConnectStatusMqService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncNewServiceImpl;
 import org.slf4j.Logger;
@@ -118,13 +122,21 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> implemen
      */
     public abstract boolean write(List<OrderPropertiesValue> propertiesValueList, String msgSeqNo);
 
+
     /**
-     * 下发功能指令
-     *
      * @param cmdMsg
      * @return
+     * @throws RuntimeException
      */
-    public abstract CmdResult write(SubCmdRequestMessage cmdMsg);
+    public abstract CmdResult cmdWrite(SubCmdRequestMessage cmdMsg) throws RuntimeException;
+
+    /**
+     * 校验下发指令是否合法
+     *
+     * @param inputData 下发内容
+     * @return true 校验通过 false:检验不通过
+     */
+    public abstract boolean cmdCheck(String inputData);
 
 
     /**
@@ -220,6 +232,8 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> implemen
 //    public void command(EedsThings things,String command){
 //        this.write(things,this.parsing.parsingCommand(command));
 //    }
+
+
 
     /**
      * 执行重连

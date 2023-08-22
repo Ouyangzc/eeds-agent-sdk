@@ -1,16 +1,12 @@
 package com.elco.eeds.agent.sdk.transfer.handler.cmd;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
-import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
-import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdRequestMessage;
-import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdResult;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.SubCmdRequestMessage;
 import com.elco.eeds.agent.sdk.transfer.handler.IReceiverMessageHandler;
-import com.elco.eeds.agent.sdk.transfer.service.order.OrderConfirmMqService;
-import com.elco.eeds.agent.sdk.transfer.service.order.OrderResultMqService;
+import com.elco.eeds.agent.sdk.transfer.service.cmd.CmdRequestManager;
+import com.elco.eeds.agent.sdk.transfer.service.cmd.CmdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,27 +21,22 @@ public class CmdRequestMessageHandler implements IReceiverMessageHandler {
 
     private static Logger logger = LoggerFactory.getLogger(CmdRequestMessageHandler.class);
 
+    private CmdService cmdService;
+
+    public CmdRequestMessageHandler(CmdService cmdService) {
+        this.cmdService = cmdService;
+    }
+
     @Override
     public void handleRecData(String topic, String recData) {
         CmdRequestMessage message = JSON.parseObject(recData, CmdRequestMessage.class);
         logger.info("接收到指令功能下发消息，topic:{},data:{}", topic, JSONUtil.toJsonStr(recData));
         SubCmdRequestMessage data = message.getData();
+        String msgSeqNo = data.getMsgSeqNo();
+        String thingsId = data.getThingsId();
         // 发送指令功能下发确认报文
-        OrderConfirmMqService.send(data.getThingsId(), data.getMsgSeqNo());
-        ThingsConnectionHandler handler = ConnectManager.getHandler(data.getThingsId());
-        if (ObjectUtil.isEmpty(handler)) {
-            logger.error("指令功能下发,数据源:{},连接异常:{}", data.getThingsId(), "CL0101011");
-            OrderResultMqService.sendFail(data.getThingsId(), data.getMsgSeqNo(), "【失败】数据源连接不存在,请检查数据源状态");
-            return;
-        }
-        CmdResult result = handler.write(data);
-        if (null != result) {
-            logger.info("指令功能下发，执行结果：{}", JSONUtil.toJsonStr(result));
-            if (result.isResult()) {
-                OrderResultMqService.sendSuccess(result.getThingsId(), result.getMsgSeqNo());
-            } else {
-                OrderResultMqService.sendFail(result.getThingsId(), result.getMsgSeqNo(), result.getResultMsg());
-            }
-        }
+        cmdService.sendConfirmMsg(thingsId, msgSeqNo);
+        //将该指令加入到缓存集合中
+        cmdService.addThingsCmdRequestMessage(thingsId, data);
     }
 }

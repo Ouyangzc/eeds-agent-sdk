@@ -62,4 +62,12 @@ public class OrderResultMqService {
         });
     }
 
+    public static void sendResult(boolean result, String thingsId, String msgSeqNo, String resultMsg) {
+        if (result) {
+            sendSuccess(thingsId, msgSeqNo);
+        } else {
+            sendFail(thingsId, msgSeqNo, resultMsg);
+        }
+    }
+
 }
