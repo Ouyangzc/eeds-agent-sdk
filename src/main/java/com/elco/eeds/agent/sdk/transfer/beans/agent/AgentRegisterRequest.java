@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.agent;
 
+import cn.hutool.json.JSONUtil;
+
 import java.io.Serializable;
 
 /**
@@ -83,12 +85,6 @@ public class AgentRegisterRequest implements Serializable {
 
     @Override
     public String toString() {
-        return "AgentRegisterRequest{" +
-                "name='" + name + '\'' +
-                ", host='" + host + '\'' +
-                ", port='" + port + '\'' +
-                ", token='" + token + '\'' +
-                ", type='" + type + '\'' +
-                '}';
+        return JSONUtil.toJsonStr(this);
     }
 }

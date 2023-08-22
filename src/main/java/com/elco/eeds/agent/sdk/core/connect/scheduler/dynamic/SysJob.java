@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.connect.scheduler.dynamic;
 
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.common.constant.ReadTypeEnums;
 
 import java.io.Serializable;
@@ -65,5 +66,10 @@ public class SysJob implements Serializable {
 
     public String getCron() {
         return cron;
+    }
+
+    @Override
+    public String toString() {
+        return JSONUtil.toJsonStr(this);
     }
 }

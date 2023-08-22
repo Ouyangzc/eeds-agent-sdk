@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.core.connect;
 
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
@@ -150,7 +151,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> implemen
         long startTime = System.currentTimeMillis();
         List<PropertiesContext> propertiesContextList = ThingsSyncNewServiceImpl
                 .getThingsPropertiesContextList(thingsId);
-        if (CollectionUtil.isNotEmpty(propertiesContextList)) {
+        if (CollUtil.isNotEmpty(propertiesContextList)) {
             List<PropertiesValue> valueList = this.getParsing()
                     .parsing(this.context, ThingsSyncNewServiceImpl.getThingsPropertiesContextList(thingsId),
                             msg);

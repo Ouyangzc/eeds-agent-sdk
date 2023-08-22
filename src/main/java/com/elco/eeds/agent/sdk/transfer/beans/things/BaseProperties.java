@@ -52,8 +52,6 @@ public class BaseProperties implements Serializable {
      */
     private Long timestamp;
 
-    public BaseProperties() {
-    }
 
 
     public String getPropertiesId() {

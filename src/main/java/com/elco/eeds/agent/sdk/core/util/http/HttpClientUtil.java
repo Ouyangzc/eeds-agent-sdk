@@ -7,11 +7,13 @@ import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.core.util.resource.ResourceUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
@@ -59,6 +61,8 @@ public class HttpClientUtil {
 
 
     public static String httpPost(String url, String token, String content) throws Exception {
+        //获取DefaultHttpClient请求
+        HttpClient client = HttpClientBuilder.create().build();
         try {
             HttpPost httpPost = new HttpPost(url);
             httpPost.addHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
@@ -70,14 +74,14 @@ public class HttpClientUtil {
             se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON));
             httpPost.setEntity(se);
             // 发送请求
-            HttpResponse httpResponse = new DefaultHttpClient().execute(httpPost);
+            HttpResponse httpResponse = client.execute(httpPost);
             // 得到应答的字符串，这也是一个 JSON 格式保存的数据
             String resp = EntityUtils.toString(httpResponse.getEntity(), CHARSET_UTF_8);
             logger.debug("response: {}", resp);
             return resp;
         } catch (Exception e) {
-            logger.error("请求错误：{}", e);
             logger.error("url: {}, token: {}, content: {}", url, token, content);
+            logger.error("请求错误：", e);
             e.printStackTrace();
             throw new SdkException(ErrorEnum.HTTP_REQUEST_ERROR.code());
         }
@@ -87,7 +91,6 @@ public class HttpClientUtil {
     public static String httpsPost(String url, String token, String content) throws Exception {
         try {
             AgentSSLProperties sslProperties = Agent.getInstance().getAgentBaseInfo().getSsl();
-            Boolean enable = sslProperties.getEnable();
             SSLContext sslContext = null;
             if (sslProperties.getEnable()) {
                 //使用证书
@@ -127,8 +130,8 @@ public class HttpClientUtil {
             logger.debug("response: {}", resp);
             return resp;
         } catch (Exception e) {
-            logger.error("请求错误：{}", e);
             logger.error("url: {}, token: {}, content: {}", url, token, content);
+            logger.error("请求错误：", e);
             throw new SdkException(ErrorEnum.HTTP_REQUEST_ERROR.code());
         }
     }

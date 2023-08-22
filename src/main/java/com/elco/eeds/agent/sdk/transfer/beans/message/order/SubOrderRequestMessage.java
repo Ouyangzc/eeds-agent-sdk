@@ -74,9 +74,3 @@ public class SubOrderRequestMessage implements Serializable {
     private String thingCode;
     List<OrderPropertiesValue>properties;
 }
-
-//
-//class PropertiesEntity{
-//
-//
-//}

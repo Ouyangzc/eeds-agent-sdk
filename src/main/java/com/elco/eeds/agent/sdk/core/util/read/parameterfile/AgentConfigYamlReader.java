@@ -36,34 +36,32 @@ public class AgentConfigYamlReader {
     }
 
     /**
-     *
      * @param location
      * @return
      * @throws SdkException
      */
     public AgentStartProperties parseYaml(String location, boolean isAbsolutePath) throws SdkException {
-        logger.info("获取配置文件路径：{}",location);
-        Map<String,Object> map;
-        try{
+        logger.info("获取配置文件路径：{}", location);
+        Map<String, Object> map;
+        try {
             Yaml yaml = new Yaml();
             URL resource;
             if (isAbsolutePath) {
                 resource = resourceLoader.getResourceByAbsolutePath(location);
-                if (resource != null){
+                if (resource != null) {
                     //读取yaml中的数据并且以map集合的形式存储
                     UrlResource urlResource = new UrlResource(resource);
                     map = yaml.load(urlResource.getInputStream());
-                    // logger.debug("yml内容为：{}", map);
-                }else {
+                } else {
                     throw new SdkException(ErrorEnum.RESOURCE_OBTAIN_ERROR.code());
                 }
-            }else {
+            } else {
                 ClassPathResource classPathResource = resourceLoader.getResource(location);
                 map = yaml.load(classPathResource.getStream());
             }
 
-        }catch (Exception e){
-            logger.error("{}路径读取配置文件失败，没有此文件", e);
+        } catch (Exception e) {
+            logger.error("路径读取配置文件失败，没有此文件,异常信息：", e);
             e.printStackTrace();
             return null;
         }
@@ -85,10 +83,6 @@ public class AgentConfigYamlReader {
             logger.error("配置文件中字段错误，请检查");
             throw new SdkException(ErrorEnum.CONFIG_FILE_ERROR.code());
         }
-
-//        logger.info("从配置文件取出配置成功：serverUrl={}, name={}, port={}, token={}, baseFolder={}",
-//                agent.get("serverUrl"), agent.get("name"), agent.get("port"),
-//                agent.get("token"), agent.get("baseFolder"));
         return agentStartProperties;
     }
 }

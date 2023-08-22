@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.things;
 
-import com.alibaba.fastjson.JSONObject;
+import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -198,7 +199,11 @@ public class ThingsDriverContext implements Serializable {
     public void setExtendFieldMap(String extendFieldMap) {
         this.extendFieldMap = extendFieldMap;
         // 将动态连接信息中的字段赋值给原先的固定字段
-        this.extraMap = JSONObject.parseObject(this.extendFieldMap, Map.class);
+        this.extraMap = JSON.parseObject(this.extendFieldMap, Map.class);
     }
 
+    @Override
+    public String toString() {
+        return JSONUtil.toJsonStr(this);
+    }
 }

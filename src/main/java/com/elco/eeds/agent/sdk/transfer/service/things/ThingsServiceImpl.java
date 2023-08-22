@@ -44,7 +44,7 @@ public class ThingsServiceImpl implements ThingsService {
         try {
             ThingsFileUtils.saveThingsFileToLocal(data);
         } catch (IOException e) {
-            logger.error("存储数据源文件异常,信息:{}", e);
+            logger.error("存储数据源文件异常,信息:", e);
         }
     }
 

@@ -83,7 +83,8 @@ public class AgentRegisterService implements IAgentRegisterService {
             // 调用http接口的register方法
             agent = agentRequestHttpService.register(clientIp, port, name, token, AgentStartProperties.getInstance().getAgentClientType());
             if (agent == null) {
-                agent.setAgentStatus(AgentStatus.ERROR);
+                Agent instance = Agent.getInstance();
+                instance.setAgentStatus(AgentStatus.ERROR);
                 throw new SdkException(ErrorEnum.CLIENT_REGISTER_ERROR.code());
             }
             // 刷新token
@@ -97,10 +98,9 @@ public class AgentRegisterService implements IAgentRegisterService {
             agent.setAgentStatus(AgentStatus.READY);
             return true;
         } catch (Exception e) {
-            agent.setAgentStatus(AgentStatus.ERROR);
-            e.printStackTrace();
-            // throw new SdkException(ErrorEnum.CLIENT_REGISTER_ERROR.code());
-            logger.error("客户端注册流程失败！{}", e.getMessage());
+            Agent instance = Agent.getInstance();
+            instance.setAgentStatus(AgentStatus.ERROR);
+            logger.error("客户端注册流程失败，失败原因：", e);
             this.close(e.getMessage());
             return false;
         }
@@ -158,7 +158,7 @@ public class AgentRegisterService implements IAgentRegisterService {
             // 待补充
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("加载Nats组件异常：{}", e);
+            logger.error("加载Nats组件异常：", e);
             throw new SdkException(ErrorEnum.NATS_LOAD_ERROR.code());
         }
     }

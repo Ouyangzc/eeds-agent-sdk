@@ -28,7 +28,7 @@ public class OrderRequestMessageHandler implements IReceiverMessageHandler {
     @Override
     public void handleRecData(String topic, String recData) {
         OrderRequestMessage message = JSON.parseObject(recData, OrderRequestMessage.class);
-        logger.info("接收到指令下发消息，topic:{},data:{}", topic, JSONUtil.toJsonStr(message));
+        logger.info("接收到指令下发消息，topic:{},data:{}", topic, message);
         SubOrderRequestMessage data = message.getData();
         // 发送指令下发确认报文
         OrderConfirmMqService.send(data.getThingsId(),data.getMsgSeqNo());

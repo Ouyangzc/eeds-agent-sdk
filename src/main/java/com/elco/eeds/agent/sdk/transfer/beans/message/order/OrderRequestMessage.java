@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.order;
 
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 
 import java.io.Serializable;
@@ -12,5 +13,8 @@ import java.io.Serializable;
  */
 public class OrderRequestMessage extends BaseMessage<SubOrderRequestMessage> implements Serializable {
 
-
+    @Override
+    public String toString() {
+        return JSONUtil.toJsonStr(this);
+    }
 }

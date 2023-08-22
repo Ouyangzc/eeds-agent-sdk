@@ -30,7 +30,7 @@ public class CmdRequestMessageHandler implements IReceiverMessageHandler {
     @Override
     public void handleRecData(String topic, String recData) {
         CmdRequestMessage message = JSON.parseObject(recData, CmdRequestMessage.class);
-        logger.info("接收到指令功能下发消息，topic:{},data:{}", topic, JSONUtil.toJsonStr(recData));
+        logger.info("接收到指令功能下发消息，topic:{},data:{}", topic, recData);
         SubCmdRequestMessage data = message.getData();
         String msgSeqNo = data.getMsgSeqNo();
         String thingsId = data.getThingsId();
