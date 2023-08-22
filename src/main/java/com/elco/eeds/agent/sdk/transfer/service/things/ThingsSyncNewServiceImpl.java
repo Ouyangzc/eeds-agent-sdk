@@ -255,7 +255,6 @@ public class ThingsSyncNewServiceImpl implements ThingsSyncService, Serializable
                         BeanUtil.copyProperties(things, driverContext);
                         String agentId = things.getAgentId();
                         String thingsId = things.getThingsId();
-                        ConnectManager.create(driverContext, AgentStartProperties.getInstance().getAgentClientType());
                         THINGS_DRIVER_CONTEXT_MAP.put(things.getThingsId(), driverContext);
                         List<EedsProperties> properties = things.getProperties();
                         for (EedsProperties p : properties) {
@@ -266,6 +265,7 @@ public class ThingsSyncNewServiceImpl implements ThingsSyncService, Serializable
                             propertiesContext.setThingsType(things.getThingsType());
                             PROPERTIES_CONTEXT_MAP.put(p.getPropertiesId(), propertiesContext);
                         }
+                        ConnectManager.create(driverContext, AgentStartProperties.getInstance().getAgentClientType());
                     }
                 }
             }

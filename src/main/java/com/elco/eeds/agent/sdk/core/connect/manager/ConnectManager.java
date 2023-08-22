@@ -5,11 +5,14 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesEvent;
+import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.common.constant.ReadTypeEnums;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
-import com.elco.eeds.agent.sdk.core.connect.scheduler.IJobManageService;
-import com.elco.eeds.agent.sdk.core.connect.scheduler.JobManageService;
+import com.elco.eeds.agent.sdk.core.connect.scheduler.dynamic.IJobManageService;
+import com.elco.eeds.agent.sdk.core.connect.scheduler.dynamic.JobManageService;
+import com.elco.eeds.agent.sdk.core.connect.scheduler.dynamic.QuartzGroupEnum;
+import com.elco.eeds.agent.sdk.core.connect.scheduler.dynamic.SysJob;
 import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
 import com.elco.eeds.agent.sdk.core.exception.EedsConnectException;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
@@ -133,7 +136,7 @@ public class ConnectManager {
         ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
         thingsStatus.setValue(handler, ConnectionStatus.CONNECTING);
         try {
-         connection.connect(driverContext);
+            connection.connect(driverContext);
         } catch (EedsConnectException e) {
             logger.error("创建连接失败,发生可知异常,连接信息：{}", JSONUtil.toJsonStr(driverContext));
             thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT, e.getMessage());
@@ -147,8 +150,17 @@ public class ConnectManager {
         logger.info("创建连接成功，连接信息：{}", JSONUtil.toJsonStr(driverContext));
         thingsStatus.setValue(handler, ConnectionStatus.CONNECTED);
         if (!connection.getReadType().equals(ReadTypeEnums.INITIATIVE)) {
+            String corn = null;
+            String samplingInterval = driverContext.getExtraMap().get(ConstantCommon.SamplingInterval);
+            if (ObjectUtil.isNotEmpty(samplingInterval)) {
+                corn = samplingInterval;
+            } else {
+                corn = connection.getCorn();
+            }
             try {
-                jobManage.addJob(connection.getCorn(), handler, connection.getReadType());
+                SysJob sysJob = new SysJob(handler.getThingsId(), connection.getReadType(), corn, QuartzGroupEnum.READ_PROPERTIES);
+                sysJob.getExtraMap().put("handler",  ConnectManager.getHandler(handler.getThingsId()));
+                jobManage.addJob(sysJob);
             } catch (Exception e) {
                 logger.error("添加定时任务失败，连接信息：{}", JSONUtil.toJsonStr(driverContext));
             }
