@@ -11,7 +11,7 @@ import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
-import com.elco.eeds.agent.sdk.core.connect.scheduler.IJobManageService;
+import com.elco.eeds.agent.sdk.core.connect.scheduler.dynamic.IJobManageService;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdConfirmMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdResult;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdResultMessage;

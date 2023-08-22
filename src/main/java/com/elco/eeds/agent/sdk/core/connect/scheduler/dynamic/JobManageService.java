@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.common.constant.ReadTypeEnums;
+import com.elco.eeds.agent.sdk.transfer.quartz.CmdTimeoutJob;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,5 +149,49 @@ public class JobManageService implements IJobManageService {
         newTrigger.getJobDataMap().put("job", sysJob);
         //按新的trigger重新设置job执行
         scheduler.rescheduleJob(triggerKey, newTrigger);
+    }
+
+    @Override
+    public boolean addCmdTimeOutJob(String msgSeqNo, String thingsId, Integer timeout) {
+        try {
+            JobDataMap dataMap = new JobDataMap();
+            dataMap.put("msgSeqNo", msgSeqNo);
+            dataMap.put("thingsId", thingsId);
+            JobDetail jobDetail = JobBuilder.newJob(CmdTimeoutJob.class)
+                    .withIdentity(msgSeqNo, msgSeqNo)
+                    .setJobData(dataMap)
+                    .build();
+            DateTime date = DateUtil.offsetSecond(DateUtil.date(), timeout);
+            System.out.println(date);
+            // 定义触发器, 会马上执行一次, 接着5秒执行一次
+            Trigger trigger = TriggerBuilder.newTrigger()
+                    .withIdentity(msgSeqNo, msgSeqNo)
+                    .startAt(date)
+                    .build();
+            scheduler.scheduleJob(jobDetail, trigger);
+        } catch (SchedulerException e) {
+            logger.error("定时任务,添加任务失败,流水号:{},所属任务:{},错误信息:{}", msgSeqNo, "指令下发超时任务", e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean removeCmdTimeOutJob(String msgSeqNo) {
+        try {
+            TriggerKey triggerKey = TriggerKey.triggerKey(msgSeqNo, msgSeqNo);
+            Trigger trigger = scheduler.getTrigger(triggerKey);
+            if (trigger == null) {
+                return false;
+            }
+            scheduler.pauseTrigger(triggerKey);
+            scheduler.unscheduleJob(triggerKey);
+            scheduler.deleteJob(JobKey.jobKey(msgSeqNo, msgSeqNo));
+        } catch (SchedulerException e) {
+            logger.error("定时任务,移除任务失败,流水号:{},所属任务:{},错误信息:{}", msgSeqNo, "指令下发超时任务", e.getMessage());
+            return false;
+        }
+        logger.info("定时任务,移除任务成功,流水号:{}", msgSeqNo);
+        return true;
     }
 }

@@ -1,8 +1,10 @@
 package com.elco.eeds.agent.sdk.transfer.service.cmd;
 
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
-import com.elco.eeds.agent.sdk.core.connect.scheduler.IJobManageService;
+import com.elco.eeds.agent.sdk.core.connect.scheduler.dynamic.IJobManageService;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdResult;
+
+import java.io.Serializable;
 
 /**
  * @ClassName CmdResultService
@@ -11,7 +13,7 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdResult;
  * @Date 2023/8/16 16:39
  * @Version 1.0
  */
-public class CmdResultService {
+public class CmdResultService implements Serializable {
 
 
     /**
