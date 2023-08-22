@@ -93,10 +93,10 @@ public class DataCountServiceImpl implements DataCountService {
 				}
 			}
 		} catch (Exception e) {
-			logger.error("统计实时数据出现异常，异常信息:{}", e);
+			logger.error("统计实时数据出现异常，统计数据源信息:{},统计区间信息:{},异常信息:{}", JSONUtil.toJsonStr(thingsDataCount),JSONUtil.toJsonStr(thingsDataCountMap.keySet()),e);
 			e.printStackTrace();
 		}catch (Error error){
-			logger.error("统计实时数据出现异常，异常信息:{}", error);
+			logger.error("统计实时数据出现异常，统计数据源信息:{},统计区间信息:{},异常信息:{}", JSONUtil.toJsonStr(thingsDataCount),JSONUtil.toJsonStr(thingsDataCountMap.keySet()),error);
 		}
 	}
 

@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.quartz;
 
+import com.elco.eeds.agent.sdk.transfer.service.cmd.CmdService;
 import com.elco.eeds.agent.sdk.transfer.service.order.OrderResultMqService;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -25,6 +26,6 @@ public class CmdTimeoutJob implements Job {
         String msgSeqNo = dataMap.get("msgSeqNo").toString();
         String thingsId = dataMap.get("thingsId").toString();
         //执行业务逻辑
-        OrderResultMqService.sendFail(thingsId, msgSeqNo, "指令下发超时,未收到数据源响应数据");
+        CmdService.sendTimeoutResult(thingsId, msgSeqNo, "指令下发超时,未收到数据源响应数据");
     }
 }

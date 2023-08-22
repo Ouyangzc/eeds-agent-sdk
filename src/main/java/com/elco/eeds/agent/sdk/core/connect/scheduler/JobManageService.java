@@ -282,7 +282,7 @@ public class JobManageService implements IJobManageService {
                     .withIdentity(msgSeqNo, msgSeqNo)
                     .setJobData(dataMap)
                     .build();
-            DateTime date = DateUtil.offsetMinute(DateUtil.date(), timeout);
+            DateTime date = DateUtil.offsetSecond(DateUtil.date(), timeout);
             System.out.println(date);
             // 定义触发器, 会马上执行一次, 接着5秒执行一次
             Trigger trigger = TriggerBuilder.newTrigger()

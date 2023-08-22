@@ -15,6 +15,7 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdResult;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.SubCmdRequestMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.message.order.OrderPropertiesValue;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
+import com.elco.eeds.agent.sdk.transfer.service.cmd.CmdService;
 import com.elco.eeds.agent.sdk.transfer.service.data.RealTimePropertiesValueService;
 import com.elco.eeds.agent.sdk.transfer.service.order.OrderResultMqService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsConnectStatusMqService;
@@ -121,22 +122,21 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> implemen
      */
     public abstract boolean write(List<OrderPropertiesValue> propertiesValueList, String msgSeqNo);
 
+
     /**
-     * 下发功能指令
-     *
      * @param cmdMsg
      * @return
+     * @throws RuntimeException
      */
-    public abstract CmdResult write(SubCmdRequestMessage cmdMsg);
+    public abstract CmdResult cmdWrite(SubCmdRequestMessage cmdMsg) throws RuntimeException;
 
     /**
      * 校验下发指令是否合法
      *
-     * @param identifier 下发功能标识
-     * @param inputData  下发内容
+     * @param inputData 下发内容
      * @return true 校验通过 false:检验不通过
      */
-    public abstract boolean writeCheck(String identifier, String inputData);
+    public abstract boolean cmdCheck(String inputData);
 
 
     /**
@@ -233,12 +233,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> implemen
 //        this.write(things,this.parsing.parsingCommand(command));
 //    }
 
-    public void sendCmdResult(CmdResult result) {
-        IJobManageService jobManage = ConnectManager.getJobManage();
-        jobManage.removeCmdTimeOutJob(result.getMsgSeqNo());
-        logger.info("指令功能下发，异步执行结果：{}", JSONUtil.toJsonStr(result));
-        OrderResultMqService.sendResult(result.isResult(), result.getThingsId(), result.getMsgSeqNo(), result.getResultMsg());
-    }
+
 
     /**
      * 执行重连

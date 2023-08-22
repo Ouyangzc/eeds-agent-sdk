@@ -24,6 +24,8 @@ import com.elco.eeds.agent.sdk.transfer.handler.order.OrderRequestMessageHandler
 import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsReconnectManualMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsSyncIncrMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.service.agent.AgentRequestHttpService;
+import com.elco.eeds.agent.sdk.transfer.service.cmd.CmdRequestManager;
+import com.elco.eeds.agent.sdk.transfer.service.cmd.CmdService;
 import com.elco.eeds.agent.sdk.transfer.service.data.sync.DataSyncService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncService;
 import org.slf4j.Logger;
@@ -49,7 +51,9 @@ public class AgentRegisterService implements IAgentRegisterService {
     private DataCountConfirmMessageHandler dataCountConfirmMessageHandler = new DataCountConfirmMessageHandler();
     private ThingsReconnectManualMessageHandler thingsReconnectManualMessageHandler = new ThingsReconnectManualMessageHandler();
 
-    private CmdRequestMessageHandler cmdRequestMessageHandler = new CmdRequestMessageHandler();
+    private CmdRequestManager cmdRequestManager = new CmdRequestManager();
+    private CmdService cmdService = new CmdService(cmdRequestManager);
+    private CmdRequestMessageHandler cmdRequestMessageHandler = new CmdRequestMessageHandler(cmdService);
 
     private DataSyncService dataSyncService = new DataSyncService();
 

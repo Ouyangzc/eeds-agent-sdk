@@ -12,4 +12,8 @@ public class CmdConstant {
     public static final String ORDER_TYPE_SERIAL = "SERIAL";
     public static final String ORDER_TYPE_RESPONSE = "RESPONSE";
     public static final String ORDER_TYPE_NO_RESPONSE = "NO_RESPONSE";
+
+    public static final Integer WAITING = 0;
+
+    public static final Integer READY = 1;
 }
