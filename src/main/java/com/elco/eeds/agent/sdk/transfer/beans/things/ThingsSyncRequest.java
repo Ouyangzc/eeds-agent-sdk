@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.things;
 
+import java.io.Serializable;
+
 /**
  * @ClassName ThingsSyncRequest
  * @Description 数据源同步请求类
  * @Author OUYANG
  * @Date 2022/12/16 9:05
  */
-public class ThingsSyncRequest {
+public class ThingsSyncRequest implements Serializable {
     /**
      * 任务ID
      */

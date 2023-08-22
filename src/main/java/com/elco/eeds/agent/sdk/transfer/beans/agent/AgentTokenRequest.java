@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.agent;
 
+import java.io.Serializable;
+
 /**
  * @title: AgentTokenRequest
  * @Author wl
  * @Date: 2022/12/6 14:29
  * @Version 1.0
  */
-public class AgentTokenRequest {
+public class AgentTokenRequest implements Serializable {
 
     private Long id;
 

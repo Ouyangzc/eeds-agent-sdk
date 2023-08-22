@@ -4,6 +4,8 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
 import com.elco.eeds.agent.sdk.core.util.DateUtils;
 
+import java.io.Serializable;
+
 /**
  * @title: AgentHeartMessage
  * @Author wl
@@ -11,7 +13,7 @@ import com.elco.eeds.agent.sdk.core.util.DateUtils;
  * @Version 1.0
  * @Description: 客户端心跳报文结构
  */
-public class AgentHeartMessage extends BaseMessage<SubAgentHeartMessage> {
+public class AgentHeartMessage extends BaseMessage<SubAgentHeartMessage> implements Serializable {
 
     public static AgentHeartMessage getRespMessage() {
         AgentHeartMessage message = new AgentHeartMessage();

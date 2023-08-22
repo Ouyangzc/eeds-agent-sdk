@@ -1,5 +1,7 @@
 package com.elco.eeds.agent.sdk.core.bean.agent;
 
+import java.io.Serializable;
+
 /**
  * @title: BaseConfigEntity
  * @Author wl
@@ -7,7 +9,7 @@ package com.elco.eeds.agent.sdk.core.bean.agent;
  * @Version 1.0
  * @Description: 配置通用类
  */
-public class BaseConfigEntity {
+public class BaseConfigEntity implements Serializable {
 
     /**
      * 字段名称

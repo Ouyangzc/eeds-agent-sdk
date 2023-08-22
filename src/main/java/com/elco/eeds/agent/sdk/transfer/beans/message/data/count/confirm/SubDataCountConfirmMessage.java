@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.data.count.confirm;
 
+import java.io.Serializable;
+
 /**
  * @ClassName SubDataCountConfirmMessage
  * @Description 数据统计确认结构体
  * @Author OUYANG
  * @Date 2022/12/9 13:33
  */
-public class SubDataCountConfirmMessage {
+public class SubDataCountConfirmMessage implements Serializable {
     /**
      * 客户端id
      */

@@ -41,7 +41,10 @@ public class ThingsConnectStatusMqService {
   }
 
   public static void sendDisConnectMsg(String thingsId) {
-    send(thingsId, DIS_CONNECT, "数据源已断开");
+    sendDisConnectMsg(thingsId, "数据源已断开");
+  }
+  public static void sendDisConnectMsg(String thingsId,String connectMsg) {
+    send(thingsId, DIS_CONNECT, connectMsg);
   }
 
   public static void sendConnectingMsg(String thingsId) {

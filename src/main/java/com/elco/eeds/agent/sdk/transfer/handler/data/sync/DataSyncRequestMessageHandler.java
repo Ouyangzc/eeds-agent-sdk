@@ -56,7 +56,7 @@ public class DataSyncRequestMessageHandler implements IReceiverMessageHandler {
             Long endTime = request.getEndTime();
             //重新加载文件
             FileUtil.getLastDataFile();
-            List<PropertiesValue> syncDatas = RealTimeDataMessageFileUtils.getFileData(thingsId, startTime, endTime, request.getProperties());
+            List<PropertiesValue> syncDatas = RealTimeDataMessageFileUtils.getFileData(request, startTime, endTime, request.getProperties());
             //判断是否取消同步
             if (!dataSyncService.getStatus()) {
                 //取消状态，跳出此次循环

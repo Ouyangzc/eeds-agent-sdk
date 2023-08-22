@@ -12,7 +12,9 @@ import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesEvent;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantThings;
 import com.elco.eeds.agent.sdk.core.common.constant.http.ConstantHttpApiPath;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
+import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
+import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 import com.elco.eeds.agent.sdk.core.util.ThingsFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.things.SubThingsSyncIncrMessage;
@@ -88,7 +90,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                 boolean addResult = eedsThings.getProperties().stream().allMatch(things -> things.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_ADD));
                 if (addResult) {
                     ThingsConnection connection = ConnectManager.getConnection(AgentStartProperties.getInstance().getAgentClientType());
-                    if (connection.checkThingsConnectParams(eedsThings)) {
+                    if (checkThingsConnectParams(connection, eedsThings)) {
                         //增量新增数据源
                         ThingsDriverContext driverContext = new ThingsDriverContext();
                         BeanUtil.copyProperties(eedsThings, driverContext);
@@ -275,7 +277,7 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                 List<EedsThings> eedsThings = JSON.parseArray(localThings, EedsThings.class);
                 for (EedsThings things : eedsThings) {
                     ThingsConnection connection = ConnectManager.getConnection(AgentStartProperties.getInstance().getAgentClientType());
-                    if (connection.checkThingsConnectParams(things)) {
+                    if (checkThingsConnectParams(connection,things)) {
                         ThingsDriverContext driverContext = new ThingsDriverContext();
                         BeanUtil.copyProperties(things, driverContext);
                         String agentId = things.getAgentId();
@@ -311,6 +313,17 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
     public static List<PropertiesContext> getThingsPropertiesContextList(String thingsId) {
         Map<String, List<PropertiesContext>> thingsPropertiesMap = PROPERTIES_CONTEXT_MAP.values().stream().collect(Collectors.groupingBy(PropertiesContext::getThingsId));
         return thingsPropertiesMap.get(thingsId);
+    }
+
+    private boolean checkThingsConnectParams(ThingsConnection connection, EedsThings things) {
+        if (!connection.checkThingsConnectParams(things)) {
+            ThingsConnectionHandler handler = (ThingsConnectionHandler) connection;
+            handler.setThingsId(things.getThingsId());
+            ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
+            thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT, "连接参数校验失败,请检查数据源连接参数");
+            return false;
+        }
+        return true;
     }
 
 }

@@ -1,5 +1,9 @@
 package com.elco.eeds.agent.sdk.core.start;
 
+import com.elco.eeds.agent.sdk.core.bean.agent.AgentSSLProperties;
+
+import java.io.Serializable;
+
 /**
  * @title: AgentStartProperties
  * @Author wl
@@ -7,7 +11,7 @@ package com.elco.eeds.agent.sdk.core.start;
  * @Version 1.0
  * @Description: 客户端启动参数
  */
-public class AgentStartProperties {
+public class AgentStartProperties implements Serializable {
 
     /**
      * server地址
@@ -33,6 +37,8 @@ public class AgentStartProperties {
      * 存储文件目录
      */
     private String baseFolder;
+
+    private AgentSSLProperties ssl;
 
     public String getProtocolPackage() {
         return protocolPackage;
@@ -119,6 +125,14 @@ public class AgentStartProperties {
 
     public void setAgentClientType(String agentClientType) {
         this.agentClientType = agentClientType;
+    }
+
+    public AgentSSLProperties getSsl() {
+        return ssl;
+    }
+
+    public void setSsl(AgentSSLProperties ssl) {
+        this.ssl = ssl;
     }
 
     @Override

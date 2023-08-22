@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.bean.agent;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Arrays;
  * @Version 1.0
  * @Description: 客户端mq配置信息
  */
-public class AgentMqInfo {
+public class AgentMqInfo implements Serializable {
 
     private String mqType;
 

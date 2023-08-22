@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.beans.things;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -8,7 +9,7 @@ import java.util.Map;
  * @Author OUYANG
  * @Date 2022/12/16 9:12
  */
-public class EedsProperties extends BaseProperties {
+public class EedsProperties extends BaseProperties implements Serializable {
     /**
      * 扩展map
      */

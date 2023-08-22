@@ -8,7 +8,7 @@ import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.message.things.ThingsReconnectManualMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import com.elco.eeds.agent.sdk.transfer.handler.IReceiverMessageHandler;
-import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
+import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncNewServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,7 @@ public class ThingsReconnectManualMessageHandler implements IReceiverMessageHand
       ThingsConnectionHandler handler = ConnectManager.getHandler(thingsId);
       if (ObjectUtil.isEmpty(handler)) {
         //获取不到数据源Handler，重新连接
-        ThingsDriverContext thingsDriverContext = ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP
+        ThingsDriverContext thingsDriverContext = ThingsSyncNewServiceImpl.THINGS_DRIVER_CONTEXT_MAP
             .get(thingsId);
         ConnectManager
             .create(thingsDriverContext, AgentStartProperties.getInstance().getAgentClientType());

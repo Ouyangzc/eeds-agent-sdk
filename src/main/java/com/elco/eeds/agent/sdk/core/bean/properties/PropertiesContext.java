@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.bean.properties;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -8,7 +9,7 @@ import java.util.Map;
  * @Author OUYANG
  * @Date 2022/12/9 9:47
  */
-public class PropertiesContext {
+public class PropertiesContext implements Serializable {
     /**
      * 客户端Id
      */

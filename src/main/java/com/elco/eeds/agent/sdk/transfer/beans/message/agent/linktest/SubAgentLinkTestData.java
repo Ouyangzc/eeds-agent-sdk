@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.agent.linktest;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -8,7 +9,7 @@ import java.util.List;
  * @Date: 2022/12/20 15:57
  * @Version 1.0
  */
-public class SubAgentLinkTestData {
+public class SubAgentLinkTestData implements Serializable {
 
     private SubAgentLinkTestStatus agentStatus;
 

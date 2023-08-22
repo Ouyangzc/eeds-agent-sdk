@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.start;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.mq.nats.plugin.NatsPlugin;
 import com.elco.eeds.agent.mq.plugin.MQPluginManager;
@@ -15,6 +16,7 @@ import com.elco.eeds.agent.sdk.core.util.ReplaceTopicAgentId;
 import com.elco.eeds.agent.sdk.core.util.http.IpUtil;
 import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentTokenRequest;
 import com.elco.eeds.agent.sdk.transfer.handler.agent.*;
+import com.elco.eeds.agent.sdk.transfer.handler.cmd.CmdRequestMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.data.count.DataCountConfirmMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.data.sync.DataSyncCancelMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.data.sync.DataSyncRequestMessageHandler;
@@ -47,10 +49,12 @@ public class AgentRegisterService implements IAgentRegisterService {
     private DataCountConfirmMessageHandler dataCountConfirmMessageHandler = new DataCountConfirmMessageHandler();
     private ThingsReconnectManualMessageHandler thingsReconnectManualMessageHandler = new ThingsReconnectManualMessageHandler();
 
+    private CmdRequestMessageHandler cmdRequestMessageHandler = new CmdRequestMessageHandler();
+
     private DataSyncService dataSyncService = new DataSyncService();
 
     private DataSyncRequestMessageHandler dataSyncRequestMessageHandler = new DataSyncRequestMessageHandler(dataSyncService);
-    private  DataSyncCancelMessageHandler dataSyncCancelMessageHandler = new DataSyncCancelMessageHandler(dataSyncService);
+    private DataSyncCancelMessageHandler dataSyncCancelMessageHandler = new DataSyncCancelMessageHandler(dataSyncService);
     private AgentRequestHttpService agentRequestHttpService = new AgentRequestHttpService();
     private ThingsSyncService thingsSyncService;
 
@@ -65,6 +69,11 @@ public class AgentRegisterService implements IAgentRegisterService {
     public boolean register(String serverUrl, String name, String port, String token, String clientType) throws Exception {
         Agent agent = Agent.getInstance();
         try {
+            //获取本地token
+            String localToken = getLocalToken();
+            if (null != localToken) {
+                token = localToken;
+            }
             // 获取IP
             String clientIp = IpUtil.getLocalIpAddress();
             // 调用http接口的register方法
@@ -138,6 +147,9 @@ public class AgentRegisterService implements IAgentRegisterService {
             // 数据源重新连接
             natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_SERVER_THINGS_RECONNECT_MANUAL, agentId), thingsReconnectManualMessageHandler);
 
+            // 指令下发--功能
+            natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_SERVER_CMD_SERVICE_REQUEST, agentId), cmdRequestMessageHandler);
+
             // 订阅其他topic...
             // 待补充
         } catch (Exception e) {
@@ -154,5 +166,19 @@ public class AgentRegisterService implements IAgentRegisterService {
         //注册失败，退出程序
         System.exit(500);
 
+    }
+
+    private String getLocalToken() {
+        String token = null;
+        try {
+            String localToken = AgentFileExtendUtils.getTokenFromLocalAgentFile();
+            if (ObjectUtil.isNotEmpty(localToken)) {
+                token = localToken;
+            }
+        } catch (SdkException e) {
+            logger.error("获取本地token发生异常,异常信息：{}", e.getMessage());
+            return null;
+        }
+        return token;
     }
 }

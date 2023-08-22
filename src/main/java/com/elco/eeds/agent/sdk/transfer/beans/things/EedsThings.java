@@ -1,10 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.things;
 
-import cn.hutool.core.util.ObjectUtil;
-import com.alibaba.fastjson.JSONObject;
-
+import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @ClassName EedsThings
@@ -12,7 +9,7 @@ import java.util.Map;
  * @Author OUYANG
  * @Date 2022/12/16 9:08
  */
-public class EedsThings extends BaseThings{
+public class EedsThings extends BaseThings implements Serializable {
     /**
      * 设备编号
      */
@@ -60,6 +57,10 @@ public class EedsThings extends BaseThings{
      * 动态连接字段
      */
     private String extendFieldMap;
+
+    private String operatorType;
+
+    private Long timestamp;
 
     public String getThingsCode() {
         return thingsCode;
@@ -148,5 +149,19 @@ public class EedsThings extends BaseThings{
     public void setExtendFieldMap(String extendFieldMap) throws Exception {
         this.extendFieldMap = extendFieldMap;
     }
+    public Long getTimestamp() {
+        return timestamp;
+    }
 
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getOperatorType() {
+        return operatorType;
+    }
+
+    public void setOperatorType(String operatorType) {
+        this.operatorType = operatorType;
+    }
 }

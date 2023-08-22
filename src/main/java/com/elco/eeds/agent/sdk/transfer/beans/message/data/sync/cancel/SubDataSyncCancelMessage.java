@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.cancel;
 
+import java.io.Serializable;
+
 /**
  * @ClassName SubDataSyncCancelMessage
  * @Description 数据同步取消报文结构体
  * @Author OUYANG
  * @Date 2022/12/9 14:38
  */
-public class SubDataSyncCancelMessage {
+public class SubDataSyncCancelMessage implements Serializable {
     /**
      * 队列ID
      */

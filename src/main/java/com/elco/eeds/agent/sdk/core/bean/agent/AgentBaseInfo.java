@@ -2,6 +2,8 @@ package com.elco.eeds.agent.sdk.core.bean.agent;
 
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 
+import java.io.Serializable;
+
 /**
  * @title: AgentBaseInfo
  * @Author wl
@@ -9,7 +11,7 @@ import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
  * @Version 1.0
  * @Description: 客户端基础信息类
  */
-public class AgentBaseInfo {
+public class AgentBaseInfo implements Serializable {
 
     public AgentBaseInfo(){}
 
@@ -19,6 +21,7 @@ public class AgentBaseInfo {
         this.port = startProperties.getPort();
         this.serverUrl = startProperties.getServerUrl();
         this.name = startProperties.getName();
+        this.ssl = startProperties.getSsl();
     }
 
 
@@ -39,6 +42,8 @@ public class AgentBaseInfo {
     private String dataCacheFileSize;
     // 缓存周期
     private String dataCacheCycle;
+
+    private AgentSSLProperties ssl;
 
     public String getPort() {
         return port;
@@ -115,6 +120,14 @@ public class AgentBaseInfo {
 
     public void setDataCacheCycle(String dataCacheCycle) {
         this.dataCacheCycle = dataCacheCycle;
+    }
+
+    public AgentSSLProperties getSsl() {
+        return ssl;
+    }
+
+    public void setSsl(AgentSSLProperties ssl) {
+        this.ssl = ssl;
     }
 
     @Override

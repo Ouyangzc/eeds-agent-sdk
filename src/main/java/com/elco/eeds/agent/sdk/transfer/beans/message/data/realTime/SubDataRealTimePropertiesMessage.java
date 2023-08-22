@@ -1,12 +1,14 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.data.realTime;
 
+import java.io.Serializable;
+
 /**
  * @ClassName SubDataRealTimePropertiesMessage
  * @Description 实时变量数据结构体
  * @Author OUYANG
  * @Date 2022/12/9 14:27
  */
-public class SubDataRealTimePropertiesMessage {
+public class SubDataRealTimePropertiesMessage implements Serializable {
     /**
      * 客户端Id
      */
