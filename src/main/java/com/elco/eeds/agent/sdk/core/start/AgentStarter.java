@@ -49,6 +49,7 @@ public class AgentStarter {
     private static void init(AgentStartProperties agentStartProperties) throws Exception {
         // 实例化Agent对象
         Agent agent = Agent.getInstance();
+        agent.setAgentStatus(AgentStatus.INTI);
         try {
             // 存储解析对象实例
             ThingsConnection connection = ReflectUtil.newInstance(agentStartProperties.getProtocolPackage());

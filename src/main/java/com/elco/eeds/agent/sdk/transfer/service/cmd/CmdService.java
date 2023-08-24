@@ -106,13 +106,14 @@ public class CmdService {
             return;
         }
         SubCmdRequestMessage requestMessage = CmdRequestManager.getNextCmdMessage(thingsId);
-        String msgSeqNo = requestMessage.getMsgSeqNo();
-        int orderTimeOut = requestMessage.getOrderTimeOut();
+        String msgSeqNo = "";
         try {
             if (null == requestMessage) {
                 logger.info("当前数据源无可执行指令,数据源:{}", thingsId);
                 return;
             }
+             msgSeqNo = requestMessage.getMsgSeqNo();
+            int orderTimeOut = requestMessage.getOrderTimeOut();
             ThingsConnectionHandler handler = ConnectManager.getHandler(thingsId);
             if (ObjectUtil.isEmpty(handler)) {
                 logger.error("指令功能下发,数据源:{},连接异常:{}", thingsId, "CL0101011");

@@ -85,7 +85,11 @@ public class ThingsServiceImpl implements ThingsService {
         }
         if (flag) {
             //新增things
-            EedsThings things = syncThingsList.stream().filter(eedsThings -> eedsThings.getThingsId().equals(thingsId)).findFirst().get();
+            Optional<EedsThings> optional = syncThingsList.stream().filter(eedsThings -> eedsThings.getThingsId().equals(thingsId)).findFirst();
+            if (!optional.isPresent()){
+                return;
+            }
+            EedsThings things = optional.get();
             List<EedsProperties> eedsPropertiesList = things.getProperties().stream().filter(p -> p.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_ADD)).collect(Collectors.toList());
             things.setProperties(eedsPropertiesList);
             this.addThings(things);
@@ -168,7 +172,11 @@ public class ThingsServiceImpl implements ThingsService {
             List<EedsThings> eedsThings = JSON.parseArray(localThings, EedsThings.class);
             for (EedsThings things : eedsThings) {
                 List<EedsProperties> properties = things.getProperties();
-                Long timeStamp = properties.stream().map(EedsProperties::getTimestamp).max(Long::compareTo).get();
+                Optional<Long> optional = properties.stream().map(EedsProperties::getTimestamp).max(Long::compareTo);
+                if (!optional.isPresent()){
+                    return maxTimeStamp;
+                }
+                Long timeStamp = optional.get();
                 if (timeStamp > maxTimeStamp) {
                     maxTimeStamp = timeStamp;
                 }
