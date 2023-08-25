@@ -44,7 +44,6 @@ public class Agent implements Serializable {
         }
       }
     }
-    agent.setAgentStatus(AgentStatus.INTI);
     return agent;
   }
 

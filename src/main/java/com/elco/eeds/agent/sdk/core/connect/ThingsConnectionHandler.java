@@ -2,13 +2,10 @@ package com.elco.eeds.agent.sdk.core.connect;
 
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
-import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
-import com.elco.eeds.agent.sdk.core.connect.scheduler.IJobManageService;
 import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
 import com.elco.eeds.agent.sdk.core.exception.EedsConnectException;
 import com.elco.eeds.agent.sdk.core.parsing.DataParsing;
@@ -16,9 +13,7 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdResult;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.SubCmdRequestMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.message.order.OrderPropertiesValue;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
-import com.elco.eeds.agent.sdk.transfer.service.cmd.CmdService;
 import com.elco.eeds.agent.sdk.transfer.service.data.RealTimePropertiesValueService;
-import com.elco.eeds.agent.sdk.transfer.service.order.OrderResultMqService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsConnectStatusMqService;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncNewServiceImpl;
 import org.slf4j.Logger;
@@ -247,6 +242,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> implemen
         //设置为断开状态
         ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
         thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
+        String thingsId = this.getThingsId();
         synchronized (thingsId) {
             if (ObjectUtil.isEmpty(scheduledTaskMap.get(this.thingsId)) && (this.getConnectionStatus().equals(ConnectionStatus.DISCONNECT) || ObjectUtil.isEmpty(connection))) {
                 ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {

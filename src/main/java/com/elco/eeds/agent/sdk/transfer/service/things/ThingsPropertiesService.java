@@ -133,7 +133,11 @@ public class ThingsPropertiesService {
             for (EedsThings things : eedsThings) {
                 List<EedsProperties> properties = things.getProperties();
                 if (ObjectUtil.isNotEmpty(properties)) {
-                    Long timeStamp = properties.stream().map(EedsProperties::getTimestamp).max(Long::compareTo).get();
+                    Optional<Long> longOptional = properties.stream().map(EedsProperties::getTimestamp).max(Long::compareTo);
+                    if (!longOptional.isPresent()){
+                        return maxTimeStamp;
+                    }
+                    Long timeStamp = optional.get();
                     if (timeStamp > maxTimeStamp) {
                         maxTimeStamp = timeStamp;
                     }
