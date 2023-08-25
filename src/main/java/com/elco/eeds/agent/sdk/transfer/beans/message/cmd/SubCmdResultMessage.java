@@ -17,11 +17,11 @@ public class SubCmdResultMessage implements Serializable {
     private String msgSeqNo;
 
 
-    public SubCmdResultMessage(String result, String errMsg, String thingsId, String msgSeqNo) {
-        this.result = result;
-        this.errMsg = errMsg;
+    public SubCmdResultMessage(String thingsId,String msgSeqNo,String result, String errMsg) {
         this.thingsId = thingsId;
         this.msgSeqNo = msgSeqNo;
+        this.result = result;
+        this.errMsg = errMsg;
     }
 
     public String getResult() {
