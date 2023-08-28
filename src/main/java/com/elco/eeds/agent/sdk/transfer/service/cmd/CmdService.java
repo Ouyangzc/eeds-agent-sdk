@@ -85,6 +85,7 @@ public class CmdService {
         MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
         mqPlugin.publish(topic, message, null);
         logger.info("指令下发结果报文：topic: {}; message: {}", topic, message);
+        setReadyStatus(thingsId);
         refreshThingsCmdQueue(thingsId);
     }
 
