@@ -25,6 +25,5 @@ public class CmdResultService implements Serializable {
         IJobManageService jobManage = ConnectManager.getJobManage();
         jobManage.removeCmdTimeOutJob(result.getMsgSeqNo());
         CmdService.sendResult(result);
-        CmdService.setReadyStatus(result.getThingsId());
     }
 }
