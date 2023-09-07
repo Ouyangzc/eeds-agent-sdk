@@ -21,6 +21,7 @@ import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessag
 import com.elco.eeds.agent.sdk.transfer.beans.data.sync.DataSyncServerRequest;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import com.elco.eeds.agent.sdk.transfer.handler.properties.VirtualPropertiesHandle;
+import com.elco.eeds.agent.sdk.transfer.quartz.DataFileJob;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncNewServiceImpl;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 import org.apache.commons.io.FileUtils;
@@ -70,12 +71,16 @@ public class RealTimeDataMessageFileUtils {
                 String filePath = getNewFilePath(thingsId);
                 File newFile = new File(filePath);
                 fileMap.put(thingsId, newFile);
+                //加载到过期文件map缓存
+                DataFileJob.saveFileToMap(newFile);
                 return newFile;
             }
         }
         String filePath = getNewFilePath(thingsId);
         File newFile = new File(filePath);
         fileMap.put(thingsId, newFile);
+        //加载到过期文件map缓存
+        DataFileJob.saveFileToMap(newFile);
         return newFile;
     }
 
@@ -178,6 +183,8 @@ public class RealTimeDataMessageFileUtils {
                     String filePath = getNewFilePath(thingsId);
                     file = new File(filePath);
                     fileMap.put(thingsId, file);
+                    //加载到过期文件map缓存
+                    DataFileJob.saveFileToMap(file);
                 }
             }
             StringBuilder dataBuffer = new StringBuilder(data);

@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
+import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.util.ThingsFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsProperties;
@@ -81,6 +82,7 @@ public class ThingsPropertiesService {
                 List<EedsProperties> properties = currentThings.getProperties();
                 PropertiesContext propertiesContext = new PropertiesContext();
                 BeanUtil.copyProperties(addProperties, propertiesContext);
+                propertiesContext.setAgentId(Agent.getInstance().getAgentBaseInfo().getAgentId());
                 propertiesContext.setThingsId(thingsId);
                 ThingsSyncNewServiceImpl.PROPERTIES_CONTEXT_MAP.put(addProperties.getPropertiesId(), propertiesContext);
                 if (ObjectUtil.isEmpty(properties)) {
