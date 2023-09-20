@@ -71,7 +71,7 @@ public class CountFileUtils {
 			//追加到完成文件
 			writeAppendForDoneData(JSONUtil.toJsonStr(dataCount));
 		} catch (Exception e) {
-			logger.error("统计已完成记录，删除异常，异常信息:{}", e);
+			logger.error("统计已完成记录，删除异常，异常信息:", e);
 		}
 
 	}

@@ -1,7 +1,7 @@
 package com.elco.eeds.agent.sdk.core.connect;
 
 
-import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
@@ -118,13 +118,21 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> implemen
      */
     public abstract boolean write(List<OrderPropertiesValue> propertiesValueList, String msgSeqNo);
 
+
     /**
-     * 下发功能指令
-     *
      * @param cmdMsg
      * @return
+     * @throws RuntimeException
      */
-    public abstract CmdResult write(SubCmdRequestMessage cmdMsg);
+    public abstract CmdResult cmdWrite(SubCmdRequestMessage cmdMsg) throws RuntimeException;
+
+    /**
+     * 校验下发指令是否合法
+     *
+     * @param inputData 下发内容
+     * @return true 校验通过 false:检验不通过
+     */
+    public abstract boolean cmdCheck(String inputData);
 
 
     /**
@@ -138,7 +146,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> implemen
         long startTime = System.currentTimeMillis();
         List<PropertiesContext> propertiesContextList = ThingsSyncNewServiceImpl
                 .getThingsPropertiesContextList(thingsId);
-        if (CollectionUtil.isNotEmpty(propertiesContextList)) {
+        if (CollUtil.isNotEmpty(propertiesContextList)) {
             List<PropertiesValue> valueList = this.getParsing()
                     .parsing(this.context, ThingsSyncNewServiceImpl.getThingsPropertiesContextList(thingsId),
                             msg);
@@ -221,6 +229,8 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> implemen
 //        this.write(things,this.parsing.parsingCommand(command));
 //    }
 
+
+
     /**
      * 执行重连
      */
@@ -232,6 +242,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> implemen
         //设置为断开状态
         ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
         thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
+        String thingsId = this.getThingsId();
         synchronized (thingsId) {
             if (ObjectUtil.isEmpty(scheduledTaskMap.get(this.thingsId)) && (this.getConnectionStatus().equals(ConnectionStatus.DISCONNECT) || ObjectUtil.isEmpty(connection))) {
                 ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(new Runnable() {

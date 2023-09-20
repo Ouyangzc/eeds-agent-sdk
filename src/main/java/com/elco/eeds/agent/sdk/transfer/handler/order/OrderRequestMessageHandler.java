@@ -28,19 +28,20 @@ public class OrderRequestMessageHandler implements IReceiverMessageHandler {
     @Override
     public void handleRecData(String topic, String recData) {
         OrderRequestMessage message = JSON.parseObject(recData, OrderRequestMessage.class);
-        logger.info("接收到指令下发消息，topic:{},data:{}", topic, JSONUtil.toJsonStr(message));
+        logger.info("接收到指令下发消息，topic:{},data:{}", topic, message);
         SubOrderRequestMessage data = message.getData();
         // 发送指令下发确认报文
-        OrderConfirmMqService.send(data.getThingsId(),data.getMsgSeqNo());
+        OrderConfirmMqService.send(data.getThingsId(), data.getMsgSeqNo());
 
         ThingsConnectionHandler handler = ConnectManager.getHandler(data.getThingsId());
-        if(ObjectUtil.isEmpty(handler)){
-            throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
+        if (ObjectUtil.isEmpty(handler)) {
+            logger.error("变量下发失败,数据源已断开:{}", data.getThingsId());
+            OrderResultMqService.sendFail(data.getThingsId(), data.getMsgSeqNo(), ErrorEnum.THINGS_CONNECT_NOT_EXIST.message());
         }
         // 发送成功：true; 发送失败：false;
         // 失败需要发送--下发报文结果报文
-        if (!handler.write(data.getProperties(),data.getMsgSeqNo())) {
-            OrderResultMqService.sendFail(data.getThingsId(),data.getMsgSeqNo(), "【失败】客户端发送网关消息失败");
+        if (!handler.write(data.getProperties(), data.getMsgSeqNo())) {
+            OrderResultMqService.sendFail(data.getThingsId(), data.getMsgSeqNo(), "【失败】客户端发送网关消息失败");
         }
     }
 }

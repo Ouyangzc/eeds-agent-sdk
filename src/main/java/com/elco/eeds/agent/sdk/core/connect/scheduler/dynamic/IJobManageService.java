@@ -54,4 +54,22 @@ public interface IJobManageService {
      */
     void modifyJob(SysJob sysJob) throws Exception;
 
+    /**
+     * 添加下发指令超时任务
+     *
+     * @param msgSeqNo
+     * @param thingsId
+     * @param timeout
+     * @return
+     */
+    boolean addCmdTimeOutJob(String msgSeqNo, String thingsId, Integer timeout);
+
+    /**
+     * 删除下发指令超时任务
+     *
+     * @param msgSeqNo
+     * @return
+     */
+    boolean removeCmdTimeOutJob(String msgSeqNo);
+
 }

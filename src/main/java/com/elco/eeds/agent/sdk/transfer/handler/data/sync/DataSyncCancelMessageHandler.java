@@ -29,7 +29,7 @@ public class DataSyncCancelMessageHandler implements IReceiverMessageHandler {
         SubDataSyncCancelMessage subMsg = message.getData();
         String queueId = subMsg.getQueueId();
         if (queueId.equals(dataSyncService.getQueueId())) {
-            logger.debug("数据同步--取消报文，主题:{},消息内容:{}", topic, JSONUtil.toJsonStr(subMsg));
+            logger.debug("数据同步--取消报文，主题:{},消息内容:{}", topic, subMsg);
             dataSyncService.setStatus(false);
         }
     }

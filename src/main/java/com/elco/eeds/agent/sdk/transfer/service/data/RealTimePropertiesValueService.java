@@ -33,10 +33,10 @@ public class RealTimePropertiesValueService {
     public DataCountServiceImpl dataCountService;
 
     /**
-     * @param message             原始报文
-     * @param thingsId            数据源ID
-     * @param collectTime         采集时间戳
-     * @param propertiesValueList 解析数据
+     * @param message               原始报文
+     * @param thingsId              数据源ID
+     * @param collectTime           采集时间戳
+     * @param propertiesValueList   解析数据
      * @param propertiesContextList 变量信息
      */
     public static void recRealTimePropertiesValue(String message, String thingsId, Long collectTime, List<PropertiesValue> propertiesValueList, List<PropertiesContext> propertiesContextList) {
@@ -44,35 +44,37 @@ public class RealTimePropertiesValueService {
             AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
             String agentId = agentBaseInfo.getAgentId();
             Optional<Long> minOptional = DataCountServiceImpl.thingsDataCountMap.keySet().stream().min(Long::compareTo);
-            if (collectTime < minOptional.get()) {
-                logger.error("丢弃该消息,时间戳：{},统计开始时间:{}", collectTime, minOptional.get());
-                return;
+            if (minOptional.isPresent()) {
+                if (collectTime < minOptional.get()) {
+                    logger.error("丢弃该消息,时间戳：{},统计开始时间:{}", collectTime, minOptional.get());
+                    return;
+                }
+                //存储原始数据
+                OriginalPropertiesValueMessage originalPropertiesValueMessage = new OriginalPropertiesValueMessage();
+                originalPropertiesValueMessage.setCollectTime(collectTime);
+                originalPropertiesValueMessage.setMessage(message);
+                RealTimeDataMessageFileUtils.writeAppend(thingsId, JSONUtil.toJsonStr(originalPropertiesValueMessage), collectTime);
+
+                // 计算虚拟变量
+                VirtualPropertiesHandle.creatVirtualProperties(propertiesContextList, propertiesValueList, collectTime);
+
+                //调用统计接口
+                ThingsDataCount dataCount = new ThingsDataCount();
+                dataCount.setThingsId(thingsId);
+                dataCount.setSize(propertiesValueList.size());
+                dataCount.setCollectTime(collectTime);
+                dataCount.setStartTime(collectTime);
+                dataCount.setEndTime(collectTime);
+                DataCountServiceImpl.recRealTimeData(agentId, collectTime, dataCount);
+
+                //推送数据
+                MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
+                String postMsg = DataRealTimePropertiesMessage.getMessage(propertiesValueList);
+
+                String topic = DataRealTimePropertiesMessage.getTopic(agentId, thingsId);
+                logger.debug("实时数据推送：采集时间:{} topic:{}, msg:{}", collectTime, topic, postMsg);
+                mqPlugin.publish(topic, postMsg, null);
             }
-            //存储原始数据
-            OriginalPropertiesValueMessage originalPropertiesValueMessage = new OriginalPropertiesValueMessage();
-            originalPropertiesValueMessage.setCollectTime(collectTime);
-            originalPropertiesValueMessage.setMessage(message);
-            RealTimeDataMessageFileUtils.writeAppend(thingsId, JSONUtil.toJsonStr(originalPropertiesValueMessage),collectTime);
-
-            // 计算虚拟变量
-            VirtualPropertiesHandle.creatVirtualProperties(propertiesContextList, propertiesValueList, collectTime);
-
-            //调用统计接口
-            ThingsDataCount dataCount = new ThingsDataCount();
-            dataCount.setThingsId(thingsId);
-            dataCount.setSize(propertiesValueList.size());
-            dataCount.setCollectTime(collectTime);
-            dataCount.setStartTime(collectTime);
-            dataCount.setEndTime(collectTime);
-            DataCountServiceImpl.recRealTimeData(agentId, collectTime, dataCount);
-
-            //推送数据
-            MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
-            String postMsg = DataRealTimePropertiesMessage.getMessage(propertiesValueList);
-
-            String topic = DataRealTimePropertiesMessage.getTopic(agentId, thingsId);
-            logger.debug("实时数据推送：采集时间:{} topic:{}, msg:{}", collectTime, topic, postMsg);
-            mqPlugin.publish(topic, postMsg, null);
         }
     }
 

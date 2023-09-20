@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
+import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.util.ThingsFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsProperties;
@@ -44,7 +45,7 @@ public class ThingsPropertiesService {
         try {
             ThingsFileUtils.saveThingsFileToLocal(data);
         } catch (IOException e) {
-            logger.error("存储数据源文件异常,信息:{}", e);
+            logger.error("存储数据源文件异常,信息:", e);
         }
     }
 
@@ -81,6 +82,7 @@ public class ThingsPropertiesService {
                 List<EedsProperties> properties = currentThings.getProperties();
                 PropertiesContext propertiesContext = new PropertiesContext();
                 BeanUtil.copyProperties(addProperties, propertiesContext);
+                propertiesContext.setAgentId(Agent.getInstance().getAgentBaseInfo().getAgentId());
                 propertiesContext.setThingsId(thingsId);
                 ThingsSyncNewServiceImpl.PROPERTIES_CONTEXT_MAP.put(addProperties.getPropertiesId(), propertiesContext);
                 if (ObjectUtil.isEmpty(properties)) {
@@ -125,11 +127,19 @@ public class ThingsPropertiesService {
             }
             Long maxTimeStamp = 0L;
             List<EedsThings> eedsThings = JSON.parseArray(localThings, EedsThings.class);
-            maxTimeStamp = eedsThings.stream().map(EedsThings::getTimestamp).max(Long::compareTo).get();
+            Optional<Long> optional = eedsThings.stream().map(EedsThings::getTimestamp).max(Long::compareTo);
+            if (!optional.isPresent()) {
+                return maxTimeStamp;
+            }
+            maxTimeStamp = optional.get();
             for (EedsThings things : eedsThings) {
                 List<EedsProperties> properties = things.getProperties();
                 if (ObjectUtil.isNotEmpty(properties)) {
-                    Long timeStamp = properties.stream().map(EedsProperties::getTimestamp).max(Long::compareTo).get();
+                    Optional<Long> longOptional = properties.stream().map(EedsProperties::getTimestamp).max(Long::compareTo);
+                    if (!longOptional.isPresent()){
+                        return maxTimeStamp;
+                    }
+                    Long timeStamp = optional.get();
                     if (timeStamp > maxTimeStamp) {
                         maxTimeStamp = timeStamp;
                     }
@@ -137,7 +147,7 @@ public class ThingsPropertiesService {
             }
             return maxTimeStamp;
         } catch (Exception e) {
-            logger.error("获取数据源文件失败，异常：{}", e);
+            logger.error("获取数据源文件失败，异常：", e);
             return 0L;
         }
     }

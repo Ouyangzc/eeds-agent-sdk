@@ -34,9 +34,7 @@ public class AgentStarter {
 
     private static Logger logger = LoggerFactory.getLogger(AgentStarter.class);
 
-    private static ThingsServiceImpl thingsService = new ThingsServiceImpl();
     private static ThingsPropertiesService thingsPropertiesService = new ThingsPropertiesService();
-    private static ThingsSyncService thingsSyncService = new ThingsSyncServiceImpl(thingsService);
 
     private static ThingsSyncNewServiceImpl thingsSyncNewService = new ThingsSyncNewServiceImpl(thingsPropertiesService);
 
@@ -47,11 +45,11 @@ public class AgentStarter {
             thingsSyncIncrMessageHandler);
 
     private static CountScheduler countScheduler = new CountScheduler();
-    private AgentConfigYamlReader configReader;
 
     private static void init(AgentStartProperties agentStartProperties) throws Exception {
         // 实例化Agent对象
         Agent agent = Agent.getInstance();
+        agent.setAgentStatus(AgentStatus.INTI);
         try {
             // 存储解析对象实例
             ThingsConnection connection = ReflectUtil.newInstance(agentStartProperties.getProtocolPackage());
@@ -166,7 +164,7 @@ public class AgentStarter {
         AgentStartProperties agentStartProperties = AgentStartProperties.getInstance();
         AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
         agentStartProperties = agentConfigYamlReader.parseYaml(ymlPath, true);
-        logger.info("读取配置文件成功：{}", agentStartProperties.toString());
+        logger.info("读取配置文件成功：{}", agentStartProperties);
         // 调用私有init方法
         init(agentStartProperties);
     }
@@ -186,7 +184,7 @@ public class AgentStarter {
             // 默认在jar包相同路径下读取agent-sdk-config.yaml
             agentStartProperties = agentConfigYamlReader.parseYaml(fileName, true);
             logger.debug("jar包同级路径配置文件读取成功");
-            logger.info("读取配置文件成功：{}", agentStartProperties.toString());
+            logger.info("读取配置文件成功：{}", agentStartProperties);
         } else {
             // jar包中resource文件下的agent-sdk-config.yaml
             logger.debug("jar包同级路径配置文件不存在，即将开始读取jar包中resource文件下的配置文件");
@@ -197,7 +195,7 @@ public class AgentStarter {
                 throw new SdkException(ErrorEnum.READ_CONFIG_FILE_ERROR.code());
             }
             logger.debug("jar包中resource文件下的配置文件读取成功");
-            logger.info("读取配置文件成功：{}", agentStartProperties.toString());
+            logger.info("读取配置文件成功：{}", agentStartProperties);
         }
         // 调用私有init方法
         init(agentStartProperties);

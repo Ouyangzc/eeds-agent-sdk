@@ -214,8 +214,11 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
                 for (PropertiesContext editProperties : editList) {
                     //编辑
                     PROPERTIES_CONTEXT_MAP.put(editProperties.getPropertiesId(), editProperties);
-                    EedsThings things = syncThingsList.stream().filter(syncThings -> syncThings.getThingsId().equals(editProperties.getThingsId())).findFirst().get();
-                    thingsService.editProperties(things);
+                    Optional<EedsThings> optional = syncThingsList.stream().filter(syncThings -> syncThings.getThingsId().equals(editProperties.getThingsId())).findFirst();
+                    if (optional.isPresent()){
+                        EedsThings things = optional.get();
+                        thingsService.editProperties(things);
+                    }
                 }
                 for (PropertiesContext addProperties : addList) {
                     //新增
@@ -240,12 +243,15 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
         Map<String, List<PropertiesContext>> thingsIdMap = propertiesContextList.stream().collect(Collectors.groupingBy(PropertiesContext::getThingsId));
         for (String thingsId : thingsIdMap.keySet()) {
             //获取该数据源原始数据
-            EedsThings things = syncThingsList.stream().filter(syncThings -> syncThings.getThingsId().equals(thingsId)).findFirst().get();
-            //获取所有要新增得点位
-            List<String> propertiesIdList = thingsIdMap.get(thingsId).stream().map(PropertiesContext::getPropertiesId).collect(Collectors.toList());
-            List<EedsProperties> properties = things.getProperties();
-            List<EedsProperties> eedsProperties = properties.stream().filter(p -> propertiesIdList.contains(p.getPropertiesId())).collect(Collectors.toList());
-            things.setProperties(eedsProperties);
+            Optional<EedsThings> optional = syncThingsList.stream().filter(syncThings -> syncThings.getThingsId().equals(thingsId)).findFirst();
+            if(optional.isPresent()){
+                EedsThings things = optional.get();
+                //获取所有要新增得点位
+                List<String> propertiesIdList = thingsIdMap.get(thingsId).stream().map(PropertiesContext::getPropertiesId).collect(Collectors.toList());
+                List<EedsProperties> properties = things.getProperties();
+                List<EedsProperties> eedsProperties = properties.stream().filter(p -> propertiesIdList.contains(p.getPropertiesId())).collect(Collectors.toList());
+                things.setProperties(eedsProperties);
+            }
         }
         return syncThingsList;
     }
@@ -264,11 +270,11 @@ public class ThingsSyncServiceImpl implements ThingsSyncService {
         return null;
     }
 
-    private EedsProperties getEditProperties(List<EedsThings> syncThingsList, PropertiesContext propertiesContext) {
-        EedsThings things = syncThingsList.stream().filter(syncThings -> syncThings.getThingsId().equals(propertiesContext.getThingsId())).findFirst().get();
-        EedsProperties properties = things.getProperties().stream().filter(eedsProperties -> eedsProperties.getPropertiesId().equals(propertiesContext.getPropertiesId())).findFirst().get();
-        return properties;
-    }
+//    private EedsProperties getEditProperties(List<EedsThings> syncThingsList, PropertiesContext propertiesContext) {
+//        EedsThings things = syncThingsList.stream().filter(syncThings -> syncThings.getThingsId().equals(propertiesContext.getThingsId())).findFirst().get();
+//        EedsProperties properties = things.getProperties().stream().filter(eedsProperties -> eedsProperties.getPropertiesId().equals(propertiesContext.getPropertiesId())).findFirst().get();
+//        return properties;
+//    }
 
     private void loadThingDriver() {
         try {

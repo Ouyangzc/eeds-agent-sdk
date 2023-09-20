@@ -108,7 +108,7 @@ public class ConnectManager {
      */
     public static void delConnection(String thingsId) {
         ThingsConnectionHandler handler = getHandler(thingsId);
-        if (ObjectUtil.isNotEmpty(handler)) {
+        if (null != handler) {
             ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
             try {
                 handler.getThingsConnection().disconnect();
@@ -127,7 +127,7 @@ public class ConnectManager {
      */
     public static void create(ThingsDriverContext driverContext, String connectKey) {
         logger.info("连接协议：{}", connectKey);
-        logger.info("开始创建连接，连接信息：{}", JSONUtil.toJsonStr(driverContext));
+        logger.info("开始创建连接，连接信息：{}", driverContext);
         ThingsConnection connection = ConnectManager.getConnection(connectKey);
         ThingsConnectionHandler handler = (ThingsConnectionHandler) connection;
         handler.setContext(driverContext);
@@ -147,7 +147,7 @@ public class ConnectManager {
             return;
         }
         ConnectManager.addHandler(handler);
-        logger.info("创建连接成功，连接信息：{}", JSONUtil.toJsonStr(driverContext));
+        logger.info("创建连接成功，连接信息：{}", driverContext);
         thingsStatus.setValue(handler, ConnectionStatus.CONNECTED);
         if (!connection.getReadType().equals(ReadTypeEnums.INITIATIVE)) {
             String corn = null;
@@ -159,7 +159,7 @@ public class ConnectManager {
             }
             try {
                 SysJob sysJob = new SysJob(handler.getThingsId(), connection.getReadType(), corn, QuartzGroupEnum.READ_PROPERTIES);
-                sysJob.getExtraMap().put("handler",  ConnectManager.getHandler(handler.getThingsId()));
+                sysJob.getExtraMap().put("handler", ConnectManager.getHandler(handler.getThingsId()));
                 jobManage.addJob(sysJob);
             } catch (Exception e) {
                 logger.error("添加定时任务失败，连接信息：{}", JSONUtil.toJsonStr(driverContext));
@@ -188,20 +188,28 @@ public class ConnectManager {
      */
     public static void destroy(ThingsDriverContext driverContext) {
         ThingsConnectionHandler handler = ConnectManager.getHandler(driverContext.getThingsId());
-        handler.getThingsConnection().disconnect();
+        if (null != handler) {
+            handler.getThingsConnection().disconnect();
+        }
     }
 
     public static void sendPropertiesEventNotify(String thingsId, PropertiesEvent propertiesEvent) {
         if (propertiesEvent.getIsVirtual() == 1) {
-            try {
-                ThingsConnectionHandler handler = getHandler(thingsId);
-                if (ObjectUtil.isNotEmpty(handler)) {
+
+            ThingsConnectionHandler handler = getHandler(thingsId);
+            if (null != handler) {
+                try {
                     logger.info("发送变量变动通知,thingsId:{}", thingsId);
                     handler.getThingsConnection().propertiesEventNotify(propertiesEvent);
+                } catch (Exception e) {
+                    logger.error("发送变量变动通知异常，异常信息:", e);
                 }
-            } catch (Exception e) {
-                logger.error("发送变量变动通知异常，异常信息:{}", e);
             }
+
         }
+    }
+
+    public static IJobManageService getJobManage() {
+        return jobManage;
     }
 }

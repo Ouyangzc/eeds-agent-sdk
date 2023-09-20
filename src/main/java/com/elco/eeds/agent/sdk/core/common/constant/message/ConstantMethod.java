@@ -57,4 +57,15 @@ public class ConstantMethod {
      */
     public static final String METHOD_DATA_REALTIME_PROPERTIES = "properties_data_report";
 
+
+    /**
+     * 指令下发-确认
+     */
+    public static final String METHOD_CMD_CONFIRM = "agent_instruct_confirm";
+
+    /**
+     * 指令下发-结果
+     */
+    public static final String METHOD_CMD_RESPOND = "agent_instruct_respond";
+
 }

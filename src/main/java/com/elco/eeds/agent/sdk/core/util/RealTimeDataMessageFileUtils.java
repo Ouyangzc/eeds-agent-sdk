@@ -21,6 +21,7 @@ import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessag
 import com.elco.eeds.agent.sdk.transfer.beans.data.sync.DataSyncServerRequest;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import com.elco.eeds.agent.sdk.transfer.handler.properties.VirtualPropertiesHandle;
+import com.elco.eeds.agent.sdk.transfer.quartz.DataFileJob;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncNewServiceImpl;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 import org.apache.commons.io.FileUtils;
@@ -70,12 +71,16 @@ public class RealTimeDataMessageFileUtils {
                 String filePath = getNewFilePath(thingsId);
                 File newFile = new File(filePath);
                 fileMap.put(thingsId, newFile);
+                //加载到过期文件map缓存
+                DataFileJob.saveFileToMap(newFile);
                 return newFile;
             }
         }
         String filePath = getNewFilePath(thingsId);
         File newFile = new File(filePath);
         fileMap.put(thingsId, newFile);
+        //加载到过期文件map缓存
+        DataFileJob.saveFileToMap(newFile);
         return newFile;
     }
 
@@ -119,7 +124,7 @@ public class RealTimeDataMessageFileUtils {
                             DataParsing dataParsing;
                             if (ObjectUtil.isEmpty(handler)) {
                                 dataParsing = Agent.getInstance().getDataParsing();
-                                logger.info("数据同步：数据源已断开:{},获取默认解析实例:{}", thingsId, dataParsing.toString());
+                                logger.info("数据同步：数据源已断开:{},获取默认解析实例:{}", thingsId, dataParsing);
                                 if (ObjectUtil.isEmpty(dataParsing)) {
                                     throw new SdkException(ErrorEnum.THINGS_CONNECT_NOT_EXIST);
                                 }
@@ -131,7 +136,7 @@ public class RealTimeDataMessageFileUtils {
                                 BeanUtil.copyProperties(request, driverContext);
                             }
                             List<PropertiesValue> propertiesValueList = dataParsing.parsing(driverContext, propertiesContextList, message);
-                            logger.info("数据同步：原始数据文件,file:{},数据源:{},获取数据大小，size:{}，driverContext:{}", key, thingsId, propertiesValueList.size(), JSONUtil.toJsonStr(driverContext));
+                            logger.info("数据同步：原始数据文件,file:{},数据源:{},获取数据大小，size:{}，driverContext:{}", key, thingsId, propertiesValueList.size(), driverContext);
                             propertiesValueList.forEach(pv -> {
                                 pv.setTimestamp(collectTime);
                                 pv.setIsVirtual(REAL);
@@ -143,7 +148,7 @@ public class RealTimeDataMessageFileUtils {
                 }
             }
         } catch (Exception e) {
-            logger.info("数据同步：获取原始报文解析错误,error:{}", e);
+            logger.info("数据同步：获取原始报文解析错误,error:", e);
         }
         logger.info("数据同步：同步数据源id:{},开始时间:{},结束时间：{},获取同步原始报文大小:{}", thingsId, startTime, endTime, result.size());
         return result;
@@ -178,9 +183,11 @@ public class RealTimeDataMessageFileUtils {
                     String filePath = getNewFilePath(thingsId);
                     file = new File(filePath);
                     fileMap.put(thingsId, file);
+                    //加载到过期文件map缓存
+                    DataFileJob.saveFileToMap(file);
                 }
             }
-            StringBuffer dataBuffer = new StringBuffer(data);
+            StringBuilder dataBuffer = new StringBuilder(data);
             dataBuffer.append("\r\n");
             NIOFileUtils fileUtils = new NIOFileUtils(file.getAbsolutePath());
             fileUtils.writeLines(dataBuffer.toString(), dataBuffer.toString().getBytes().length, "UTF-8");

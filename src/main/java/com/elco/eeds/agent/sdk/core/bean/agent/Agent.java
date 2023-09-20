@@ -41,7 +41,6 @@ public class Agent implements Serializable {
       synchronized (Agent.class) {
         if (agent == null) {
           agent = new Agent();
-          agent.setAgentStatus(AgentStatus.INTI);
         }
       }
     }

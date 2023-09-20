@@ -45,16 +45,6 @@ public class ResponseResult<T> implements Serializable {
         this.code = sysCodeEnum.getCode();
         this.msg = sysCodeEnum.getMessage(params);
     }
-//
-//    public ResponseResult(BusinessException businessException) {
-//        this.code = businessException.getCode();
-//        this.msg = businessException.getMessage();
-//    }
-//
-//    public ResponseResult(BaseException baseException) {
-//        this.code = baseException.getCode();
-//        this.msg = baseException.getMessage();
-//    }
 
     public String getMsg() {
         return this.msg;

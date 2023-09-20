@@ -99,7 +99,7 @@ public class DataFileJob implements Job {
                 }
             }
         } catch (Exception e) {
-            logger.error("删除文件发生异常，异常信息：{}", e);
+            logger.error("删除文件发生异常，异常信息：", e);
         }
     }
 
@@ -216,22 +216,6 @@ class ExpireFileKey {
     @Override
     public int hashCode() {
         return key != null ? key.hashCode() : 0;
-    }
-
-    public static void main(String[] args) {
-//        ExpireFileKey expireFileKey = new ExpireFileKey(1678933819340L);
-//        ExpireFileKey expireFileKey2 = new ExpireFileKey(1678933819340L);
-//        if (expireFileKey2.equals(expireFileKey)) {
-//            System.out.println("哈哈");
-//        }
-//        if (expireFileKey.hashCode() == expireFileKey2.hashCode()) {
-//            System.out.println("哇哈哈");
-//        }
-//        if (expireFileKey.compare(expireFileKey2)) {
-//            System.out.println("即哈哈");
-//        }
-        DateTime dateEnd = DateUtil.offset(DateUtil.date(), DateField.HOUR, -0);
-        System.out.println(dateEnd);
     }
 }
 

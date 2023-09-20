@@ -14,10 +14,12 @@ public class SubCmdRequestMessage implements Serializable {
      * 数据源ID
      */
     private String thingsId;
+
     /**
-     * 功能标识,供客户端识别
+     * 指令下发方式
+     * 顺序下发: SERIAL 响应:RESPONSE 无响应:NO_RESPONSE
      */
-    private String identifier;
+    private String orderType;
     /**
      * 消息ID
      */
@@ -27,6 +29,11 @@ public class SubCmdRequestMessage implements Serializable {
      */
     private String inputData;
 
+    /**
+     * 指令下发超时时间，单位（秒）
+     */
+    private int orderTimeOut;
+
     public String getThingsId() {
         return thingsId;
     }
@@ -34,15 +41,6 @@ public class SubCmdRequestMessage implements Serializable {
     public void setThingsId(String thingsId) {
         this.thingsId = thingsId;
     }
-
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
-    }
-
     public String getMsgSeqNo() {
         return msgSeqNo;
     }
@@ -57,5 +55,21 @@ public class SubCmdRequestMessage implements Serializable {
 
     public void setInputData(String inputData) {
         this.inputData = inputData;
+    }
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
+    }
+
+    public int getOrderTimeOut() {
+        return orderTimeOut;
+    }
+
+    public void setOrderTimeOut(int orderTimeOut) {
+        this.orderTimeOut = orderTimeOut;
     }
 }

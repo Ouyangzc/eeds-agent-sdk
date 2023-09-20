@@ -28,7 +28,7 @@ public class ThingsSyncIncrMessageHandler implements IReceiverMessageHandler {
     @Override
     public void handleRecData(String topic, String recData) {
         ThingsSyncIncrMessage message = JSON.parseObject(recData, ThingsSyncIncrMessage.class);
-        logger.info("接收到数据源信息同步消息，topic:{},data:{}", topic, JSONUtil.toJsonStr(message));
+        logger.info("接收到数据源信息同步消息，topic:{},data:{}", topic, message);
         thingsSyncService.incrSyncThings(message.getData());
     }
 }

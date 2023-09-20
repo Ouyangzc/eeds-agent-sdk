@@ -73,7 +73,6 @@ public class ConstantTopic {
     public static final String TOPIC_SED_DATA_SYNC_FINISH = "agent.data.syncData.respond.{agentId}";
 
 
-
     /**
      * 数据--实时--变量值
      */
@@ -114,6 +113,16 @@ public class ConstantTopic {
      * server.cmd.service.request.{agentId}
      */
     public static final String TOPIC_SERVER_CMD_SERVICE_REQUEST = "server.cmd.service.request.{agentId}";
+
+    /**
+     * 指令下发确认报文
+     */
+    public static final String TOPIC_AGENT_CMD_CONFIRM_RESPOND = "agent.agent.instruct.confirm.{thingsId}";
+
+    /**
+     * 指令下发结果报文
+     */
+    public static final String TOPIC_AGENT_CMD_RESULT_RESPOND = "agent.agent.instruct.respond.{thingsId}";
 
 
     /**

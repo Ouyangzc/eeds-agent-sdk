@@ -9,6 +9,9 @@ package com.elco.eeds.agent.sdk.core.util;
  */
 public class ClassUtils {
 
+    private ClassUtils() {
+    }
+
     /**
      * 获取默认类加载器
      *
@@ -19,7 +22,7 @@ public class ClassUtils {
         try {
             classLoader = Thread.currentThread().getContextClassLoader();
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         if (null == classLoader) {
             classLoader = ClassUtils.class.getClassLoader();
