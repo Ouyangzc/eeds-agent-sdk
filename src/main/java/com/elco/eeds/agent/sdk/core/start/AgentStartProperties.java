@@ -59,6 +59,10 @@ public class AgentStartProperties implements Serializable {
      */
     private String agentClientType;
 
+    private String localIp;
+
+    private boolean localCache;
+
     private static volatile AgentStartProperties agentStartProperties;
 
     public static AgentStartProperties getInstance() {
@@ -70,6 +74,10 @@ public class AgentStartProperties implements Serializable {
             }
         }
         return agentStartProperties;
+    }
+
+    public AgentStartProperties() {
+        this.localCache = true;
     }
 
     public String getServerUrl() {
@@ -126,6 +134,22 @@ public class AgentStartProperties implements Serializable {
 
     public void setSsl(AgentSSLProperties ssl) {
         this.ssl = ssl;
+    }
+
+    public String getLocalIp() {
+        return localIp;
+    }
+
+    public void setLocalIp(String localIp) {
+        this.localIp = localIp;
+    }
+
+    public boolean isLocalCache() {
+        return localCache;
+    }
+
+    public void setLocalCache(boolean localCache) {
+        this.localCache = localCache;
     }
 
     @Override
