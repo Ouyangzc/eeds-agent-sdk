@@ -53,6 +53,6 @@ public class IpUtil {
             return "unknown";
         }
         logger.info("本地IP地址列表:{}", addressList);
-        return addressList.get(0).getHostAddress();
+        return addressList.get(addressList.size()-1).getHostAddress();
     }
 }
