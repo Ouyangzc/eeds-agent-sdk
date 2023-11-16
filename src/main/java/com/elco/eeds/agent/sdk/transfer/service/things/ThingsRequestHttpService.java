@@ -1,13 +1,15 @@
 package com.elco.eeds.agent.sdk.transfer.service.things;
 
 import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.common.entity.ResponseResult;
 import com.elco.eeds.agent.sdk.common.enums.SysCodeEnum;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
+import com.elco.eeds.agent.sdk.core.bean.agent.AgentClusterProperties;
+import com.elco.eeds.agent.sdk.core.common.constant.http.ConstantHttpApiPath;
 import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
+import com.elco.eeds.agent.sdk.core.util.AgentResourceUtils;
 import com.elco.eeds.agent.sdk.core.util.http.HttpClientUtil;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsSyncRequest;
 import org.slf4j.Logger;
@@ -32,7 +34,12 @@ public class ThingsRequestHttpService {
     public static String getThingsSyncData(ThingsSyncRequest request, String token,String apiPath) {
         AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
         String serverUrl = agentBaseInfo.getServerUrl();
-        String requestUrl = serverUrl + apiPath;
+        AgentClusterProperties cluster = AgentResourceUtils.getAgentConfigCluster();
+        String servicePrefix = ConstantHttpApiPath.STANDALONE_PREFIX;
+        if (cluster.getEnable()) {
+            servicePrefix = ConstantHttpApiPath.CLUSTER_PREFIX;
+        }
+        String requestUrl = serverUrl +servicePrefix+ apiPath;
         try {
             String response = HttpClientUtil.post(requestUrl, token, JSONUtil.toJsonStr(request));
             ResponseResult responseResult = JSONUtil.toBean(response, ResponseResult.class);

@@ -1,7 +1,9 @@
 package com.elco.eeds.agent.sdk.core.util;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
+import com.elco.eeds.agent.sdk.core.bean.agent.AgentClusterProperties;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 import org.slf4j.Logger;
@@ -40,6 +42,15 @@ public class AgentResourceUtils {
     public static boolean getAgentConfigLocalCache() {
         AgentResourceUtils agentResourceUtils = new AgentResourceUtils();
         return agentResourceUtils.agentStartProperties.isLocalCache();
+    }
+
+    public static AgentClusterProperties getAgentConfigCluster() {
+        AgentResourceUtils agentResourceUtils = new AgentResourceUtils();
+        AgentClusterProperties cluster = agentResourceUtils.agentStartProperties.getCluster();
+        if(ObjectUtil.isEmpty(cluster)){
+            return new AgentClusterProperties();
+        }
+        return cluster;
     }
 
     public AgentStartProperties loadYaml() {

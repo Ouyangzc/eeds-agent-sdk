@@ -8,10 +8,7 @@ import com.elco.eeds.agent.sdk.common.enums.SysCodeEnum;
 import com.elco.eeds.agent.sdk.core.bean.agent.*;
 import com.elco.eeds.agent.sdk.core.common.constant.http.ConstantHttpApiPath;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
-import com.elco.eeds.agent.sdk.core.util.AgentFileExtendUtils;
-import com.elco.eeds.agent.sdk.core.util.JsonUtil;
-import com.elco.eeds.agent.sdk.core.util.MapUtils;
-import com.elco.eeds.agent.sdk.core.util.ReflectUtils;
+import com.elco.eeds.agent.sdk.core.util.*;
 import com.elco.eeds.agent.sdk.core.util.http.HttpClientUtil;
 import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentRegisterRequest;
 import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentTokenRequest;
@@ -46,24 +43,29 @@ public class AgentRequestHttpService {
      */
     public Agent register(String host, String port, String name, String token, String clientType) {
         AgentRegisterRequest agentRegisterRequest = new AgentRegisterRequest(name, host, port, token, clientType);
-        String requestUrl = agent.getAgentBaseInfo().getServerUrl() + ConstantHttpApiPath.AGENT_REGISTER;
+        AgentClusterProperties cluster = AgentResourceUtils.getAgentConfigCluster();
+        String servicePrefix = ConstantHttpApiPath.STANDALONE_PREFIX;
+        if (cluster.getEnable()) {
+            servicePrefix = ConstantHttpApiPath.CLUSTER_PREFIX;
+        }
+        String requestUrl = agent.getAgentBaseInfo().getServerUrl() + servicePrefix + ConstantHttpApiPath.AGENT_REGISTER;
         try {
             String response = HttpClientUtil.post(requestUrl, token, JSONUtil.toJsonStr(agentRegisterRequest));
-            if(!JSONUtil.isJson(response)){
+            if (!JSONUtil.isJson(response)) {
                 logger.error("request rpc register error,msg:{}", response);
             }
             ResponseResult responseResult = JSONUtil.toBean(response, ResponseResult.class);
-            if(SysCodeEnum.SUCCESS.getCode().equals(responseResult.getCode())){
+            if (SysCodeEnum.SUCCESS.getCode().equals(responseResult.getCode())) {
                 // 将server-config反馈的data赋值给Agent对象
                 agent = copyFieldToAgent(JSONUtil.toJsonStr(responseResult.getData()));
                 logger.info("rpc register interfaces,result:{}", response);
                 return agent;
-            }else{
+            } else {
                 logger.error("request rpc register error,msg:{}", response);
                 return null;
             }
         } catch (Exception e) {
-            logger.error("调用server自动注册接口异常, 请求地址为：{}，形参为：{}", requestUrl,agentRegisterRequest);
+            logger.error("调用server自动注册接口异常, 请求地址为：{}，形参为：{}", requestUrl, agentRegisterRequest);
             e.printStackTrace();
         }
         return null;
@@ -161,7 +163,12 @@ public class AgentRequestHttpService {
      * @param agentTokenRequest 客户端请求对象
      */
     public void updateAgentEffectTime(AgentTokenRequest agentTokenRequest) {
-        String requestUrl = this.agent.getAgentBaseInfo().getServerUrl() + ConstantHttpApiPath.AGENT_TOKEN;
+        AgentClusterProperties cluster = AgentResourceUtils.getAgentConfigCluster();
+        String servicePrefix = ConstantHttpApiPath.STANDALONE_PREFIX;
+        if (cluster.getEnable()) {
+            servicePrefix = ConstantHttpApiPath.CLUSTER_PREFIX;
+        }
+        String requestUrl = this.agent.getAgentBaseInfo().getServerUrl() +servicePrefix+ ConstantHttpApiPath.AGENT_TOKEN;
         try {
             String response = HttpClientUtil.post(requestUrl, agentTokenRequest.getCurrentToken(), JSONUtil.toJsonStr(agentTokenRequest));
             logger.debug("调用token接口返回值为：{}", response);

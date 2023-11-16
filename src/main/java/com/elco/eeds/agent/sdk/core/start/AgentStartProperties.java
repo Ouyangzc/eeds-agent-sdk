@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.core.start;
 
 import cn.hutool.json.JSONUtil;
+import com.elco.eeds.agent.sdk.core.bean.agent.AgentClusterProperties;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentSSLProperties;
 
 import java.io.Serializable;
@@ -63,6 +64,7 @@ public class AgentStartProperties implements Serializable {
 
     private boolean localCache;
 
+    private AgentClusterProperties cluster;
     private static volatile AgentStartProperties agentStartProperties;
 
     public static AgentStartProperties getInstance() {
@@ -150,6 +152,14 @@ public class AgentStartProperties implements Serializable {
 
     public void setLocalCache(boolean localCache) {
         this.localCache = localCache;
+    }
+
+    public AgentClusterProperties getCluster() {
+        return cluster;
+    }
+
+    public void setCluster(AgentClusterProperties cluster) {
+        this.cluster = cluster;
     }
 
     @Override
