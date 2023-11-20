@@ -51,13 +51,11 @@ public class ThingsPropertiesService {
 
     public void addThings(EedsThings addThings) {
         currentThingsList.add(addThings);
-        saveToFile(JSONUtil.toJsonStr(currentThingsList));
     }
 
     public void delThings(String delThingsId) {
         if (ObjectUtil.isNotEmpty(currentThingsList) && currentThingsList.size() > 0 && currentThingsList.stream().anyMatch(t -> t.getThingsId().equals(delThingsId))) {
             currentThingsList = currentThingsList.stream().filter(things -> !things.getThingsId().equals(delThingsId)).collect(Collectors.toList());
-            saveToFile(JSONUtil.toJsonStr(currentThingsList));
         }
     }
 
@@ -72,7 +70,6 @@ public class ThingsPropertiesService {
             eedsThings.setProperties(sourceProperties);
             currentThingsList = currentThingsList.stream().filter(things -> !things.getThingsId().equals(eedsThings.getThingsId())).collect(Collectors.toList());
             currentThingsList.add(eedsThings);
-            saveToFile(JSONUtil.toJsonStr(currentThingsList));
         }
     }
 
@@ -90,11 +87,13 @@ public class ThingsPropertiesService {
                     eedsProperties.add(addProperties);
                     currentThings.setProperties(eedsProperties);
                 } else {
-                    properties.add(addProperties);
+                    Optional<EedsProperties> optional = properties.stream().filter(p -> p.getPropertiesId().equals(addProperties.getPropertiesId())).findAny();
+                    if (!optional.isPresent()){
+                        properties.add(addProperties);
+                    }
                 }
             }
         }
-        saveToFile(JSONUtil.toJsonStr(currentThingsList));
     }
 
     public void delProperties(String thingsId, EedsProperties delProperties) {
@@ -111,11 +110,6 @@ public class ThingsPropertiesService {
                     }
                 }
             }
-        }
-        if (currentThingsList.size() > 0) {
-            saveToFile(JSONUtil.toJsonStr(currentThingsList));
-        } else {
-            saveToFile("");
         }
     }
 

@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.transfer.service.things;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
@@ -117,8 +118,8 @@ public class ThingsSyncNewServiceImpl implements ThingsSyncService, Serializable
                     handleUnchangeThings(syncThings, localThingsData);
                     break;
             }
-
         }
+        thingsService.saveToFile(JSONUtil.toJsonStr(thingsService.getCurrentThingsList()));
     }
 
     private void handleIncrSyncThingsDataList(List<EedsThings> syncDataList) {
@@ -172,8 +173,18 @@ public class ThingsSyncNewServiceImpl implements ThingsSyncService, Serializable
             }
 
         }
+        saveToFile();
     }
 
+
+    private void saveToFile() {
+        List<EedsThings> currentThingsList = thingsService.getCurrentThingsList();
+        if (currentThingsList.size() > 0) {
+            thingsService.saveToFile(JSONUtil.toJsonStr(currentThingsList));
+        } else {
+            thingsService.saveToFile("");
+        }
+    }
 
     private void handleAddThings(EedsThings syncThings, String localThingsData) {
         List<EedsProperties> properties = syncThings.getProperties().stream().filter(p -> p.getOperatorType().equals(ConstantThings.P_OPERATOR_TYPE_ADD)).collect(Collectors.toList());

@@ -8,6 +8,7 @@ import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
+import com.elco.eeds.agent.sdk.core.util.AgentResourceUtils;
 import com.elco.eeds.agent.sdk.core.util.RealTimeDataMessageFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.data.count.ThingsDataCount;
@@ -49,24 +50,28 @@ public class RealTimePropertiesValueService {
                     logger.error("丢弃该消息,时间戳：{},统计开始时间:{}", collectTime, minOptional.get());
                     return;
                 }
-                //存储原始数据
-                OriginalPropertiesValueMessage originalPropertiesValueMessage = new OriginalPropertiesValueMessage();
-                originalPropertiesValueMessage.setCollectTime(collectTime);
-                originalPropertiesValueMessage.setMessage(message);
-                RealTimeDataMessageFileUtils.writeAppend(thingsId, JSONUtil.toJsonStr(originalPropertiesValueMessage), collectTime);
+                if (AgentResourceUtils.getAgentConfigLocalCache()) {
+                    //存储原始数据
+                    OriginalPropertiesValueMessage originalPropertiesValueMessage = new OriginalPropertiesValueMessage();
+                    originalPropertiesValueMessage.setCollectTime(collectTime);
+                    originalPropertiesValueMessage.setMessage(message);
+                    RealTimeDataMessageFileUtils.writeAppend(thingsId, JSONUtil.toJsonStr(originalPropertiesValueMessage), collectTime);
 
-                // 计算虚拟变量
-                VirtualPropertiesHandle.creatVirtualProperties(propertiesContextList, propertiesValueList, collectTime);
+                    // 计算虚拟变量
+                    VirtualPropertiesHandle.creatVirtualProperties(propertiesContextList, propertiesValueList, collectTime);
 
-                //调用统计接口
-                ThingsDataCount dataCount = new ThingsDataCount();
-                dataCount.setThingsId(thingsId);
-                dataCount.setSize(propertiesValueList.size());
-                dataCount.setCollectTime(collectTime);
-                dataCount.setStartTime(collectTime);
-                dataCount.setEndTime(collectTime);
-                DataCountServiceImpl.recRealTimeData(agentId, collectTime, dataCount);
-
+                    //调用统计接口
+                    ThingsDataCount dataCount = new ThingsDataCount();
+                    dataCount.setThingsId(thingsId);
+                    dataCount.setSize(propertiesValueList.size());
+                    dataCount.setCollectTime(collectTime);
+                    dataCount.setStartTime(collectTime);
+                    dataCount.setEndTime(collectTime);
+                    DataCountServiceImpl.recRealTimeData(agentId, collectTime, dataCount);
+                } else {
+                    // 计算虚拟变量
+                    VirtualPropertiesHandle.creatVirtualProperties(propertiesContextList, propertiesValueList, collectTime);
+                }
                 //推送数据
                 MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
                 String postMsg = DataRealTimePropertiesMessage.getMessage(propertiesValueList);

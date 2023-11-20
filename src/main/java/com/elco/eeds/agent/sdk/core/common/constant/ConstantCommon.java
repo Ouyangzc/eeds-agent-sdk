@@ -27,4 +27,15 @@ public class ConstantCommon {
 
     //采样频率
     public static final String SamplingInterval = "SamplingInterval";
+
+    public static final String CONFIG_FILE_NAME_YAML = "application.yaml";
+
+    public static final String YAML_AGENT_KEY = "agent";
+
+    public static final String SYMBOL_EXCLAMATION_POINT= "!";
+    public static final String SYSTEM_OS_NAME_KEY= "os.name";
+
+    public static final String WINDOWS_OS_KEY= "dows";
+
+    public static final String FILE_FORMAT_JAR= ".jar";
 }
