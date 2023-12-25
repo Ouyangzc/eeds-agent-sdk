@@ -36,6 +36,12 @@ public class ConstantTopic {
     public static final String TOPIC_AGENT_LINK_TEST_RSP = "agent.agent.linkTest.respond.{agentId}";
 
     /**
+     * 客户端链接测试(集群)
+     */
+    public static final String TOPIC_AGENT_LINK_TEST_CLUSTER_REQ = "server.agent.linkTestCluster.request.{agentId}";
+    public static final String TOPIC_AGENT_LINK_TEST_CLUSTER_RSP = "agent.agent.linkTestCluster.respond.{agentId}";
+
+    /**
      * 客户端下发报文
      */
     public static final String TOPIC_AGENT_COMMAND_DISTRIBUTE_REQ = "server.agent.order.request.{agentId}.{thingsId}";

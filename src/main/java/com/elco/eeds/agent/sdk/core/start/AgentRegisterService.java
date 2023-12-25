@@ -48,6 +48,8 @@ public class AgentRegisterService implements IAgentRegisterService {
     private AgentConfigGlobalMessageHandler agentConfigGlobalMessageHandler = new AgentConfigGlobalMessageHandler();
     private AgentConfigLocalMessageHandler agentConfigLocalMessageHandler = new AgentConfigLocalMessageHandler();
     private AgentLinkTestMessageHandler agentLinkTestMessageHandler = new AgentLinkTestMessageHandler();
+
+    private AgentLinkTestClusterMessageHandler agentLinkTestClusterMessageHandler = new AgentLinkTestClusterMessageHandler();
     private DataCountConfirmMessageHandler dataCountConfirmMessageHandler = new DataCountConfirmMessageHandler();
     private ThingsReconnectManualMessageHandler thingsReconnectManualMessageHandler = new ThingsReconnectManualMessageHandler();
 
@@ -133,6 +135,7 @@ public class AgentRegisterService implements IAgentRegisterService {
             // 订阅 基础配置修改（私有）topic
             natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_AGENT_CONFIG_LOCAL, agentId), agentConfigLocalMessageHandler);
             natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_AGENT_LINK_TEST_REQ, agentId), agentLinkTestMessageHandler);
+            natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_AGENT_LINK_TEST_CLUSTER_REQ, agentId), agentLinkTestClusterMessageHandler);
 
             //数据源--增量同步
             natsClient.syncSub(ReplaceTopicAgentId.getTopicWithRealAgentId(ConstantTopic.TOPIC_REC_THINGS_SYNC_INCR, agentId), thingsSyncIncrMessageHandler);
