@@ -102,7 +102,7 @@ public class AgentRegisterService implements IAgentRegisterService {
         } catch (Exception e) {
             Agent instance = Agent.getInstance();
             instance.setAgentStatus(AgentStatus.ERROR);
-            logger.error("客户端注册流程失败，失败原因：", e);
+            logger.error("客户端注册流程失败");
             this.close(e.getMessage());
             return false;
         }
@@ -183,7 +183,7 @@ public class AgentRegisterService implements IAgentRegisterService {
                 token = localToken;
             }
         } catch (SdkException e) {
-            logger.error("获取本地token发生异常,异常信息：{}", e.getMessage());
+            logger.warn("获取本地token发生异常,异常信息：{}", e.getMessage());
             return null;
         }
         return token;
