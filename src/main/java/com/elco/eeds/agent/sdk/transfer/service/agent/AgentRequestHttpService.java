@@ -60,6 +60,7 @@ public class AgentRequestHttpService {
     String servicePrefix = ConstantHttpApiPath.STANDALONE_PREFIX;
     if (cluster.getEnable()) {
       servicePrefix = ConstantHttpApiPath.CLUSTER_PREFIX;
+      agentRegisterRequest.setNodeName(cluster.getNodeName().trim());
     }
     String requestUrl = agent.getAgentBaseInfo().getServerUrl() + servicePrefix
         + ConstantHttpApiPath.AGENT_REGISTER;
@@ -76,14 +77,16 @@ public class AgentRequestHttpService {
         logger.info("rpc register interfaces,result:{}", response);
         return agent;
       } else {
-        String message = "{\"code\":\\"+responseResult.getCode()+",\"msg\":\\"+responseResult.getMsg()+",\"data\":null}";
+        String message =
+            "{\"code\":\\" + responseResult.getCode() + ",\"msg\":\\" + responseResult.getMsg()
+                + ",\"data\":null}";
         throw new EedsHttpRequestException(message);
       }
     } catch (Exception e) {
       logger.error("调用server自动注册接口异常, 请求地址为：{}，形参为：{}", requestUrl,
           agentRegisterRequest);
 
-      throw new EedsHttpRequestException(e.getMessage(),e);
+      throw new EedsHttpRequestException(e.getMessage(), e);
     }
   }
 

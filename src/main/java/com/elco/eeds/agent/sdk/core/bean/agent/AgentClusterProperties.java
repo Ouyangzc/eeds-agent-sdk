@@ -10,7 +10,10 @@ import java.io.Serializable;
  * @Version 1.0
  */
 public class AgentClusterProperties implements Serializable {
+
     private Boolean enable;
+
+    private String nodeName;
 
     public AgentClusterProperties() {
         this.enable = false;
@@ -22,5 +25,13 @@ public class AgentClusterProperties implements Serializable {
 
     public void setEnable(Boolean enable) {
         this.enable = enable;
+    }
+
+    public String getNodeName() {
+        return nodeName;
+    }
+
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName;
     }
 }
