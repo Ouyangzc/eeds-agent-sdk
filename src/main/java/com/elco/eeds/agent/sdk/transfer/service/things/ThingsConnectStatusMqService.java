@@ -24,16 +24,11 @@ public class ThingsConnectStatusMqService {
   private static final String CONNECTING = "5";
 
   private static void send(String thingsId, String status, String msg) {
-    ThreadUtil.execute(new Runnable() {
-      @Override
-      public void run() {
-        String json = ThingsConnectStatusMessage.create(thingsId, status, msg).toJson();
-        MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
-        mqPlugin.publish(ConstantTopic.TOPIC_THINGS_CONNECTSTATUS_REQUEST + thingsId
-            , json, null);
-        logger.info("发送数据源连接状态报文：{}", json);
-      }
-    });
+    String json = ThingsConnectStatusMessage.create(thingsId, status, msg).toJson();
+    MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
+    mqPlugin.publish(ConstantTopic.TOPIC_THINGS_CONNECTSTATUS_REQUEST + thingsId
+        , json, null);
+    logger.info("发送数据源连接状态报文：{}", json);
   }
 
   public static void sendConnectMsg(String thingsId) {
