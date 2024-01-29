@@ -25,6 +25,7 @@ import com.elco.eeds.agent.sdk.core.util.http.HttpClientUtil;
 import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentRegisterRequest;
 import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentTokenRequest;
 import java.util.Map;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,9 @@ public class AgentRequestHttpService {
     String servicePrefix = ConstantHttpApiPath.STANDALONE_PREFIX;
     if (cluster.getEnable()) {
       servicePrefix = ConstantHttpApiPath.CLUSTER_PREFIX;
-      agentRegisterRequest.setNodeName(cluster.getNodeName().trim());
+      if (Objects.nonNull(cluster.getNodeName())) {
+        agentRegisterRequest.setNodeName(cluster.getNodeName().trim());
+      }
     }
     String requestUrl = agent.getAgentBaseInfo().getServerUrl() + servicePrefix
         + ConstantHttpApiPath.AGENT_REGISTER;
