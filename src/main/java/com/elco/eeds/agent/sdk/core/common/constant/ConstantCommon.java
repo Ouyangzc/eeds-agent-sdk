@@ -38,4 +38,8 @@ public class ConstantCommon {
     public static final String WINDOWS_OS_KEY= "dows";
 
     public static final String FILE_FORMAT_JAR= ".jar";
+    /**
+     * 符号:逗号(英文)  ,
+     */
+    public static final String SYMBOL_COMMAS = ",";
 }

@@ -21,7 +21,7 @@ import com.elco.eeds.agent.sdk.core.util.AgentResourceUtils;
 import com.elco.eeds.agent.sdk.core.util.JsonUtil;
 import com.elco.eeds.agent.sdk.core.util.MapUtils;
 import com.elco.eeds.agent.sdk.core.util.ReflectUtils;
-import com.elco.eeds.agent.sdk.core.util.http.HttpClientUtil;
+import com.elco.eeds.agent.sdk.core.util.http.HttpUrlProcessor;
 import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentRegisterRequest;
 import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentTokenRequest;
 import java.util.Map;
@@ -65,10 +65,11 @@ public class AgentRequestHttpService {
         agentRegisterRequest.setNodeName(cluster.getNodeName().trim());
       }
     }
-    String requestUrl = agent.getAgentBaseInfo().getServerUrl() + servicePrefix
-        + ConstantHttpApiPath.AGENT_REGISTER;
+    HttpUrlProcessor httpUrlProcessor = new HttpUrlProcessor(cluster.getServerUrls(),
+        cluster.getEnable(), servicePrefix, ConstantHttpApiPath.AGENT_REGISTER);
+
     try {
-      String response = HttpClientUtil.post(requestUrl, token,
+      String response = httpUrlProcessor.processRequest(token,
           JSONUtil.toJsonStr(agentRegisterRequest));
       if (!JSONUtil.isJson(response)) {
         logger.error("request rpc register error,msg:{}", response);
@@ -86,9 +87,6 @@ public class AgentRequestHttpService {
         throw new EedsHttpRequestException(message);
       }
     } catch (Exception e) {
-      logger.error("调用server自动注册接口异常, 请求地址为：{}，形参为：{}", requestUrl,
-          agentRegisterRequest);
-
       throw new EedsHttpRequestException(e.getMessage(), e);
     }
   }
@@ -198,16 +196,15 @@ public class AgentRequestHttpService {
     if (cluster.getEnable()) {
       servicePrefix = ConstantHttpApiPath.CLUSTER_PREFIX;
     }
-    String requestUrl = this.agent.getAgentBaseInfo().getServerUrl() + servicePrefix
-        + ConstantHttpApiPath.AGENT_TOKEN;
     try {
-      String response = HttpClientUtil.post(requestUrl, agentTokenRequest.getCurrentToken(),
+      HttpUrlProcessor httpUrlProcessor = new HttpUrlProcessor(cluster.getServerUrls(),
+          cluster.getEnable(), servicePrefix, ConstantHttpApiPath.AGENT_TOKEN);
+      String response = httpUrlProcessor.processRequest(agentTokenRequest.getCurrentToken(),
           JSONUtil.toJsonStr(agentTokenRequest));
       logger.debug("调用token接口返回值为：{}", response);
     } catch (Exception e) {
       logger.error("更新客户端TOKEN生效时间接口异常, 形参为：{}",
           JSONUtil.toJsonStr(agentTokenRequest));
-      logger.error("请求地址为：{}", requestUrl);
       e.printStackTrace();
     }
   }
