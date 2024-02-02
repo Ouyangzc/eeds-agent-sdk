@@ -9,7 +9,7 @@ package com.elco.eeds.agent.sdk.core.common.enums;
  */
 public enum RegexEnum {
   HTTP_HTTPS(
-      "https?://(?:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|(?:www\\.)?[\\w-]+\\.\\w{2,3}(?:\\.\\w{2})?)(:\\d{1,5})?\\/?",
+      "https?://(?:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|[\\w.-]+)(:\\d{1,5})?(\\/\\w*)?",
       "url填写错误");
   private String regexStr;
   private String msg;

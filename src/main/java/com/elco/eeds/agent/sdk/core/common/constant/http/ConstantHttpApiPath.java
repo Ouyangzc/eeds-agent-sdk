@@ -17,7 +17,7 @@ public class ConstantHttpApiPath {
     /**
      * 集群前缀
      */
-    public static final String CLUSTER_PREFIX = "/api/eeds-base-server";
+    public static final String CLUSTER_PREFIX = "/eeds-base-server";
 
     /**
      * 客户端注册 url路径
