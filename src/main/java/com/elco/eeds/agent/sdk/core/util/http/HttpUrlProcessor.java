@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.util.http;
 
+import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.exception.EedsHttpRequestException;
 import java.util.List;
 import java.util.Objects;
@@ -54,13 +55,15 @@ public class HttpUrlProcessor {
     String exceptionMsg = "";
     Exception causeExp = null;
     for (int attempt = 1; attempt <= maxAttempts; attempt++) {
-      String serverUlr = urls.get(attempt-1);
+      String serverUlr = urls.get(attempt - 1);
       String requestUrl = serverUlr + servicePrefix + apiPath;
       try {
         String response = HttpClientUtil.post(requestUrl, token,
             content);
-        this.setSuccesUrl(serverUlr);
-        return response;
+        if (JSONUtil.isJson(response)) {
+          this.setSuccesUrl(serverUlr);
+          return response;
+        }
       } catch (Exception e) {
         exceptionMsg = e.getMessage();
         causeExp = e;
