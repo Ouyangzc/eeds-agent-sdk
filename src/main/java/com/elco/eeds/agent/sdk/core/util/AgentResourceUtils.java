@@ -47,7 +47,10 @@ public class AgentResourceUtils {
     AgentResourceUtils agentResourceUtils = new AgentResourceUtils();
     AgentClusterProperties cluster = agentResourceUtils.agentStartProperties.getCluster();
     if (ObjectUtil.isEmpty(cluster)) {
-      return new AgentClusterProperties();
+      AgentClusterProperties clusterProperties = new AgentClusterProperties();
+      clusterProperties.setServerUrls(agentResourceUtils.agentStartProperties.getServerUrl());
+      clusterProperties.setEnable(false);
+      return clusterProperties;
     }
     cluster.setServerUrls(agentResourceUtils.agentStartProperties.getServerUrl());
     return cluster;
