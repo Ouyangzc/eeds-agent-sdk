@@ -103,14 +103,14 @@ public class CmdService {
 
     public static void refreshThingsCmdQueue(String thingsId) {
         if (!CmdRequestManager.checkThingsQueueCanRun(thingsId)) {
-            logger.info("当前数据源执行指令条件不足,数据源:{}", thingsId);
+            logger.debug("当前数据源执行指令条件不足,数据源:{}", thingsId);
             return;
         }
         SubCmdRequestMessage requestMessage = CmdRequestManager.getNextCmdMessage(thingsId);
         String msgSeqNo = "";
         try {
             if (null == requestMessage) {
-                logger.info("当前数据源无可执行指令,数据源:{}", thingsId);
+                logger.debug("当前数据源无可执行指令,数据源:{}", thingsId);
                 return;
             }
              msgSeqNo = requestMessage.getMsgSeqNo();
@@ -134,7 +134,7 @@ public class CmdService {
                 refreshThingsCmdQueue(thingsId);
             } else {
                 if (null != result) {
-                    logger.info("指令功能下发，执行结果：{}",result);
+                    logger.debug("指令功能下发，执行结果：{}",result);
                     if (result.isResult()) {
                         CmdService.sendResult(thingsId, msgSeqNo, null);
                     } else {
