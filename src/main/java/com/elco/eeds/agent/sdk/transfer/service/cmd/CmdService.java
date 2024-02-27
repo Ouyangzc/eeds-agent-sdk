@@ -124,6 +124,7 @@ public class CmdService {
             if (!handler.cmdCheck(requestMessage.getInputData())) {
                 logger.error("指令功能下发,消息ID:{},参数校验不通过：{}", msgSeqNo, requestMessage.getInputData());
                 CmdService.sendResult(thingsId, msgSeqNo, "参数校验不通过,请检查下发参数");
+                return;
             }
             String orderType = requestMessage.getOrderType();
             CmdResult result = handler.cmdWrite(requestMessage);
