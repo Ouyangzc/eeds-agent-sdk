@@ -128,6 +128,10 @@ public class ConnectManager {
     public static void create(ThingsDriverContext driverContext, String connectKey) {
         logger.info("连接协议：{}", connectKey);
         logger.info("开始创建连接，连接信息：{}", driverContext);
+        if (ObjectUtil.isEmpty(driverContext)){
+            logger.info("暂无数据源信息：无法创建连接");
+            return;
+        }
         ThingsConnection connection = ConnectManager.getConnection(connectKey);
         ThingsConnectionHandler handler = (ThingsConnectionHandler) connection;
         handler.setContext(driverContext);
