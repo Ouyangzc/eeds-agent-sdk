@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
+import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesEvent;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantThings;
 import com.elco.eeds.agent.sdk.core.common.constant.http.ConstantHttpApiPath;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
@@ -200,6 +201,10 @@ public class ThingsSyncNewServiceImpl implements ThingsSyncService, Serializable
         List<EedsProperties> syncThingsPropertiesList = syncThings.getProperties();
         for (EedsProperties properties : syncThingsPropertiesList) {
             String operatorType = properties.getOperatorType();
+            PropertiesEvent propertiesEvent = new PropertiesEvent();
+            propertiesEvent.setThingsId(thingsId);
+            BeanUtil.copyProperties(properties, propertiesEvent);
+            ConnectManager.sendPropertiesEventNotify(thingsId,propertiesEvent);
             if (ConstantThings.P_OPERATOR_TYPE_ADD.equals(operatorType)) {
                 thingsService.addProperties(thingsId, properties);
             } else if (ConstantThings.P_OPERATOR_TYPE_DEL.equals(operatorType)) {

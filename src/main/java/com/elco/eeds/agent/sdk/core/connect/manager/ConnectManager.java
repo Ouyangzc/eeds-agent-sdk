@@ -44,7 +44,7 @@ public class ConnectManager {
     static {
         try {
             jobManage = new JobManageService(StdSchedulerFactory.getDefaultScheduler());
-        } catch (SchedulerException e) {
+        }catch (SchedulerException e) {
             logger.error(e.getMessage());
         }
     }
@@ -113,7 +113,7 @@ public class ConnectManager {
             try {
                 handler.getThingsConnection().disconnect();
                 thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
-            } catch (Exception e) {
+            }catch (Exception e) {
                 thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT, e.getMessage());
             }
             CONNECTION_HANDLER_MAP.remove(thingsId);
@@ -128,6 +128,10 @@ public class ConnectManager {
     public static void create(ThingsDriverContext driverContext, String connectKey) {
         logger.info("连接协议：{}", connectKey);
         logger.info("开始创建连接，连接信息：{}", driverContext);
+        if (ObjectUtil.isEmpty(driverContext)){
+            logger.info("暂无数据源信息：无法创建连接");
+            return;
+        }
         ThingsConnection connection = ConnectManager.getConnection(connectKey);
         ThingsConnectionHandler handler = (ThingsConnectionHandler) connection;
         handler.setContext(driverContext);
@@ -136,12 +140,16 @@ public class ConnectManager {
         ThingsConnectionHandler.ThingsStatus thingsStatus = handler.new ThingsStatus();
         thingsStatus.setValue(handler, ConnectionStatus.CONNECTING);
         try {
-            connection.connect(driverContext);
-        } catch (EedsConnectException e) {
+            if (!connection.connect(driverContext)) {
+                logger.error("创建连接失败，客户端创建连接失败,连接信息：{}", JSONUtil.toJsonStr(driverContext));
+                thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT);
+                return;
+            }
+        }catch (EedsConnectException e) {
             logger.error("创建连接失败,发生可知异常,连接信息：{}", JSONUtil.toJsonStr(driverContext));
             thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT, e.getMessage());
             return;
-        } catch (Exception e) {
+        }catch (Exception e) {
             logger.error("创建连接失败，发生未知异常,连接信息：{}", JSONUtil.toJsonStr(driverContext));
             thingsStatus.setValue(handler, ConnectionStatus.DISCONNECT, e.getMessage());
             return;
@@ -154,14 +162,14 @@ public class ConnectManager {
             String samplingInterval = driverContext.getExtraMap().get(ConstantCommon.SamplingInterval);
             if (ObjectUtil.isNotEmpty(samplingInterval)) {
                 corn = samplingInterval;
-            } else {
+            }else {
                 corn = connection.getCorn();
             }
             try {
                 SysJob sysJob = new SysJob(handler.getThingsId(), connection.getReadType(), corn, QuartzGroupEnum.READ_PROPERTIES);
                 sysJob.getExtraMap().put("handler", ConnectManager.getHandler(handler.getThingsId()));
                 jobManage.addJob(sysJob);
-            } catch (Exception e) {
+            }catch (Exception e) {
                 logger.error("添加定时任务失败，连接信息：{}", JSONUtil.toJsonStr(driverContext));
             }
 
@@ -200,8 +208,9 @@ public class ConnectManager {
             if (null != handler) {
                 try {
                     logger.info("发送变量变动通知,thingsId:{}", thingsId);
+                    propertiesEvent.setThingsId(thingsId);
                     handler.getThingsConnection().propertiesEventNotify(propertiesEvent);
-                } catch (Exception e) {
+                }catch (Exception e) {
                     logger.error("发送变量变动通知异常，异常信息:", e);
                 }
             }

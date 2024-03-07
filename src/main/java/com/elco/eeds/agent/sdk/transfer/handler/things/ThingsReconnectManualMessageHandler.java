@@ -27,7 +27,6 @@ public class ThingsReconnectManualMessageHandler implements IReceiverMessageHand
   @Override
   public void handleRecData(String topic, String recData) {
     logger.info("收到数据源手动重连报文：topic: {}, msg: {}", topic, recData);
-
     try {
       // 校验报文是否格式是否满足
       ThingsReconnectManualMessage message = JSON
@@ -47,7 +46,6 @@ public class ThingsReconnectManualMessageHandler implements IReceiverMessageHand
       }
     } catch (Exception e) {
       logger.error("数据源手动重连报文处理异常：", e);
-      e.printStackTrace();
     }
   }
 }

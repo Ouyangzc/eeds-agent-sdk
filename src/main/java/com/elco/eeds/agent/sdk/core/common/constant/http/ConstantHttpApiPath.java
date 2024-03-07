@@ -10,28 +10,39 @@ package com.elco.eeds.agent.sdk.core.common.constant.http;
 public class ConstantHttpApiPath {
 
     /**
+     * 单机前缀
+     */
+    public static final String STANDALONE_PREFIX = "/eeds-sys-config";
+
+    /**
+     * 集群前缀
+     */
+    public static final String CLUSTER_PREFIX = "/eeds-base-server";
+
+    /**
      * 客户端注册 url路径
      */
-    public static final String AGENT_REGISTER = "/eeds-sys-config/agents/autoAddAgents";
+    public static final String AGENT_REGISTER = "/agents/autoAddAgents";
 
     /**
      * 客户端更新token url路径
      */
-    public static final String AGENT_TOKEN = "/eeds-sys-config/agents/updateAfterFinishToken";
+    public static final String AGENT_TOKEN = "/agents/updateAfterFinishToken";
 
     /**
      * 数据源启动同步url路径
      */
-    public static final String THINGS_SETUP_SYNC_API = "/eeds-sys-config/things/getThingsBySync";
+    public static final String THINGS_SETUP_SYNC_API = "/things/getThingsBySync";
 
     /**
      * 数据源启动同步url路径
      */
-    public static final String THINGS_SETUP_SYNC_NEW_API = "/eeds-sys-config/things/getThingsSyncInfo";
+    public static final String THINGS_SETUP_SYNC_NEW_API = "/things/getThingsSyncInfo";
     /**
      * 数据源增量同步url路径
      */
-    public static final String THINGS_INCR_SYNC_API = "/eeds-sys-config/things/saveAgentsByConfirm";
+    public static final String THINGS_INCR_SYNC_API = "/things/saveAgentsByConfirm";
+
 
 
 }

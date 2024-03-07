@@ -35,6 +35,8 @@ public class AgentRegisterRequest implements Serializable {
      */
     private String type;
 
+    private String nodeName;
+
     public AgentRegisterRequest(String name, String host, String port, String token, String type) {
         this.name = name;
         this.host = host;
@@ -81,6 +83,14 @@ public class AgentRegisterRequest implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getNodeName() {
+        return nodeName;
+    }
+
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName;
     }
 
     @Override
