@@ -6,7 +6,7 @@
 
     <groupId>com.elco</groupId>
     <artifactId>eeds-agent-sdk</artifactId>
-    <version>1.1.4-SNAPSHOT</version>
+    <version>1.1.5-SNAPSHOT</version>
 
     <description>宜科边缘服务代理端SDK</description>
 

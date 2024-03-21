@@ -42,7 +42,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
             <FileNamePattern>${LOG_HOME}/${PROJECT_NAME}/debug/${PROJECT_NAME}.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
-            <maxFileSize>500MB</maxFileSize>
+            <maxFileSize>250MB</maxFileSize>
             <maxHistory>7</maxHistory>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
@@ -64,7 +64,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
             <FileNamePattern>${LOG_HOME}/${PROJECT_NAME}/error/${PROJECT_NAME}.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
-            <maxFileSize>500MB</maxFileSize>
+            <maxFileSize>250MB</maxFileSize>
             <maxHistory>7</maxHistory>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
@@ -96,6 +96,6 @@
         <appender-ref ref="FILEErrorLog"/>
     </root>
 
-
+    <contextListener class="com.elco.eeds.agent.sdk.core.config.LogbackConfigurator"/>
 
 </configuration>

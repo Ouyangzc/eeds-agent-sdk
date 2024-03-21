@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentClusterProperties;
+import com.elco.eeds.agent.sdk.core.bean.agent.AgentLoggingFileProperties;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 import java.io.File;
@@ -27,32 +28,48 @@ public class AgentResourceUtils {
   private static final Logger logger = LoggerFactory.getLogger(AgentResourceUtils.class);
 
   private AgentStartProperties agentStartProperties;
-
+  private static AgentResourceUtils instance;
 
   private AgentResourceUtils() {
     agentStartProperties = loadYaml();
   }
 
+  public static AgentResourceUtils getInstance() {
+    if (instance == null) {
+      synchronized (AgentResourceUtils.class) {
+        if (instance == null) {
+          instance = new AgentResourceUtils();
+        }
+      }
+    }
+    return instance;
+  }
+
   public static String getAgentConfigLocalIp() {
-    AgentResourceUtils agentResourceUtils = new AgentResourceUtils();
-    return agentResourceUtils.agentStartProperties.getLocalIp();
+    AgentResourceUtils instance = getInstance();
+    return instance.getAgentStartProperties().getLocalIp();
   }
 
   public static boolean getAgentConfigLocalCache() {
-    AgentResourceUtils agentResourceUtils = new AgentResourceUtils();
-    return agentResourceUtils.agentStartProperties.isLocalCache();
+    AgentResourceUtils instance = getInstance();
+    return instance.getAgentStartProperties().isLocalCache();
+  }
+
+  public static AgentLoggingFileProperties getLoggingFileSize() {
+    AgentResourceUtils instance = getInstance();
+    return instance.getAgentStartProperties().getLoggingFile();
   }
 
   public static AgentClusterProperties getAgentConfigCluster() {
-    AgentResourceUtils agentResourceUtils = new AgentResourceUtils();
-    AgentClusterProperties cluster = agentResourceUtils.agentStartProperties.getCluster();
+    AgentResourceUtils instance = getInstance();
+    AgentClusterProperties cluster = instance.getAgentStartProperties().getCluster();
     if (ObjectUtil.isEmpty(cluster)) {
       AgentClusterProperties clusterProperties = new AgentClusterProperties();
-      clusterProperties.setServerUrls(agentResourceUtils.agentStartProperties.getServerUrl());
+      clusterProperties.setServerUrls(instance.getAgentStartProperties().getServerUrl());
       clusterProperties.setEnable(false);
       return clusterProperties;
     }
-    cluster.setServerUrls(agentResourceUtils.agentStartProperties.getServerUrl());
+    cluster.setServerUrls(instance.getAgentStartProperties().getServerUrl());
     return cluster;
   }
 
@@ -103,5 +120,9 @@ public class AgentResourceUtils {
       return jarCatalog;
     }
     return null;
+  }
+
+  public AgentStartProperties getAgentStartProperties() {
+    return agentStartProperties;
   }
 }
