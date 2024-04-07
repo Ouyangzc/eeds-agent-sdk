@@ -54,6 +54,9 @@ public class LogbackConfigurator extends ContextAwareBase implements LoggerConte
     }
     try {
       AgentLoggingFileProperties properties = AgentResourceUtils.getLoggingFileSize();
+      if (null == properties) {
+        return;
+      }
       if (StrUtil.isEmpty(properties.getMaxFileSize()) && ObjectUtil.isEmpty(
           properties.getMaxHistory())) {
         //走默认配置
