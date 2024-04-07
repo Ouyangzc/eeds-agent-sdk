@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  * @Author OUYANG
  * @Date 2022/12/19 14:31
  */
-public class ThingsSyncIncrMessageHandler implements IReceiverMessageHandler {
+public class ThingsSyncIncrMessageHandler extends IReceiverMessageHandler {
 
   private static Logger logger = LoggerFactory.getLogger(ThingsSyncIncrMessageHandler.class);
 

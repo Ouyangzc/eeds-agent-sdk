@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
 import com.elco.eeds.agent.sdk.core.common.enums.AgentStatus;
+import com.elco.eeds.agent.sdk.core.util.MqPluginUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.heart.AgentHeartMessage;
 import com.elco.eeds.agent.sdk.transfer.handler.IReceiverMessageHandler;
 import org.slf4j.Logger;
@@ -17,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * @Version 1.0
  * @Description: 客户端心跳报文处理类
  */
-public class AgentHeartMessageHandler implements IReceiverMessageHandler {
+public class AgentHeartMessageHandler extends IReceiverMessageHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(AgentHeartMessageHandler.class);
 
@@ -34,7 +35,7 @@ public class AgentHeartMessageHandler implements IReceiverMessageHandler {
         AgentHeartMessage rspMessage = AgentHeartMessage.getRespMessage();
         String rspTopic = ConstantTopic.TOPIC_AGENT_HEART_RSP
             .replace("{agentId}", agent.getAgentBaseInfo().getAgentId());
-        this.publishMessage(rspTopic, JSONUtil.toJsonStr(rspMessage));
+        MqPluginUtils.sendAgentHeartBeatMsg(rspTopic,JSONUtil.toJsonStr(rspMessage));
       } catch (Exception e) {
         logger.error("客户端心跳报文处理异常", e);
         e.printStackTrace();

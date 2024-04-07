@@ -3,15 +3,13 @@ package com.elco.eeds.agent.sdk.transfer.service.cmd;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.elco.eeds.agent.mq.nats.plugin.NatsPlugin;
-import com.elco.eeds.agent.mq.plugin.MQPluginManager;
-import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
 import com.elco.eeds.agent.sdk.core.common.constant.CmdConstant;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
 import com.elco.eeds.agent.sdk.core.connect.scheduler.dynamic.IJobManageService;
+import com.elco.eeds.agent.sdk.core.util.MqPluginUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdConfirmMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdResult;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdResultMessage;
@@ -46,11 +44,11 @@ public class CmdService {
      * @param msgSeqNo
      */
     public void sendConfirmMsg(String thingsId, String msgSeqNo) {
-        String json = CmdConfirmMessage.createMsg(thingsId, msgSeqNo).toJson();
-        MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
-        mqPlugin.publish(ConstantTopic.TOPIC_AGENT_CMD_CONFIRM_RESPOND.replace(ConstantCommon.TOPIC_SUFFIX_THINGSID, thingsId)
-                , json, null);
-        logger.info("指令下发发送确认报文：{}", json);
+        String message = CmdConfirmMessage.createMsg(thingsId, msgSeqNo).toJson();
+        String topic = ConstantTopic.TOPIC_AGENT_CMD_CONFIRM_RESPOND.replace(
+            ConstantCommon.TOPIC_SUFFIX_THINGSID, thingsId);
+        MqPluginUtils.sendCmdConfirmMsg(topic,message);
+        logger.info("指令下发发送确认报文：{}", message);
     }
 
     public static void sendResult(CmdResult result) {
@@ -65,8 +63,7 @@ public class CmdService {
         CmdResultMessage cmdResultMessage = CmdResultMessage.createFail(thingsId, msgSeqNo, errMsg);
         String message = JSONUtil.toJsonStr(cmdResultMessage);
         String topic = ConstantTopic.TOPIC_AGENT_CMD_RESULT_RESPOND.replace(ConstantCommon.TOPIC_SUFFIX_THINGSID, thingsId);
-        MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
-        mqPlugin.publish(topic, message, null);
+        MqPluginUtils.sendCmdTimeoutMsg(topic,message);
         logger.info("指令下发结果报文：topic: {}; message: {}", topic, message);
         setReadyStatus(thingsId);
         refreshThingsCmdQueue(thingsId);
@@ -82,8 +79,7 @@ public class CmdService {
         }
         String message = JSONUtil.toJsonStr(cmdResultMessage);
         String topic = ConstantTopic.TOPIC_AGENT_CMD_RESULT_RESPOND.replace(ConstantCommon.TOPIC_SUFFIX_THINGSID, thingsId);
-        MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
-        mqPlugin.publish(topic, message, null);
+        MqPluginUtils.sendCmdResultMsg(topic,message);
         logger.info("指令下发结果报文：topic: {}; message: {}", topic, message);
         setReadyStatus(thingsId);
         refreshThingsCmdQueue(thingsId);

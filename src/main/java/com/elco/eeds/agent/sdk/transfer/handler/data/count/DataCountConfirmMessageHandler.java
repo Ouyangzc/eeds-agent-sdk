@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  * @Author OUYANG
  * @Date 2022/12/9 13:43
  */
-public class DataCountConfirmMessageHandler implements IReceiverMessageHandler {
+public class DataCountConfirmMessageHandler extends IReceiverMessageHandler {
     private static Logger logger = LoggerFactory.getLogger(DataCountConfirmMessageHandler.class);
 
     @Override

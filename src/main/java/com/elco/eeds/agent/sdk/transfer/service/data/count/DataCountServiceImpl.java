@@ -9,6 +9,7 @@ import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCount;
 import com.elco.eeds.agent.sdk.core.util.DateUtils;
+import com.elco.eeds.agent.sdk.core.util.MqPluginUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.data.count.PostDataCount;
 import com.elco.eeds.agent.sdk.transfer.beans.data.count.ThingsDataCount;
 import com.elco.eeds.agent.sdk.transfer.beans.message.data.count.post.DataCountMessage;
@@ -122,9 +123,8 @@ public class DataCountServiceImpl implements DataCountService {
             String agentId = Agent.getInstance().getAgentBaseInfo().getAgentId();
             String topic = DataCountMessage.getTopic(agentId);
             String msg = DataCountMessage.getMsg(doPostData);
-            MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
+            MqPluginUtils.sendThingsDataCountMsg(topic,msg);
             logger.info("发送统计报文，主题:{}，消息内容:{}", topic, msg);
-            mqPlugin.publish(topic, msg, null);
         }
     }
 

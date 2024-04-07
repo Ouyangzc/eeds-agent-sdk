@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * @Author ytl
  * @Date 2022/12/19 14:31
  */
-public class OrderRequestMessageHandler implements IReceiverMessageHandler {
+public class OrderRequestMessageHandler extends IReceiverMessageHandler {
 
     private static Logger logger = LoggerFactory.getLogger(OrderRequestMessageHandler.class);
 

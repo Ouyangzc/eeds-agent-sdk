@@ -2,10 +2,12 @@ package com.elco.eeds.agent.sdk.core.util;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentClusterProperties;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentLoggingFileProperties;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
+import com.elco.eeds.agent.sdk.core.common.enums.AgentRunningModelEnum;
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 import java.io.File;
 import java.io.IOException;
@@ -68,9 +70,27 @@ public class AgentResourceUtils {
       clusterProperties.setServerUrls(instance.getAgentStartProperties().getServerUrl());
       clusterProperties.setEnable(false);
       return clusterProperties;
+    } else {
+      cluster.setServerUrls(instance.getAgentStartProperties().getServerUrl());
+      return cluster;
     }
-    cluster.setServerUrls(instance.getAgentStartProperties().getServerUrl());
-    return cluster;
+  }
+
+  /**
+   * 是否为SLIM版本Model
+   *
+   * @return
+   */
+  public static boolean isSlimModle() {
+    return getAgentRunningModle().equals(AgentRunningModelEnum.SLIM.getRunningModel());
+  }
+
+  public static String getAgentRunningModle() {
+    AgentResourceUtils instance = getInstance();
+    String runningModel = instance.getAgentStartProperties().getRunningModel();
+
+    return StrUtil.isEmpty(runningModel) ? AgentRunningModelEnum.CLUSTER.getRunningModel()
+        : runningModel.toUpperCase();
   }
 
   public AgentStartProperties loadYaml() {

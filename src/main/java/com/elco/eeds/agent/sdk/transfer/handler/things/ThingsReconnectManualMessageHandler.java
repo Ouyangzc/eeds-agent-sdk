@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * @Version 1.0
  * @Description: 数据源手动重连处理类
  */
-public class ThingsReconnectManualMessageHandler implements IReceiverMessageHandler {
+public class ThingsReconnectManualMessageHandler extends IReceiverMessageHandler {
 
   private static final Logger logger = LoggerFactory
       .getLogger(ThingsReconnectManualMessageHandler.class);

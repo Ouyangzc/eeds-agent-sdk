@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * @Version 1.0
  * @Description: 客户端token报文处理类
  */
-public class AgentTokenMessageHandler implements IReceiverMessageHandler {
+public class AgentTokenMessageHandler extends IReceiverMessageHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AgentTokenMessageHandler.class);
 

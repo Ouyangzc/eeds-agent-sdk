@@ -9,6 +9,7 @@ import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.util.AgentResourceUtils;
+import com.elco.eeds.agent.sdk.core.util.MqPluginUtils;
 import com.elco.eeds.agent.sdk.core.util.RealTimeDataMessageFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.data.count.ThingsDataCount;
@@ -73,12 +74,11 @@ public class RealTimePropertiesValueService {
                     VirtualPropertiesHandle.creatVirtualProperties(propertiesContextList, propertiesValueList, collectTime);
                 }
                 //推送数据
-                MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
                 String postMsg = DataRealTimePropertiesMessage.getMessage(propertiesValueList);
 
                 String topic = DataRealTimePropertiesMessage.getTopic(agentId, thingsId);
                 logger.debug("实时数据推送：采集时间:{} topic:{}, msg:{}", collectTime, topic, postMsg);
-                mqPlugin.publish(topic, postMsg, null);
+                MqPluginUtils.sendRealTimeValueMsg(topic,postMsg);
             }
         }
     }

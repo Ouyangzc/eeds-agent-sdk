@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * @Version 1.0
  * @Description: 客户端私有配置报文处理类
  */
-public class AgentConfigLocalMessageHandler implements IReceiverMessageHandler {
+public class AgentConfigLocalMessageHandler extends IReceiverMessageHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AgentConfigLocalMessageHandler.class);
 

@@ -1,10 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.service.things;
 
-import cn.hutool.core.thread.ThreadUtil;
-import com.elco.eeds.agent.mq.nats.plugin.NatsPlugin;
-import com.elco.eeds.agent.mq.plugin.MQPluginManager;
-import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
+import com.elco.eeds.agent.sdk.core.util.MqPluginUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.things.ThingsConnectStatusMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +21,10 @@ public class ThingsConnectStatusMqService {
   private static final String CONNECTING = "5";
 
   private static void send(String thingsId, String status, String msg) {
-    String json = ThingsConnectStatusMessage.create(thingsId, status, msg).toJson();
-    MQServicePlugin mqPlugin = MQPluginManager.getMQPlugin(NatsPlugin.class.getName());
-    mqPlugin.publish(ConstantTopic.TOPIC_THINGS_CONNECTSTATUS_REQUEST + thingsId
-        , json, null);
-    logger.info("发送数据源连接状态报文：{}", json);
+    String message = ThingsConnectStatusMessage.create(thingsId, status, msg).toJson();
+    String topic = ConstantTopic.TOPIC_THINGS_CONNECTSTATUS_REQUEST + thingsId;
+    MqPluginUtils.sendThingsConnectStatusMsg(topic, message);
+    logger.info("发送数据源连接状态报文：{}", message);
   }
 
   public static void sendConnectMsg(String thingsId) {
@@ -38,7 +34,8 @@ public class ThingsConnectStatusMqService {
   public static void sendDisConnectMsg(String thingsId) {
     sendDisConnectMsg(thingsId, "数据源已断开");
   }
-  public static void sendDisConnectMsg(String thingsId,String connectMsg) {
+
+  public static void sendDisConnectMsg(String thingsId, String connectMsg) {
     send(thingsId, DIS_CONNECT, connectMsg);
   }
 

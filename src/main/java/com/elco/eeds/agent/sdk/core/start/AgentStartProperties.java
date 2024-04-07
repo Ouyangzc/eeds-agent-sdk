@@ -63,6 +63,11 @@ public class AgentStartProperties implements Serializable {
 
     private String localIp;
 
+    /**
+     * 模式
+     */
+    private String runningModel;
+
     private boolean localCache;
 
     private AgentClusterProperties cluster;
@@ -181,6 +186,14 @@ public class AgentStartProperties implements Serializable {
     public static void setAgentStartProperties(
         AgentStartProperties agentStartProperties) {
         AgentStartProperties.agentStartProperties = agentStartProperties;
+    }
+
+    public String getRunningModel() {
+        return runningModel;
+    }
+
+    public void setRunningModel(String runningModel) {
+        this.runningModel = runningModel;
     }
 
     @Override

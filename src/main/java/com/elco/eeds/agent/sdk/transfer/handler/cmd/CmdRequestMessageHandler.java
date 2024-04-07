@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * @Date 2023/5/16 11:35
  * @Version 1.0
  */
-public class CmdRequestMessageHandler implements IReceiverMessageHandler {
+public class CmdRequestMessageHandler extends IReceiverMessageHandler {
 
     private static Logger logger = LoggerFactory.getLogger(CmdRequestMessageHandler.class);
 

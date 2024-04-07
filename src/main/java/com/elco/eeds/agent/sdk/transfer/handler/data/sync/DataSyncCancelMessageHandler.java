@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * @Author OUYANG
  * @Date 2022/12/15 13:36
  */
-public class DataSyncCancelMessageHandler implements IReceiverMessageHandler {
+public class DataSyncCancelMessageHandler extends IReceiverMessageHandler {
     private static Logger logger = LoggerFactory.getLogger(DataSyncCancelMessageHandler.class);
     private DataSyncService dataSyncService;
 
