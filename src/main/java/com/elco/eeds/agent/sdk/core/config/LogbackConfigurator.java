@@ -78,7 +78,8 @@ public class LogbackConfigurator extends ContextAwareBase implements LoggerConte
       reBuildAppenderRollingPolicy(rootLogger, LOGGER_DEBUG_APPENDER, FileSize.valueOf(fileSize),
           maxHistory, FileSize.valueOf(totalSizeCap));
     } catch (Exception e) {
-      logger.error("自定义配置日志文件失败,异常:", e);
+      logger.error("自定义配置日志文件失败,错误信息:{}", e.getMessage());
+      return;
     }
 
     isStarted = true;
