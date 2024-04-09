@@ -4,7 +4,6 @@ import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentClusterProperties;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentLoggingFileProperties;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentSSLProperties;
-
 import java.io.Serializable;
 
 /**
@@ -16,188 +15,188 @@ import java.io.Serializable;
  */
 public class AgentStartProperties implements Serializable {
 
-    /**
-     * server地址
-     */
-    private String serverUrl;
+  /**
+   * server地址
+   */
+  private String serverUrl;
 
-    /**
-     * 客户端名称
-     */
-    private String name;
+  /**
+   * 客户端名称
+   */
+  private String name;
 
-    /**
-     * 客户端端口
-     */
-    private String port;
+  /**
+   * 客户端端口
+   */
+  private String port;
 
-    /**
-     * 客户端token
-     */
-    private String token;
+  /**
+   * 客户端token
+   */
+  private String token;
 
-    /**
-     * 存储文件目录
-     */
-    private String baseFolder;
+  /**
+   * 存储文件目录
+   */
+  private String baseFolder;
 
-    private AgentSSLProperties ssl;
+  private AgentSSLProperties ssl;
 
-    public String getProtocolPackage() {
-        return protocolPackage;
-    }
+  public String getProtocolPackage() {
+    return protocolPackage;
+  }
 
-    public void setProtocolPackage(String protocolPackage) {
-        this.protocolPackage = protocolPackage;
-    }
+  public void setProtocolPackage(String protocolPackage) {
+    this.protocolPackage = protocolPackage;
+  }
 
-    /**
-     * 协议包路径
-     */
-    private String protocolPackage;
+  /**
+   * 协议包路径
+   */
+  private String protocolPackage;
 
-    /**
-     * 客户端类型
-     */
-    private String agentClientType;
+  /**
+   * 客户端类型
+   */
+  private String agentClientType;
 
-    private String localIp;
+  private String localIp;
 
-    /**
-     * 模式
-     */
-    private String runningModel;
+  /**
+   * 模式
+   */
+  private String runningModel;
 
-    private boolean localCache;
+  private boolean localCache;
 
-    private AgentClusterProperties cluster;
+  private AgentClusterProperties cluster;
 
-    private AgentLoggingFileProperties loggingFile;
-    private static volatile AgentStartProperties agentStartProperties;
+  private AgentLoggingFileProperties loggingFile;
+  private static volatile AgentStartProperties agentStartProperties;
 
-    public static AgentStartProperties getInstance() {
-        if(agentStartProperties == null) {
-            synchronized (AgentStartProperties.class) {
-                if(agentStartProperties == null) {
-                    agentStartProperties = new AgentStartProperties();
-                }
-            }
+  public static AgentStartProperties getInstance() {
+    if (agentStartProperties == null) {
+      synchronized (AgentStartProperties.class) {
+        if (agentStartProperties == null) {
+          agentStartProperties = new AgentStartProperties();
         }
-        return agentStartProperties;
+      }
     }
+    return agentStartProperties;
+  }
 
-    public AgentStartProperties() {
-        this.localCache = true;
-    }
+  public AgentStartProperties() {
+    this.localCache = true;
+  }
 
-    public String getServerUrl() {
-        return serverUrl;
-    }
+  public String getServerUrl() {
+    return serverUrl;
+  }
 
-    public void setServerUrl(String serverUrl) {
-        this.serverUrl = serverUrl;
-    }
+  public void setServerUrl(String serverUrl) {
+    this.serverUrl = serverUrl;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getPort() {
-        return port;
-    }
+  public String getPort() {
+    return port;
+  }
 
-    public void setPort(String port) {
-        this.port = port;
-    }
+  public void setPort(String port) {
+    this.port = port;
+  }
 
-    public String getToken() {
-        return token;
-    }
+  public String getToken() {
+    return token;
+  }
 
-    public void setToken(String token) {
-        this.token = token;
-    }
+  public void setToken(String token) {
+    this.token = token;
+  }
 
-    public String getBaseFolder() {
-        return baseFolder;
-    }
+  public String getBaseFolder() {
+    return baseFolder;
+  }
 
-    public void setBaseFolder(String baseFolder) {
-        this.baseFolder = baseFolder;
-    }
+  public void setBaseFolder(String baseFolder) {
+    this.baseFolder = baseFolder;
+  }
 
-    public String getAgentClientType() {
-        return agentClientType;
-    }
+  public String getAgentClientType() {
+    return agentClientType;
+  }
 
-    public void setAgentClientType(String agentClientType) {
-        this.agentClientType = agentClientType;
-    }
+  public void setAgentClientType(String agentClientType) {
+    this.agentClientType = agentClientType;
+  }
 
-    public AgentSSLProperties getSsl() {
-        return ssl;
-    }
+  public AgentSSLProperties getSsl() {
+    return ssl;
+  }
 
-    public void setSsl(AgentSSLProperties ssl) {
-        this.ssl = ssl;
-    }
+  public void setSsl(AgentSSLProperties ssl) {
+    this.ssl = ssl;
+  }
 
-    public String getLocalIp() {
-        return localIp;
-    }
+  public String getLocalIp() {
+    return localIp;
+  }
 
-    public void setLocalIp(String localIp) {
-        this.localIp = localIp;
-    }
+  public void setLocalIp(String localIp) {
+    this.localIp = localIp;
+  }
 
-    public boolean isLocalCache() {
-        return localCache;
-    }
+  public boolean isLocalCache() {
+    return localCache;
+  }
 
-    public void setLocalCache(boolean localCache) {
-        this.localCache = localCache;
-    }
+  public void setLocalCache(boolean localCache) {
+    this.localCache = localCache;
+  }
 
-    public AgentClusterProperties getCluster() {
-        return cluster;
-    }
+  public AgentClusterProperties getCluster() {
+    return cluster;
+  }
 
-    public void setCluster(AgentClusterProperties cluster) {
-        this.cluster = cluster;
-    }
+  public void setCluster(AgentClusterProperties cluster) {
+    this.cluster = cluster;
+  }
 
-    public AgentLoggingFileProperties getLoggingFile() {
-        return loggingFile;
-    }
+  public AgentLoggingFileProperties getLoggingFile() {
+    return loggingFile;
+  }
 
-    public void setLoggingFile(
-        AgentLoggingFileProperties loggingFile) {
-        this.loggingFile = loggingFile;
-    }
+  public void setLoggingFile(
+      AgentLoggingFileProperties loggingFile) {
+    this.loggingFile = loggingFile;
+  }
 
-    public static AgentStartProperties getAgentStartProperties() {
-        return agentStartProperties;
-    }
+  public static AgentStartProperties getAgentStartProperties() {
+    return agentStartProperties;
+  }
 
-    public static void setAgentStartProperties(
-        AgentStartProperties agentStartProperties) {
-        AgentStartProperties.agentStartProperties = agentStartProperties;
-    }
+  public static void setAgentStartProperties(
+      AgentStartProperties agentStartProperties) {
+    AgentStartProperties.agentStartProperties = agentStartProperties;
+  }
 
-    public String getRunningModel() {
-        return runningModel;
-    }
+  public String getRunningModel() {
+    return runningModel;
+  }
 
-    public void setRunningModel(String runningModel) {
-        this.runningModel = runningModel;
-    }
+  public void setRunningModel(String runningModel) {
+    this.runningModel = runningModel;
+  }
 
-    @Override
-    public String toString() {
-        return JSONUtil.toJsonStr(this);
-    }
+  @Override
+  public String toString() {
+    return JSONUtil.toJsonStr(this);
+  }
 }

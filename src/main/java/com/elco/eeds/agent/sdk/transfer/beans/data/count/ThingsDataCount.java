@@ -70,4 +70,56 @@ public class ThingsDataCount implements Serializable {
     public void setEndTime(Long endTime) {
         this.endTime = endTime;
     }
+
+
+    public static final class ThingsDataCountBuilder {
+
+        private String thingsId;
+        private Integer size;
+        private Long collectTime;
+        private Long startTime;
+        private Long endTime;
+
+        private ThingsDataCountBuilder() {
+        }
+
+        public static ThingsDataCountBuilder create() {
+            return new ThingsDataCountBuilder();
+        }
+
+        public ThingsDataCountBuilder thingsId(String thingsId) {
+            this.thingsId = thingsId;
+            return this;
+        }
+
+        public ThingsDataCountBuilder size(Integer size) {
+            this.size = size;
+            return this;
+        }
+
+        public ThingsDataCountBuilder collectTime(Long collectTime) {
+            this.collectTime = collectTime;
+            return this;
+        }
+
+        public ThingsDataCountBuilder startTime(Long startTime) {
+            this.startTime = startTime;
+            return this;
+        }
+
+        public ThingsDataCountBuilder endTime(Long endTime) {
+            this.endTime = endTime;
+            return this;
+        }
+
+        public ThingsDataCount build() {
+            ThingsDataCount thingsDataCount = new ThingsDataCount();
+            thingsDataCount.setThingsId(thingsId);
+            thingsDataCount.setSize(size);
+            thingsDataCount.setCollectTime(collectTime);
+            thingsDataCount.setStartTime(startTime);
+            thingsDataCount.setEndTime(endTime);
+            return thingsDataCount;
+        }
+    }
 }

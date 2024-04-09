@@ -12,29 +12,12 @@ import com.elco.eeds.agent.sdk.core.exception.SdkException;
  * @Description: 客户端接口
  */
 public interface IAgentRegisterService {
-
-    /**
-     * 注册客户端
-     * @param url
-     * @param name
-     * @param token
-     * @return
-     * @throws Exception
-     */
-    boolean register(String url,String name,String port, String token, String clientType) throws Exception;
-
     /**
      * 存储客户端文件
      * @param agentInfo
+     * @throws SdkException
      */
     void saveAgentFile(Agent agentInfo) throws SdkException;
-
-    /**
-     * 加载mq
-     * @param mqInfo
-     * @throws Exception
-     */
-    void loadMq(AgentMqInfo mqInfo) throws Exception;
 
     /**
      * 关闭客户端

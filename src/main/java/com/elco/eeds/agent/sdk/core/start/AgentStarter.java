@@ -17,13 +17,8 @@ import com.elco.eeds.agent.sdk.core.util.AgentResourceUtils;
 import com.elco.eeds.agent.sdk.core.util.MqPluginUtils;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.AgentConfigYamlReader;
 import com.elco.eeds.agent.sdk.core.util.read.parameterfile.ResourceLoader;
-import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsSyncIncrMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.quartz.CountScheduler;
-import com.elco.eeds.agent.sdk.transfer.service.agent.AgentRequestHttpService;
 import com.elco.eeds.agent.sdk.transfer.service.data.count.DataCountServiceImpl;
-import com.elco.eeds.agent.sdk.transfer.service.things.ThingsPropertiesService;
-import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncNewServiceImpl;
-import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncService;
 import io.vertx.core.Vertx;
 import java.io.File;
 import org.slf4j.Logger;
@@ -40,20 +35,9 @@ public class AgentStarter {
 
   private static Logger logger = LoggerFactory.getLogger(AgentStarter.class);
 
-  private static ThingsPropertiesService thingsPropertiesService = new ThingsPropertiesService();
-  private static AgentRequestHttpService requestHttpService = new AgentRequestHttpService();
-
-  private static ThingsSyncService thingsSyncService = new ThingsSyncNewServiceImpl(
-      thingsPropertiesService);
-
-
-  private static ThingsSyncIncrMessageHandler thingsSyncIncrMessageHandler = new ThingsSyncIncrMessageHandler(
-      thingsSyncService);
-  private static IAgentRegisterService registerService =
-      AgentResourceUtils.isSlimModle() ? new AgentSlimRegisterService(thingsSyncService,
-          requestHttpService)
-          : new AgentRegisterService(thingsSyncService,
-              thingsSyncIncrMessageHandler);
+  private static AbstractAgentRegisterService registerService =
+      AgentResourceUtils.isSlimModle() ? new AgentSlimRegisterService()
+          : new AgentRegisterService();
 
   private static CountScheduler countScheduler = new CountScheduler();
 
@@ -75,9 +59,8 @@ public class AgentStarter {
       agent.setAgentBaseInfo(new AgentBaseInfo(agentStartProperties));
       // 注册
       logger.info("init,agentStartProperties:{}", JSONUtil.toJsonStr(agentStartProperties));
-      registerService.register(agentStartProperties.getServerUrl(), agentStartProperties.getName(),
-          agentStartProperties.getPort(), agentStartProperties.getToken(),
-          agentStartProperties.getAgentClientType());
+      registerService.processRegister(agentStartProperties.getName(),
+          agentStartProperties.getPort(), agentStartProperties.getToken());
       // 加载数据文件
       com.elco.eeds.agent.sdk.core.util.FileUtil.getLastDataFile();
       // 定时任务
@@ -89,7 +72,7 @@ public class AgentStarter {
       DataCountServiceImpl.setUp();
       logger.info(Logo.logo);
       agent.setAgentStatus(AgentStatus.RUNNING);
-      Vertx.vertx().setPeriodic(1000,v -> {
+      Vertx.vertx().setPeriodic(1000, v -> {
         MqPluginUtils.sendDaDaDa();
       });
     } catch (Exception e) {

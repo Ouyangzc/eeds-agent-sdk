@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * @ClassName ThingsFileUtils
- * @Description TODO
+ * @Description 数据源文件工具类
  * @Author OUYANG
  * @Date 2022/12/16 14:38
  */

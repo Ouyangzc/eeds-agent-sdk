@@ -6,15 +6,10 @@ import com.elco.eeds.agent.mq.plugin.MQServicePlugin;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentMqInfo;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
-import com.elco.eeds.agent.sdk.core.common.enums.AgentStatus;
 import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.core.util.ReplaceTopicAgentId;
-import com.elco.eeds.agent.sdk.core.util.http.IpUtil;
 import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentTokenRequest;
-import com.elco.eeds.agent.sdk.transfer.service.agent.AgentRequestHttpService;
-import com.elco.eeds.agent.sdk.transfer.service.agent.AgentRequestInvokeService;
-import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncService;
 import com.elco.eeds.mq.eventbus.plugin.EventBusPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,58 +24,33 @@ import org.slf4j.LoggerFactory;
 public class AgentSlimRegisterService extends AbstractAgentRegisterService {
 
   private static Logger logger = LoggerFactory.getLogger(AgentSlimRegisterService.class);
-  private AgentRequestHttpService httpService;
 
-  public AgentSlimRegisterService(ThingsSyncService thingsSyncService,
-      AgentRequestHttpService httpService) {
-    this.thingsSyncService = thingsSyncService;
-    this.httpService = httpService;
+  public AgentSlimRegisterService() {
   }
 
   @Override
-  public boolean register(String url, String name, String port, String token, String clientType)
-      throws Exception {
-    Agent agent = Agent.getInstance();
-    try {
-      //获取本地token
-      String localToken = getLocalToken();
-      if (null != localToken) {
-        token = localToken;
-      }
-      // 获取IP
-      String clientIp = IpUtil.getLocalIpAddress();
-      // 调用http接口的register方法
-      agent = httpService.register(clientIp, port, name, token,
-          AgentStartProperties.getInstance().getAgentClientType());
-      if (agent == null) {
-        Agent instance = Agent.getInstance();
-        instance.setAgentStatus(AgentStatus.ERROR);
-        throw new SdkException(ErrorEnum.CLIENT_REGISTER_ERROR.code());
-      }
-      // 刷新token
-      // saveAgentFile(agent);
-      // 回调更新客户端Token生效时间
-      httpService.updateAgentEffectTime(
-          new AgentTokenRequest(Long.parseLong(agent.getAgentBaseInfo().getAgentId()),
-              agent.getAgentBaseInfo().getToken()));
-      // 加载Nats组件
-      loadMq(agent.getAgentMqInfo());
-      // 数据源同步
-      thingsSyncService.setupSyncThings();
-      agent.setAgentStatus(AgentStatus.READY);
-      return true;
-    } catch (Exception e) {
-      Agent instance = Agent.getInstance();
-      instance.setAgentStatus(AgentStatus.ERROR);
-      logger.error("客户端注册流程失败，" + e.getMessage(), e);
-      super.close(e.getMessage());
-      return false;
-    }
+  protected Agent requestServer(String clientIp, String port, String name, String token,
+      String agentClientType) {
+    Agent agent = requestHttpService.register(clientIp, port, name, token,
+        AgentStartProperties.getInstance().getAgentClientType());
+    return agent;
+  }
+
+  @Override
+  protected void updateAgentEffect(AgentTokenRequest agentTokenRequest) {
+    requestHttpService.updateAgentEffectTime(agentTokenRequest);
   }
 
 
   @Override
-  public void loadMq(AgentMqInfo mqInfo) throws Exception {
+  protected void syncThings() {
+    thingsSyncService.setupSyncThings();
+  }
+
+
+
+  @Override
+  public void loadMq(AgentMqInfo mqInfo){
     try {
       Agent agent = Agent.getInstance();
       String agentId = agent.getAgentBaseInfo().getAgentId();
@@ -155,4 +125,6 @@ public class AgentSlimRegisterService extends AbstractAgentRegisterService {
       throw new SdkException(ErrorEnum.NATS_LOAD_ERROR.code());
     }
   }
+
+
 }
