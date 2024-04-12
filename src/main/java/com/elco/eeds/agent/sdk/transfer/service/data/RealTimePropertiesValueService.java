@@ -3,8 +3,7 @@ package com.elco.eeds.agent.sdk.transfer.service.data;
 import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
-import com.elco.eeds.agent.sdk.core.disruptor.DisruptorRealTimeValueService;
-import com.elco.eeds.agent.sdk.core.disruptor.DisruptorService;
+import com.elco.eeds.agent.sdk.core.disruptor.RealTimeDataDisruptorServer;
 import com.elco.eeds.agent.sdk.core.util.MqPluginUtils;
 import com.elco.eeds.agent.sdk.core.util.RealTimeDataMessageFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessage;
@@ -41,14 +40,14 @@ public class RealTimePropertiesValueService extends AbstractRealTimeService {
   }
 
   @Override
-  protected void pushDataToLocally(List<PropertiesValue> propertiesValueList,DisruptorRealTimeValueService realTimeValueService) {
-    DisruptorService disruptorService = DisruptorService.getInstance(realTimeValueService);
-    disruptorService.sendData(propertiesValueList);
+  protected void pushDataToLocally(List<PropertiesValue> propertiesValueList) {
+    RealTimeDataDisruptorServer disruptorServer = RealTimeDataDisruptorServer.getInstance();
+    disruptorServer.sendData(propertiesValueList);
   }
 
   @Override
   protected void pushDataToMQ(String agentId, String thingsId,
-      List<PropertiesValue> propertiesValueList,Long collectTime) {
+      List<PropertiesValue> propertiesValueList, Long collectTime) {
     //MQ推送数据
     String postMsg = DataRealTimePropertiesMessage.getMessage(propertiesValueList);
     String topic = DataRealTimePropertiesMessage.getTopic(agentId, thingsId);
@@ -65,7 +64,8 @@ public class RealTimePropertiesValueService extends AbstractRealTimeService {
   }
 
   @Override
-  protected void localCache(String agentId, String thingsId,String message,List<PropertiesContext> propertiesContextList,
+  protected void localCache(String agentId, String thingsId, String message,
+      List<PropertiesContext> propertiesContextList,
       List<PropertiesValue> propertiesValueList, Long collectTime) {
     //存储原始数据
     OriginalPropertiesValueMessage originalPropertiesValueMessage = new OriginalPropertiesValueMessage();

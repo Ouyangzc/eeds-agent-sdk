@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.core.disruptor.event;
 
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ import java.util.List;
  * @Date 2024/4/7 10:47
  * @Version 1.0
  */
-public class DataEvent {
+public class DataEvent implements Serializable {
 
   private List<PropertiesValue> data;
 

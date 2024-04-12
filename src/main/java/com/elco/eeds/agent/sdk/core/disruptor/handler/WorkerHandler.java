@@ -1,5 +1,6 @@
-package com.elco.eeds.agent.sdk.core.disruptor;
+package com.elco.eeds.agent.sdk.core.disruptor.handler;
 
+import com.elco.eeds.agent.sdk.core.disruptor.DisruptorProcessorService;
 import com.elco.eeds.agent.sdk.core.disruptor.event.DataEvent;
 import com.lmax.disruptor.WorkHandler;
 import java.util.concurrent.Executor;
@@ -7,22 +8,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @ClassName DisruptorConsumer
+ * @ClassName WorkerConsumer
  * @Description 消费者Handler
  * @Author OuYang
  * @Date 2024/4/7 10:55
  * @Version 1.0
  */
-public class DisruptorConsumer implements WorkHandler<DataEvent> {
+public class WorkerHandler implements WorkHandler<DataEvent> {
 
-  public static final Logger logger = LoggerFactory.getLogger(DisruptorConsumer.class);
+  public static final Logger logger = LoggerFactory.getLogger(WorkerHandler.class);
 
-  private DisruptorRealTimeValueService disruptorService;
+  private DisruptorProcessorService disruptorService;
 
   private final Executor executor;
 
 
-  public DisruptorConsumer(DisruptorRealTimeValueService disruptorService, Executor executor) {
+  public WorkerHandler(DisruptorProcessorService disruptorService, Executor executor) {
     this.disruptorService = disruptorService;
     this.executor = executor;
   }

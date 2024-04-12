@@ -20,7 +20,7 @@
         <fastjson.version>1.2.76</fastjson.version>
         <httpclient.version>4.5.10</httpclient.version>
         <quartz.version>2.3.2</quartz.version>
-        <disruptor.version>3.3.4</disruptor.version>
+        <disruptor.version>3.4.3</disruptor.version>
         <realtime.storage.version>1.0.4-SNAPSHOT</realtime.storage.version>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
     </properties>

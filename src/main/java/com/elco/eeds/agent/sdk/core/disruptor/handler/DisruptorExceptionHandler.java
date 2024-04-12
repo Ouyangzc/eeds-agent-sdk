@@ -1,6 +1,6 @@
 package com.elco.eeds.agent.sdk.core.disruptor.handler;
 
-import com.elco.eeds.agent.sdk.core.disruptor.DisruptorRealTimeValueService;
+import com.elco.eeds.agent.sdk.core.disruptor.DisruptorProcessorService;
 import com.elco.eeds.agent.sdk.core.disruptor.event.DataEvent;
 import com.lmax.disruptor.ExceptionHandler;
 import org.slf4j.Logger;
@@ -17,14 +17,14 @@ public class DisruptorExceptionHandler implements ExceptionHandler<DataEvent> {
 
   public static final Logger logger = LoggerFactory.getLogger(DisruptorExceptionHandler.class);
 
-  private DisruptorRealTimeValueService disruptorService;
+  private DisruptorProcessorService disruptorService;
 
-  public DisruptorExceptionHandler(DisruptorRealTimeValueService disruptorService) {
+  public DisruptorExceptionHandler(DisruptorProcessorService disruptorService) {
     this.disruptorService = disruptorService;
   }
 
   @Override
-  public void handleEventException(Throwable throwable, long l, DataEvent dataEvent) {
+  public void handleEventException(Throwable throwable, long sequence, DataEvent dataEvent) {
     //事件处理异常里面进行补偿执行
     disruptorService.execute(dataEvent.getData());
     logger.error(">>> Disruptor事件处理异常，进行立即执行补偿操作..........");

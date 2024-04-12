@@ -1,7 +1,7 @@
 package com.elco.eeds.agent.sdk.core.storage;
 
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
-import com.elco.eeds.agent.sdk.core.disruptor.DisruptorRealTimeValueService;
+import com.elco.eeds.agent.sdk.core.disruptor.DisruptorProcessorService;
 import com.elco.eeds.agent.sdk.core.util.MapstructUtils;
 
 import com.elco.storage.domain.ChangeResult;
@@ -14,15 +14,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @ClassName DisruptorRealTimeValueServiceImpl
- * @Description 实时数据本地消费者
+ * @Description 试试数据存储消费逻辑
  * @Author OuYang
  * @Date 2024/4/8 11:23
  * @Version 1.0
  */
 
-public class DisruptorRealTimeValueServiceImpl implements DisruptorRealTimeValueService {
+public class RealTimeValueStorageServiceImpl implements DisruptorProcessorService {
 
-  public static Logger logger = LoggerFactory.getLogger(DisruptorRealTimeValueServiceImpl.class);
+  public static Logger logger = LoggerFactory.getLogger(RealTimeValueStorageServiceImpl.class);
   private static ChangeResult changeResult = null;
 
   @Override

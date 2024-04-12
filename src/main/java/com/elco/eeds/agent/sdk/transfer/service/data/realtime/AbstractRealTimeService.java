@@ -4,8 +4,6 @@ import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
-import com.elco.eeds.agent.sdk.core.disruptor.DisruptorRealTimeValueService;
-import com.elco.eeds.agent.sdk.core.storage.DisruptorRealTimeValueServiceImpl;
 import com.elco.eeds.agent.sdk.core.util.AgentResourceUtils;
 import com.elco.eeds.agent.sdk.core.util.RealTimeDataMessageFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessage;
@@ -62,7 +60,7 @@ public abstract class AbstractRealTimeService implements RealTimeService {
       noNeedLocalCache(propertiesContextList, propertiesValueList, collectTime);
     }
     if (runningModel) {
-      pushDataToLocally(propertiesValueList, new DisruptorRealTimeValueServiceImpl());
+      pushDataToLocally(propertiesValueList);
     }
     pushDataToMQ(agentId, thingsId, propertiesValueList, collectTime);
   }
@@ -71,10 +69,8 @@ public abstract class AbstractRealTimeService implements RealTimeService {
    * 本地存储数据
    *
    * @param propertiesValueList
-   * @param realTimeValueService
    */
-  protected abstract void pushDataToLocally(List<PropertiesValue> propertiesValueList,
-      DisruptorRealTimeValueService realTimeValueService);
+  protected abstract void pushDataToLocally(List<PropertiesValue> propertiesValueList);
 
   /**
    * 推送数据到MQ
