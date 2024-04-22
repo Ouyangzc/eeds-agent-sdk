@@ -4,11 +4,10 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
-import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
+import com.elco.eeds.agent.sdk.core.common.enums.MessageMethod;
 import com.elco.eeds.agent.sdk.core.util.DateUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,7 @@ public class DataSyncPropertiesValueMessage extends BaseMessage<List<SubDataSync
 
     public static String getMessage(List<PropertiesValue> datas) {
         DataSyncPropertiesValueMessage message = new DataSyncPropertiesValueMessage();
-        message.setMethod(ConstantMethod.METHOD_DATA_SYNC_DATA);
+        message.setMethod(MessageMethod.DATA_SYNC_DATA);
         message.setTimestamp(DateUtils.getTimestamp());
         List<SubDataSyncPropertiesValueMessage> subMsgs = new ArrayList<>();
         for (PropertiesValue pv : datas) {

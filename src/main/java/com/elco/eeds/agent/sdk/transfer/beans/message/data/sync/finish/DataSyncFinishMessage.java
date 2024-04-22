@@ -2,12 +2,11 @@ package com.elco.eeds.agent.sdk.transfer.beans.message.data.sync.finish;
 
 import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
-import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
+import com.elco.eeds.agent.sdk.core.common.enums.MessageMethod;
 import com.elco.eeds.agent.sdk.core.util.DateUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.data.sync.DataSyncFinishResult;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -20,7 +19,7 @@ import java.util.List;
 public class DataSyncFinishMessage extends BaseMessage<SubDataSyncFinishMessage> implements Serializable {
     public static String getMessage(String queueId, Boolean syncFlag, List<DataSyncFinishResult> datas) {
         DataSyncFinishMessage message = new DataSyncFinishMessage();
-        message.setMethod(ConstantMethod.METHOD_DATA_SYNC_FINISH);
+        message.setMethod(MessageMethod.DATA_SYNC_FINISH);
         message.setTimestamp(DateUtils.getTimestamp());
         SubDataSyncFinishMessage subMsg = new SubDataSyncFinishMessage();
         subMsg.setQueueId(queueId);

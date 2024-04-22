@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.order;
 
+import com.elco.eeds.agent.sdk.core.common.enums.MessageMethod;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 
 import java.io.Serializable;
@@ -13,7 +14,7 @@ import java.io.Serializable;
 public class OrderConfirmMessage extends BaseMessage<SubOrderConfirmMessage> implements Serializable {
     public static OrderConfirmMessage create(String thingsId,  String msgSeqNo) {
         OrderConfirmMessage msg = new OrderConfirmMessage();
-        msg.setMethod("agent_order_confirm");
+        msg.setMethod(MessageMethod.AGENT_ORDER_CONFIRM);
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(new SubOrderConfirmMessage(thingsId, msgSeqNo));
         return msg;

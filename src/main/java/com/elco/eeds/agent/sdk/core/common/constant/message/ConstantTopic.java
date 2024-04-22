@@ -141,4 +141,14 @@ public class ConstantTopic {
      * 下发指令返回结果报文
      */
     public static final String TOPIC_AGENT_AGENT_ORDER_RESPOND = "agent.agent.order.respond.";
+
+    /**
+     * 数据库切换报文
+     */
+    public static final String TOPIC_STORAGE_DB_CHANGE = "server.base.storage.change";
+    /**
+     * 数据库切换结果报文
+     */
+    public static final String TOPIC_STORAGE_DB_CHANGE_RESULT = "server.base.storage.change.result";
+
 }

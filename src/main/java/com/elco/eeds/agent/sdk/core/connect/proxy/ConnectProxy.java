@@ -1,13 +1,11 @@
 package com.elco.eeds.agent.sdk.core.connect.proxy;
 
 import com.elco.eeds.agent.sdk.Main;
-import com.elco.eeds.agent.sdk.transfer.beans.message.connect.ThingsStatusMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author ：ytl
@@ -35,7 +33,7 @@ public class ConnectProxy {
                             Boolean bool = (Boolean)invoke;
                             if(bool){
                                 logger.debug("创建连接成功：{}",method.getName());
-                                ThingsStatusMessage.sendConnectMsg("1","2");
+//                                ThingsStatusMessage.sendConnectMsg("1","2");
                             }
                         }
                         return invoke;

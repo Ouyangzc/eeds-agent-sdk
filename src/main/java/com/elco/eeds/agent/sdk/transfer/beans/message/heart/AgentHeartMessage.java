@@ -1,9 +1,8 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.heart;
 
-import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
-import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
+import com.elco.eeds.agent.sdk.core.common.enums.MessageMethod;
 import com.elco.eeds.agent.sdk.core.util.DateUtils;
-
+import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 import java.io.Serializable;
 
 /**
@@ -17,7 +16,7 @@ public class AgentHeartMessage extends BaseMessage<SubAgentHeartMessage> impleme
 
     public static AgentHeartMessage getRespMessage() {
         AgentHeartMessage message = new AgentHeartMessage();
-        message.setMethod(ConstantMethod.METHOD_AGENT_HEART_RSP);
+        message.setMethod(MessageMethod.AGENT_HEART_RSP);
         message.setTimestamp(DateUtils.getTimestamp());
         message.setData(SubAgentHeartMessage.getResponseMessage());
         return message;

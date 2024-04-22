@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.things;
 
+import com.elco.eeds.agent.sdk.core.common.enums.MessageMethod;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 
 import java.io.Serializable;
@@ -14,7 +15,7 @@ public class ThingsHeartBeatMessage extends BaseMessage<SubThingsHeartBeatMessag
 
     public static ThingsHeartBeatMessage create(String thingsId, String status) {
         ThingsHeartBeatMessage msg = new ThingsHeartBeatMessage();
-        msg.setMethod("things_heartBeat");
+        msg.setMethod(MessageMethod.THINGS_BEAT_HEART);
         msg.setTimestamp(null);
         msg.setData(new SubThingsHeartBeatMessage(thingsId, status));
         return msg;

@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.transfer.beans.message;
 
 import cn.hutool.json.JSONUtil;
 
+import com.elco.eeds.agent.sdk.core.common.enums.MessageMethod;
 import java.io.Serializable;
 
 /**
@@ -30,8 +31,8 @@ public class BaseMessage<T> implements Serializable {
         return method;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
+    public void setMethod(MessageMethod messageMethod) {
+        this.method = messageMethod.getMethod();
     }
 
     public Long getTimestamp() {

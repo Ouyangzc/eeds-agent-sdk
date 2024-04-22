@@ -1,9 +1,8 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.agent.linktest;
 
-import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
+import com.elco.eeds.agent.sdk.core.common.enums.MessageMethod;
 import com.elco.eeds.agent.sdk.core.util.DateUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +20,7 @@ public class AgentLinkTestClusterMessage extends BaseMessage<SubAgentLinkTestClu
 
     public static AgentLinkTestClusterMessage getRspMessage(String nodeName, String nodeIp,String sessionId) {
         AgentLinkTestClusterMessage message = new AgentLinkTestClusterMessage();
-        message.setMethod(ConstantMethod.METHOD_AGENT_LINK_TEST);
+        message.setMethod(MessageMethod.AGENT_LINK_TEST);
         message.setTimestamp(DateUtils.getTimestamp());
         // 准备数据
         SubAgentLinkTestClusterMessage subMsg = new SubAgentLinkTestClusterMessage();

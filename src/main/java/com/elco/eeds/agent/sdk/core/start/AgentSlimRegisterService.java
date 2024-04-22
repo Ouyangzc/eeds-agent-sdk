@@ -48,9 +48,8 @@ public class AgentSlimRegisterService extends AbstractAgentRegisterService {
   }
 
 
-
   @Override
-  public void loadMq(AgentMqInfo mqInfo){
+  public void loadMq(AgentMqInfo mqInfo) {
     try {
       Agent agent = Agent.getInstance();
       String agentId = agent.getAgentBaseInfo().getAgentId();
@@ -116,7 +115,8 @@ public class AgentSlimRegisterService extends AbstractAgentRegisterService {
       // 指令下发--功能
       eventBusClient.subscribe(ReplaceTopicAgentId.getTopicWithRealAgentId(
           ConstantTopic.TOPIC_SERVER_CMD_SERVICE_REQUEST, agentId), cmdRequestMessageHandler);
-
+      //数据库切换
+      eventBusClient.subscribe(ConstantTopic.TOPIC_STORAGE_DB_CHANGE, dbChangeMessageHandler);
       // 订阅其他topic...
       // 待补充
     } catch (Exception e) {

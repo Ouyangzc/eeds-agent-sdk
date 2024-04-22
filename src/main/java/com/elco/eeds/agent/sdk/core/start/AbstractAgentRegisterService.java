@@ -20,6 +20,7 @@ import com.elco.eeds.agent.sdk.transfer.handler.data.count.DataCountConfirmMessa
 import com.elco.eeds.agent.sdk.transfer.handler.data.sync.DataSyncCancelMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.data.sync.DataSyncRequestMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.order.OrderRequestMessageHandler;
+import com.elco.eeds.agent.sdk.transfer.handler.storage.StorageDbChangeMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsReconnectManualMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.handler.things.ThingsSyncIncrMessageHandler;
 import com.elco.eeds.agent.sdk.transfer.service.agent.AgentRequestHttpService;
@@ -65,6 +66,8 @@ public abstract class AbstractAgentRegisterService implements IAgentRegisterServ
   protected DataSyncCancelMessageHandler dataSyncCancelMessageHandler = new DataSyncCancelMessageHandler(
       dataSyncService);
 
+  protected StorageDbChangeMessageHandler dbChangeMessageHandler = new StorageDbChangeMessageHandler();
+
   private static ThingsPropertiesService thingsPropertiesService = new ThingsPropertiesService();
   protected static AgentRequestHttpService requestHttpService = new AgentRequestHttpService();
 
@@ -73,6 +76,9 @@ public abstract class AbstractAgentRegisterService implements IAgentRegisterServ
 
   protected ThingsSyncIncrMessageHandler thingsSyncIncrMessageHandler= new ThingsSyncIncrMessageHandler(
       thingsSyncService);;
+
+
+
 
   public boolean processRegister(String name, String port, String token){
     try {

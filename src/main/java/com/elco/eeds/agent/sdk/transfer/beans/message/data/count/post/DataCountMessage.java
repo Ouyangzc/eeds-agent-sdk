@@ -3,14 +3,13 @@ package com.elco.eeds.agent.sdk.transfer.beans.message.data.count.post;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
-import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
+import com.elco.eeds.agent.sdk.core.common.enums.MessageMethod;
 import com.elco.eeds.agent.sdk.transfer.beans.data.count.PostDataCount;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
+import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.Serializable;
 
 /**
  * @ClassName DataCountMessage
@@ -29,7 +28,7 @@ public class DataCountMessage extends BaseMessage<SubDataCountMessage> implement
      */
     public static String getMsg(PostDataCount dataCount) {
         DataCountMessage message = new DataCountMessage();
-        message.setMethod(ConstantMethod.METHOD_DATA_COUNT_POST);
+        message.setMethod(MessageMethod.DATA_COUNT_POST);
         message.setTimestamp(DateUtil.currentSeconds());
         message.setData(SubDataCountMessage.getSubMsg(dataCount));
 

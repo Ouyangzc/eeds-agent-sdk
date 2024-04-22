@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.order;
 
+import com.elco.eeds.agent.sdk.core.common.enums.MessageMethod;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 
 import java.io.Serializable;
@@ -17,7 +18,7 @@ public class OrderResultMessage extends BaseMessage<SubOrderResultMessage> imple
 
     public static OrderResultMessage createSuccess(String thingsId, String msgSeqNo) {
         OrderResultMessage msg = new OrderResultMessage();
-        msg.setMethod("agent_order_respond");
+        msg.setMethod(MessageMethod.AGENT_ORDER_RESP);
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(new SubOrderResultMessage(thingsId, msgSeqNo, SUCCESS, ""));
         return msg;
@@ -25,7 +26,7 @@ public class OrderResultMessage extends BaseMessage<SubOrderResultMessage> imple
 
     public static OrderResultMessage createFail(String thingsId, String msgSeqNo, String errMsg) {
         OrderResultMessage msg = new OrderResultMessage();
-        msg.setMethod("agent_order_respond");
+        msg.setMethod(MessageMethod.AGENT_ORDER_RESP);
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(new SubOrderResultMessage(thingsId, msgSeqNo, FAIL, errMsg));
         return msg;

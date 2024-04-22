@@ -197,6 +197,14 @@ public class MqPluginUtils {
     publishMessage(topic, msg);
   }
 
+  /**
+   * 数据库切换结果报文
+   * @param topic
+   * @param msg
+   */
+  public static void sendStorageDbChangeResultMsg(String topic,String msg) {
+    publishMessage(topic, msg);
+  }
 
   public static void sendDaDaDa() {
     publishMessage("dadada", "dongdongdongdong");

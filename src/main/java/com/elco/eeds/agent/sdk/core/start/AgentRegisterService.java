@@ -108,6 +108,9 @@ public class AgentRegisterService extends AbstractAgentRegisterService {
       natsClient.subscribe(ReplaceTopicAgentId.getTopicWithRealAgentId(
           ConstantTopic.TOPIC_SERVER_CMD_SERVICE_REQUEST, agentId), cmdRequestMessageHandler);
 
+      //数据库切换
+      natsClient.subscribe(ConstantTopic.TOPIC_STORAGE_DB_CHANGE,dbChangeMessageHandler);
+
       // 订阅其他topic...
       // 待补充
     } catch (Exception e) {

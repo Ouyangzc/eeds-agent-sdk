@@ -1,8 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.cmd;
 
-import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
+import com.elco.eeds.agent.sdk.core.common.enums.MessageMethod;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
-
 import java.io.Serializable;
 
 /**
@@ -18,7 +17,7 @@ public class CmdResultMessage extends BaseMessage<SubCmdResultMessage> implement
 
     public static CmdResultMessage createSuccess(String thingsId, String msgSeqNo) {
         CmdResultMessage msg = new CmdResultMessage();
-        msg.setMethod(ConstantMethod.METHOD_CMD_RESPOND);
+        msg.setMethod(MessageMethod.CMD_RESPOND);
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(new SubCmdResultMessage(thingsId, msgSeqNo, SUCCESS, ""));
         return msg;
@@ -26,7 +25,7 @@ public class CmdResultMessage extends BaseMessage<SubCmdResultMessage> implement
 
     public static CmdResultMessage createFail(String thingsId, String msgSeqNo, String errMsg) {
         CmdResultMessage msg = new CmdResultMessage();
-        msg.setMethod(ConstantMethod.METHOD_CMD_RESPOND);
+        msg.setMethod(MessageMethod.CMD_RESPOND);
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(new SubCmdResultMessage(thingsId, msgSeqNo, FAIL, errMsg));
         return msg;

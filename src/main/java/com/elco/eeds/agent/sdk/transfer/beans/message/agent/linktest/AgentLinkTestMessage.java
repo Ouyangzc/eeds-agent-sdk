@@ -1,10 +1,8 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.agent.linktest;
 
-import cn.hutool.core.util.IdUtil;
-import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
+import com.elco.eeds.agent.sdk.core.common.enums.MessageMethod;
 import com.elco.eeds.agent.sdk.core.util.DateUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +20,7 @@ public class AgentLinkTestMessage extends BaseMessage<SubAgentLinkTestMessage> i
 
     public static AgentLinkTestMessage getRspMessage(String pkUser, String socketId) {
         AgentLinkTestMessage message = new AgentLinkTestMessage();
-        message.setMethod(ConstantMethod.METHOD_AGENT_LINK_TEST);
+        message.setMethod(MessageMethod.AGENT_LINK_TEST);
         message.setTimestamp(DateUtils.getTimestamp());
         // 准备数据
         SubAgentLinkTestMessage subAgentLinkTestMessage = new SubAgentLinkTestMessage();

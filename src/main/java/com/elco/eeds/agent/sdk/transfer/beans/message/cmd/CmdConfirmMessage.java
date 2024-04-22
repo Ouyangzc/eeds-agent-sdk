@@ -1,8 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.cmd;
 
-import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantMethod;
+import com.elco.eeds.agent.sdk.core.common.enums.MessageMethod;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
-
 import java.io.Serializable;
 
 /**
@@ -16,7 +15,7 @@ public class CmdConfirmMessage extends BaseMessage<SubCmdConfirmMessage> impleme
 
     public static CmdConfirmMessage createMsg(String thingsId, String msgSeqNo) {
         CmdConfirmMessage msg = new CmdConfirmMessage();
-        msg.setMethod(ConstantMethod.METHOD_CMD_CONFIRM);
+        msg.setMethod(MessageMethod.CMD_CONFIRM);
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(new SubCmdConfirmMessage(thingsId, msgSeqNo));
         return msg;
