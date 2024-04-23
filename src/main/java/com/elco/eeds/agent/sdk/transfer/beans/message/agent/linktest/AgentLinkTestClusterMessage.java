@@ -20,7 +20,7 @@ public class AgentLinkTestClusterMessage extends BaseMessage<SubAgentLinkTestClu
 
     public static AgentLinkTestClusterMessage getRspMessage(String nodeName, String nodeIp,String sessionId) {
         AgentLinkTestClusterMessage message = new AgentLinkTestClusterMessage();
-        message.setMethod(MessageMethod.AGENT_LINK_TEST);
+        message.setMethod(MessageMethod.AGENT_LINK_TEST.getMethod());
         message.setTimestamp(DateUtils.getTimestamp());
         // 准备数据
         SubAgentLinkTestClusterMessage subMsg = new SubAgentLinkTestClusterMessage();

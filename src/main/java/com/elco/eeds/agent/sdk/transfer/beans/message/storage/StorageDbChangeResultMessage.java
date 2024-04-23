@@ -3,9 +3,6 @@ package com.elco.eeds.agent.sdk.transfer.beans.message.storage;
 import com.elco.eeds.agent.sdk.core.common.enums.MessageMethod;
 import com.elco.eeds.agent.sdk.core.util.JSONUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
-import com.elco.eeds.agent.sdk.transfer.beans.message.order.OrderResultMessage;
-import com.elco.eeds.agent.sdk.transfer.beans.message.order.SubOrderResultMessage;
-import com.elco.storage.domain.ChangeResult;
 import java.io.Serializable;
 
 /**
@@ -21,7 +18,7 @@ public class StorageDbChangeResultMessage extends BaseMessage<SubStorageDbChange
 
   public static StorageDbChangeResultMessage getResult(long pkStorage,String result) {
     StorageDbChangeResultMessage msg = new StorageDbChangeResultMessage();
-    msg.setMethod(MessageMethod.DB_CHANGE_RESULT);
+    msg.setMethod(MessageMethod.DB_CHANGE_RESULT.getMethod());
     msg.setTimestamp(System.currentTimeMillis());
     msg.setData(new SubStorageDbChangeResultMessage(pkStorage,result));
     return msg;

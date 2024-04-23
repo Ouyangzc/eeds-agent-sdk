@@ -89,7 +89,7 @@ public class AgentResourceUtils {
     AgentResourceUtils instance = getInstance();
     String runningModel = instance.getAgentStartProperties().getRunningModel();
 
-    return StrUtil.isEmpty(runningModel) ? AgentRunningModelEnum.CLUSTER.getRunningModel()
+    return StrUtil.isEmpty(runningModel) ? AgentRunningModelEnum.SINGLE.getRunningModel()
         : runningModel.toUpperCase();
   }
 

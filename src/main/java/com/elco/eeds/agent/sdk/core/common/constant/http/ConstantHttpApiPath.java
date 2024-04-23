@@ -42,7 +42,9 @@ public class ConstantHttpApiPath {
      * 数据源增量同步url路径
      */
     public static final String THINGS_INCR_SYNC_API = "/things/saveAgentsByConfirm";
-
-
+    /**
+     * 连接数据库配置接口
+     */
+    public static final String STORAGE_DB_INFO_API = "/storage/syncStorageInfo";
 
 }

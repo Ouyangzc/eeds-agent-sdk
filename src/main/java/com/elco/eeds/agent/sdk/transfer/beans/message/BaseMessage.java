@@ -31,8 +31,8 @@ public class BaseMessage<T> implements Serializable {
         return method;
     }
 
-    public void setMethod(MessageMethod messageMethod) {
-        this.method = messageMethod.getMethod();
+    public void setMethod(String method) {
+        this.method = method;
     }
 
     public Long getTimestamp() {

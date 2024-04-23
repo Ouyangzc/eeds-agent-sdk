@@ -17,7 +17,7 @@ import java.io.Serializable;
 public class DataSyncConfirmMessage extends BaseMessage<SubDataSyncConfirmMessage> implements Serializable {
     public static String getMsg(String agentId, String queueId) {
         DataSyncConfirmMessage message = new DataSyncConfirmMessage();
-        message.setMethod(MessageMethod.DATA_SYNC_CONFIRM);
+        message.setMethod(MessageMethod.DATA_SYNC_CONFIRM.getMethod());
         message.setTimestamp(DateUtils.getTimestamp());
         SubDataSyncConfirmMessage subMsg = new SubDataSyncConfirmMessage();
         subMsg.setAgentId(agentId);

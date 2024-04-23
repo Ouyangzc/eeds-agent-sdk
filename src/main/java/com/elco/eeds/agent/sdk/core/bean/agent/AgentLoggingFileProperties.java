@@ -14,11 +14,11 @@ public class AgentLoggingFileProperties implements Serializable {
   /**
    * 保留天数
    */
-  private Integer maxHistory;
+  private Integer maxHistory = 7;
   /**
    * 文件大小
    */
-  private String maxFileSize;
+  private String maxFileSize = "250MB";
   /**
    * 总大小
    */

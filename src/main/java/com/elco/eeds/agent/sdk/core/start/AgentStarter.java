@@ -1,26 +1,19 @@
 package com.elco.eeds.agent.sdk.core.start;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentSSLProperties;
-import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
 import com.elco.eeds.agent.sdk.core.common.enums.AgentStatus;
-import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
+import com.elco.eeds.agent.sdk.core.config.Config;
+import com.elco.eeds.agent.sdk.core.config.ConfigLoader;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.init.InitConnectFactory;
-import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.core.util.AgentResourceUtils;
-import com.elco.eeds.agent.sdk.core.util.MqPluginUtils;
-import com.elco.eeds.agent.sdk.core.util.read.parameterfile.AgentConfigYamlReader;
-import com.elco.eeds.agent.sdk.core.util.read.parameterfile.ResourceLoader;
 import com.elco.eeds.agent.sdk.transfer.quartz.CountScheduler;
 import com.elco.eeds.agent.sdk.transfer.service.data.count.DataCountServiceImpl;
-import io.vertx.core.Vertx;
-import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,14 +65,12 @@ public class AgentStarter {
       DataCountServiceImpl.setUp();
       logger.info(Logo.logo);
       agent.setAgentStatus(AgentStatus.RUNNING);
-      Vertx.vertx().setPeriodic(1000, v -> {
-        MqPluginUtils.sendDaDaDa();
-      });
     } catch (Exception e) {
       agent.setAgentStatus(AgentStatus.ERROR);
       e.printStackTrace();
       logger.error("客户端注册异常", e);
     }
+
 
   }
 
@@ -120,101 +111,27 @@ public class AgentStarter {
     init(agentStartProperties);
   }
 
-  public static void initWithHttps(String serverUrl
-      , String name
-      , String port
-      , String token
-      , String baseFolder
-      , String clientType
-      , String protocolPackage
-      , String keystorePath
-      , String password
-  ) throws Exception {
-    logger.debug("开始手动初始化方法...");
-    logger.debug("传入参数为：服务器地址：{}，客户端名称：{}，客户端端口：{}，token：{}，文件存储路径：{}",
-        serverUrl, name, port, token, baseFolder);
-    // 封装启动参数类
-    AgentStartProperties agentStartProperties = AgentStartProperties.getInstance();
-    agentStartProperties.setServerUrl(serverUrl);
-    agentStartProperties.setName(name);
-    agentStartProperties.setPort(port);
-    agentStartProperties.setToken(token);
-    agentStartProperties.setBaseFolder(baseFolder);
-    agentStartProperties.setAgentClientType(clientType);
-    agentStartProperties.setProtocolPackage(protocolPackage);
-    AgentSSLProperties sslProperties = new AgentSSLProperties();
-    sslProperties.setEnable(true);
-    sslProperties.setKeystorePath(keystorePath);
-    sslProperties.setPassword(password);
-    agentStartProperties.setSsl(sslProperties);
-    // 调用私有init方法
-    init(agentStartProperties);
-  }
-
-  /**
-   * 客户端手动启动方法：一个参数（从给定的路径取yml文件）
-   *
-   * @param ymlPath yml的绝对路径
-   */
-  public static void init(String ymlPath) throws Exception {
-    logger.debug("开始手动初始化方法...");
-    logger.debug("yml文件全路径参数为：{}", ymlPath);
-    // 从yml配置文件读取配置，赋值给AgentStartProperties
-    AgentStartProperties agentStartProperties = AgentStartProperties.getInstance();
-    AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
-    agentStartProperties = agentConfigYamlReader.parseYaml(ymlPath, true);
-    logger.info("读取配置文件成功：{}", agentStartProperties);
-    // 调用私有init方法
-    init(agentStartProperties);
-  }
-
   /**
    * 客户端手动启动方法：空参init方法（从默认的两个位置取yml）
    */
   public static void init() throws Exception {
-    logger.debug("开始手动初始化方法...");
-    logger.debug("开始从默认的位置读取yml文件...");
-    // 从yml配置文件读取配置，赋值给AgentStartProperties
-    AgentConfigYamlReader agentConfigYamlReader = new AgentConfigYamlReader(new ResourceLoader());
+    Config config = ConfigLoader.getInstance().load(new String[]{});
+    // 封装启动参数类
     AgentStartProperties agentStartProperties = AgentStartProperties.getInstance();
-
-    String fileName = getJarSamePathYml();
-    if (FileUtil.exist(new File(fileName))) {
-      // 默认在jar包相同路径下读取agent-sdk-config.yaml
-      agentStartProperties = agentConfigYamlReader.parseYaml(fileName, true);
-      logger.debug("jar包同级路径配置文件读取成功");
-      logger.info("读取配置文件成功：{}", agentStartProperties);
-    } else {
-      // jar包中resource文件下的agent-sdk-config.yaml
-      logger.debug("jar包同级路径配置文件不存在，即将开始读取jar包中resource文件下的配置文件");
-      agentStartProperties = agentConfigYamlReader
-          .parseYaml("/" + ConstantFilePath.YML_NAME, false);
-      if (agentStartProperties == null) {
-        logger.debug("读取配置文件失败");
-        throw new SdkException(ErrorEnum.READ_CONFIG_FILE_ERROR.code());
-      }
-      logger.debug("jar包中resource文件下的配置文件读取成功");
-      logger.info("读取配置文件成功：{}", agentStartProperties);
-    }
+    agentStartProperties.setServerUrl(config.getServerUrl());
+    agentStartProperties.setName(config.getName());
+    agentStartProperties.setPort(String.valueOf(config.getPort()));
+    agentStartProperties.setToken(config.getToken());
+    agentStartProperties.setBaseFolder(config.getBaseFolder());
+    agentStartProperties.setAgentClientType(config.getClientType());
+    agentStartProperties.setProtocolPackage(config.getProtocolPackage());
+    agentStartProperties.setLocalIp(config.getLocalIp());
+    agentStartProperties.setRunningModel(config.getRunningModel());
+    agentStartProperties.setLocalCache(config.isLocalCache());
+    agentStartProperties.setSsl(config.getSsl());
+    agentStartProperties.setLoggingFile(config.getLoggingFile());
+    agentStartProperties.setCluster(config.getCluster());
     // 调用私有init方法
     init(agentStartProperties);
-  }
-
-  /**
-   * 获取jar包同路径下的规定名称的配置文件
-   *
-   * @return
-   */
-  private static String getJarSamePathYml() {
-    //获取当前目录
-    String property = System.getProperty("user.dir");
-    //默认是linux os
-    String fileName = "/" + ConstantFilePath.YML_NAME;
-    //判断是否是windows os
-    if (System.getProperty("os.name").contains("Windows")) {
-      fileName = "\\" + ConstantFilePath.YML_NAME;
-    }
-    // 读取当前目录下conf配置文件
-    return property + fileName;
   }
 }

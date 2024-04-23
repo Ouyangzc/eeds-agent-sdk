@@ -15,7 +15,7 @@ public class ThingsHeartBeatMessage extends BaseMessage<SubThingsHeartBeatMessag
 
     public static ThingsHeartBeatMessage create(String thingsId, String status) {
         ThingsHeartBeatMessage msg = new ThingsHeartBeatMessage();
-        msg.setMethod(MessageMethod.THINGS_BEAT_HEART);
+        msg.setMethod(MessageMethod.THINGS_BEAT_HEART.getMethod());
         msg.setTimestamp(null);
         msg.setData(new SubThingsHeartBeatMessage(thingsId, status));
         return msg;

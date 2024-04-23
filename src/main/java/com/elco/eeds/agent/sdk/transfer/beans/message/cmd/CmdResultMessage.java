@@ -17,7 +17,7 @@ public class CmdResultMessage extends BaseMessage<SubCmdResultMessage> implement
 
     public static CmdResultMessage createSuccess(String thingsId, String msgSeqNo) {
         CmdResultMessage msg = new CmdResultMessage();
-        msg.setMethod(MessageMethod.CMD_RESPOND);
+        msg.setMethod(MessageMethod.CMD_RESPOND.getMethod());
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(new SubCmdResultMessage(thingsId, msgSeqNo, SUCCESS, ""));
         return msg;
@@ -25,7 +25,7 @@ public class CmdResultMessage extends BaseMessage<SubCmdResultMessage> implement
 
     public static CmdResultMessage createFail(String thingsId, String msgSeqNo, String errMsg) {
         CmdResultMessage msg = new CmdResultMessage();
-        msg.setMethod(MessageMethod.CMD_RESPOND);
+        msg.setMethod(MessageMethod.CMD_RESPOND.getMethod());
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(new SubCmdResultMessage(thingsId, msgSeqNo, FAIL, errMsg));
         return msg;

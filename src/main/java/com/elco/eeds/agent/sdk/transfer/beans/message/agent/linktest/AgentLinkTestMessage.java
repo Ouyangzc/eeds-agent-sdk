@@ -20,7 +20,7 @@ public class AgentLinkTestMessage extends BaseMessage<SubAgentLinkTestMessage> i
 
     public static AgentLinkTestMessage getRspMessage(String pkUser, String socketId) {
         AgentLinkTestMessage message = new AgentLinkTestMessage();
-        message.setMethod(MessageMethod.AGENT_LINK_TEST);
+        message.setMethod(MessageMethod.AGENT_LINK_TEST.getMethod());
         message.setTimestamp(DateUtils.getTimestamp());
         // 准备数据
         SubAgentLinkTestMessage subAgentLinkTestMessage = new SubAgentLinkTestMessage();

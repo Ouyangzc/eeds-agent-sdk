@@ -58,15 +58,10 @@ public class AgentRequestHttpService {
     AgentRegisterRequest agentRegisterRequest = new AgentRegisterRequest(name, host, port, token,
         clientType);
     AgentClusterProperties cluster = AgentResourceUtils.getAgentConfigCluster();
-    String servicePrefix = ConstantHttpApiPath.STANDALONE_PREFIX;
-    if (cluster.getEnable()) {
-      servicePrefix = ConstantHttpApiPath.CLUSTER_PREFIX;
-      if (Objects.nonNull(cluster.getNodeName())) {
-        agentRegisterRequest.setNodeName(cluster.getNodeName().trim());
-      }
+    if (cluster.getEnable() && Objects.nonNull(cluster.getNodeName())) {
+      agentRegisterRequest.setNodeName(cluster.getNodeName().trim());
     }
-    HttpUrlProcessor httpUrlProcessor = new HttpUrlProcessor(cluster.getServerUrls(),
-        cluster.getEnable(), servicePrefix, ConstantHttpApiPath.AGENT_REGISTER);
+    HttpUrlProcessor httpUrlProcessor = new HttpUrlProcessor(ConstantHttpApiPath.AGENT_REGISTER);
 
     try {
       String response = httpUrlProcessor.processRequest(token,
@@ -191,14 +186,8 @@ public class AgentRequestHttpService {
    * @param agentTokenRequest 客户端请求对象
    */
   public void updateAgentEffectTime(AgentTokenRequest agentTokenRequest) {
-    AgentClusterProperties cluster = AgentResourceUtils.getAgentConfigCluster();
-    String servicePrefix = ConstantHttpApiPath.STANDALONE_PREFIX;
-    if (cluster.getEnable()) {
-      servicePrefix = ConstantHttpApiPath.CLUSTER_PREFIX;
-    }
     try {
-      HttpUrlProcessor httpUrlProcessor = new HttpUrlProcessor(cluster.getServerUrls(),
-          cluster.getEnable(), servicePrefix, ConstantHttpApiPath.AGENT_TOKEN);
+      HttpUrlProcessor httpUrlProcessor = new HttpUrlProcessor(ConstantHttpApiPath.AGENT_TOKEN);
       String response = httpUrlProcessor.processRequest(agentTokenRequest.getCurrentToken(),
           JSONUtil.toJsonStr(agentTokenRequest));
       logger.debug("调用token接口返回值为：{}", response);

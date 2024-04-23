@@ -14,7 +14,7 @@ import java.io.Serializable;
 public class OrderConfirmMessage extends BaseMessage<SubOrderConfirmMessage> implements Serializable {
     public static OrderConfirmMessage create(String thingsId,  String msgSeqNo) {
         OrderConfirmMessage msg = new OrderConfirmMessage();
-        msg.setMethod(MessageMethod.AGENT_ORDER_CONFIRM);
+        msg.setMethod(MessageMethod.AGENT_ORDER_CONFIRM.getMethod());
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(new SubOrderConfirmMessage(thingsId, msgSeqNo));
         return msg;

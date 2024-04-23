@@ -28,7 +28,7 @@ public class DataCountMessage extends BaseMessage<SubDataCountMessage> implement
      */
     public static String getMsg(PostDataCount dataCount) {
         DataCountMessage message = new DataCountMessage();
-        message.setMethod(MessageMethod.DATA_COUNT_POST);
+        message.setMethod(MessageMethod.DATA_COUNT_POST.getMethod());
         message.setTimestamp(DateUtil.currentSeconds());
         message.setData(SubDataCountMessage.getSubMsg(dataCount));
 

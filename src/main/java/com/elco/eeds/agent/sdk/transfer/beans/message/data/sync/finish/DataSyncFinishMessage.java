@@ -19,7 +19,7 @@ import java.util.List;
 public class DataSyncFinishMessage extends BaseMessage<SubDataSyncFinishMessage> implements Serializable {
     public static String getMessage(String queueId, Boolean syncFlag, List<DataSyncFinishResult> datas) {
         DataSyncFinishMessage message = new DataSyncFinishMessage();
-        message.setMethod(MessageMethod.DATA_SYNC_FINISH);
+        message.setMethod(MessageMethod.DATA_SYNC_FINISH.getMethod());
         message.setTimestamp(DateUtils.getTimestamp());
         SubDataSyncFinishMessage subMsg = new SubDataSyncFinishMessage();
         subMsg.setQueueId(queueId);

@@ -15,7 +15,7 @@ public class CmdConfirmMessage extends BaseMessage<SubCmdConfirmMessage> impleme
 
     public static CmdConfirmMessage createMsg(String thingsId, String msgSeqNo) {
         CmdConfirmMessage msg = new CmdConfirmMessage();
-        msg.setMethod(MessageMethod.CMD_CONFIRM);
+        msg.setMethod(MessageMethod.CMD_CONFIRM.getMethod());
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(new SubCmdConfirmMessage(thingsId, msgSeqNo));
         return msg;

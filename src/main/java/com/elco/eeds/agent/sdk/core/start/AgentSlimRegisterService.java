@@ -10,6 +10,7 @@ import com.elco.eeds.agent.sdk.core.common.enums.ErrorEnum;
 import com.elco.eeds.agent.sdk.core.exception.SdkException;
 import com.elco.eeds.agent.sdk.core.util.ReplaceTopicAgentId;
 import com.elco.eeds.agent.sdk.transfer.beans.agent.AgentTokenRequest;
+import com.elco.eeds.agent.sdk.transfer.service.db.StorageDbService;
 import com.elco.eeds.mq.eventbus.plugin.EventBusPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ public class AgentSlimRegisterService extends AbstractAgentRegisterService {
 
   private static Logger logger = LoggerFactory.getLogger(AgentSlimRegisterService.class);
 
+  private StorageDbService storageDbService = new StorageDbService();
   public AgentSlimRegisterService() {
   }
 
@@ -33,6 +35,7 @@ public class AgentSlimRegisterService extends AbstractAgentRegisterService {
       String agentClientType) {
     Agent agent = requestHttpService.register(clientIp, port, name, token,
         AgentStartProperties.getInstance().getAgentClientType());
+    storageDbService.getAndLoadStorageInfo();
     return agent;
   }
 

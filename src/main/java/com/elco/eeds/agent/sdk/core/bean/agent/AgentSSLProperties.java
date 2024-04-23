@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 public class AgentSSLProperties implements Serializable {
 
-    private Boolean enable;
+    private Boolean enable = false;
 
 
     private String keystorePath;
@@ -19,6 +19,7 @@ public class AgentSSLProperties implements Serializable {
     private String type;
 
     private String password;
+
 
 
     public String getKeystorePath() {

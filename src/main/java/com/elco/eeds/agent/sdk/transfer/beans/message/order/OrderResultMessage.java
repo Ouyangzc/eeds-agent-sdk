@@ -18,7 +18,7 @@ public class OrderResultMessage extends BaseMessage<SubOrderResultMessage> imple
 
     public static OrderResultMessage createSuccess(String thingsId, String msgSeqNo) {
         OrderResultMessage msg = new OrderResultMessage();
-        msg.setMethod(MessageMethod.AGENT_ORDER_RESP);
+        msg.setMethod(MessageMethod.AGENT_ORDER_RESP.getMethod());
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(new SubOrderResultMessage(thingsId, msgSeqNo, SUCCESS, ""));
         return msg;
@@ -26,7 +26,7 @@ public class OrderResultMessage extends BaseMessage<SubOrderResultMessage> imple
 
     public static OrderResultMessage createFail(String thingsId, String msgSeqNo, String errMsg) {
         OrderResultMessage msg = new OrderResultMessage();
-        msg.setMethod(MessageMethod.AGENT_ORDER_RESP);
+        msg.setMethod(MessageMethod.AGENT_ORDER_RESP.getMethod());
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(new SubOrderResultMessage(thingsId, msgSeqNo, FAIL, errMsg));
         return msg;

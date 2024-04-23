@@ -22,7 +22,7 @@ public class DataRealTimePropertiesMessage extends BaseMessage<List<SubDataRealT
 
     public static String getMessage(List<PropertiesValue> propertiesValueList) {
         DataRealTimePropertiesMessage message = new DataRealTimePropertiesMessage();
-        message.setMethod(MessageMethod.DATA_REALTIME_DATA);
+        message.setMethod(MessageMethod.DATA_REALTIME_DATA.getMethod());
         message.setTimestamp(DateUtils.getTimestamp());
         List<SubDataRealTimePropertiesMessage> subMsgs = new ArrayList<>();
         for (PropertiesValue pv : propertiesValueList) {

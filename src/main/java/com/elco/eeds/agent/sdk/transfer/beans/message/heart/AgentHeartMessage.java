@@ -16,7 +16,7 @@ public class AgentHeartMessage extends BaseMessage<SubAgentHeartMessage> impleme
 
     public static AgentHeartMessage getRespMessage() {
         AgentHeartMessage message = new AgentHeartMessage();
-        message.setMethod(MessageMethod.AGENT_HEART_RSP);
+        message.setMethod(MessageMethod.AGENT_HEART_RSP.getMethod());
         message.setTimestamp(DateUtils.getTimestamp());
         message.setData(SubAgentHeartMessage.getResponseMessage());
         return message;

@@ -15,7 +15,7 @@ import java.time.Instant;
 public class ThingsConnectStatusMessage extends BaseMessage<SubThingsConnectStatusMessage> implements Serializable {
     public static ThingsConnectStatusMessage create(String thingsId,String connectStatus,String message) {
         ThingsConnectStatusMessage msg = new ThingsConnectStatusMessage();
-        msg.setMethod(MessageMethod.THINGS_CONNECT_STATUS);
+        msg.setMethod(MessageMethod.THINGS_CONNECT_STATUS.getMethod());
         msg.setTimestamp(Instant.now().toEpochMilli());
         msg.setData(new SubThingsConnectStatusMessage(thingsId, connectStatus,message));
         return msg;

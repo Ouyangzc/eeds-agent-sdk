@@ -22,7 +22,7 @@ public class DataSyncPropertiesValueMessage extends BaseMessage<List<SubDataSync
 
     public static String getMessage(List<PropertiesValue> datas) {
         DataSyncPropertiesValueMessage message = new DataSyncPropertiesValueMessage();
-        message.setMethod(MessageMethod.DATA_SYNC_DATA);
+        message.setMethod(MessageMethod.DATA_SYNC_DATA.getMethod());
         message.setTimestamp(DateUtils.getTimestamp());
         List<SubDataSyncPropertiesValueMessage> subMsgs = new ArrayList<>();
         for (PropertiesValue pv : datas) {
