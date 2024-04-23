@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.util;
 
+import com.elco.eeds.agent.sdk.core.common.enums.BasicTypeReflectEnum;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -45,17 +46,17 @@ public class YamlUtils {
               if (null != pt & pt.length > 0) {
                 String simpleName = pt[0].getSimpleName();
                 Object arg = null;
-                if (simpleName.equals("int") || simpleName.equals("Integer")) {
+                if (BasicTypeReflectEnum.INT.getBasicKey().equals(simpleName)|| BasicTypeReflectEnum.INT.getWrapperKey().equals(simpleName)) {
                   arg = Integer.parseInt(strProperty);
-                } else if (simpleName.equals("long") || simpleName.equals("Long")) {
+                } else if (BasicTypeReflectEnum.LONG.getBasicKey().equals(simpleName) || BasicTypeReflectEnum.LONG.getWrapperKey().equals(simpleName)) {
                   arg = Long.parseLong(strProperty);
-                } else if (simpleName.equals("double") || simpleName.equals("Double")) {
+                } else if (BasicTypeReflectEnum.DOUBLE.getBasicKey().equals(simpleName) || BasicTypeReflectEnum.DOUBLE.getWrapperKey().equals(simpleName)) {
                   arg = Double.parseDouble(strProperty);
-                } else if (simpleName.equals("boolean") || simpleName.equals("Boolean")) {
+                } else if (BasicTypeReflectEnum.BOOLEAN.getBasicKey().equals(simpleName) || BasicTypeReflectEnum.BOOLEAN.getWrapperKey().equals(simpleName)) {
                   arg = Boolean.parseBoolean(strProperty);
-                } else if (simpleName.equals("float") || simpleName.equals("Float")) {
+                } else if (BasicTypeReflectEnum.FLOAT.getBasicKey().equals(simpleName) || BasicTypeReflectEnum.FLOAT.getWrapperKey().equals(simpleName)) {
                   arg = Float.parseFloat(strProperty);
-                } else if (simpleName.equals("String")) {
+                } else if (BasicTypeReflectEnum.STRING.getBasicKey().equals(simpleName)) {
                   arg = property;
                 } else {
                   continue;
