@@ -11,8 +11,8 @@ import com.elco.eeds.agent.sdk.core.config.ConfigLoader;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.init.InitConnectFactory;
+import com.elco.eeds.agent.sdk.core.quartz.QuartzManager;
 import com.elco.eeds.agent.sdk.core.util.AgentResourceUtils;
-import com.elco.eeds.agent.sdk.transfer.quartz.CountScheduler;
 import com.elco.eeds.agent.sdk.transfer.service.data.count.DataCountServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ public class AgentStarter {
       AgentResourceUtils.isSlimModle() ? new AgentSlimRegisterService()
           : new AgentRegisterService();
 
-  private static CountScheduler countScheduler = new CountScheduler();
+  private static QuartzManager quartzManager = new QuartzManager();
 
   private static void init(AgentStartProperties agentStartProperties) throws Exception {
     // 实例化Agent对象
@@ -50,17 +50,19 @@ public class AgentStarter {
       InitConnectFactory.initConnect();
 
       agent.setAgentBaseInfo(new AgentBaseInfo(agentStartProperties));
+      // 定时任务
+      quartzManager.start();
+
       // 注册
-      logger.info("init,agentStartProperties:{}", JSONUtil.toJsonStr(agentStartProperties));
+      logger.debug("init,agentStartProperties:{}", JSONUtil.toJsonStr(agentStartProperties));
       registerService.processRegister(agentStartProperties.getName(),
           agentStartProperties.getPort(), agentStartProperties.getToken());
       // 加载数据文件
       com.elco.eeds.agent.sdk.core.util.FileUtil.getLastDataFile();
-      // 定时任务
-      countScheduler.scheduleJobs();
       agent.setAgentStatus(AgentStatus.LOAD);
 
-      // 加载统计
+      // 加载文件
+      quartzManager.load();
       DataCountServiceImpl.createCountMapSection(null);
       DataCountServiceImpl.setUp();
       logger.info(Logo.logo);

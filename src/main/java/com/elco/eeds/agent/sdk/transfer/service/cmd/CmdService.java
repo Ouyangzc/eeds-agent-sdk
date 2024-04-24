@@ -8,7 +8,7 @@ import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
-import com.elco.eeds.agent.sdk.core.connect.scheduler.dynamic.IJobManageService;
+import com.elco.eeds.agent.sdk.core.quartz.QuartzManager;
 import com.elco.eeds.agent.sdk.core.util.MqPluginUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdConfirmMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdResult;
@@ -137,8 +137,7 @@ public class CmdService {
                         CmdService.sendResult(thingsId, msgSeqNo, result.getResultMsg());
                     }
                 } else {
-                    IJobManageService jobManage = ConnectManager.getJobManage();
-                    jobManage.addCmdTimeOutJob(msgSeqNo, thingsId, orderTimeOut);
+                    QuartzManager.addCmdTimeOutJob(msgSeqNo, thingsId, orderTimeOut);
                     //设置等待状态，等待回复或者超时
                     CmdRequestManager.setWaitingStatus(thingsId);
                 }

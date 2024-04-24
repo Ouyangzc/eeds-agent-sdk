@@ -1,4 +1,4 @@
-package com.elco.eeds.agent.sdk.transfer.quartz;
+package com.elco.eeds.agent.sdk.core.quartz.job;
 
 import com.elco.eeds.agent.sdk.transfer.service.data.count.DataCountServiceImpl;
 import org.quartz.Job;

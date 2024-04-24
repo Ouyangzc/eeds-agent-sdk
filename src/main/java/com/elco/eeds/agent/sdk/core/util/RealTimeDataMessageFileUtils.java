@@ -5,7 +5,6 @@ import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
@@ -21,9 +20,8 @@ import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessag
 import com.elco.eeds.agent.sdk.transfer.beans.data.sync.DataSyncServerRequest;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
 import com.elco.eeds.agent.sdk.transfer.handler.properties.VirtualPropertiesHandle;
-import com.elco.eeds.agent.sdk.transfer.quartz.DataFileJob;
+import com.elco.eeds.agent.sdk.core.quartz.job.DataFileJob;
 import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncNewServiceImpl;
-import com.elco.eeds.agent.sdk.transfer.service.things.ThingsSyncServiceImpl;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

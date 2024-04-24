@@ -9,21 +9,16 @@ import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.common.constant.ReadTypeEnums;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
-import com.elco.eeds.agent.sdk.core.connect.scheduler.dynamic.IJobManageService;
-import com.elco.eeds.agent.sdk.core.connect.scheduler.dynamic.JobManageService;
-import com.elco.eeds.agent.sdk.core.connect.scheduler.dynamic.QuartzGroupEnum;
-import com.elco.eeds.agent.sdk.core.connect.scheduler.dynamic.SysJob;
 import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
 import com.elco.eeds.agent.sdk.core.exception.EedsConnectException;
+import com.elco.eeds.agent.sdk.core.quartz.QuartzManager;
 import com.elco.eeds.agent.sdk.transfer.beans.things.ThingsDriverContext;
-import org.quartz.SchedulerException;
-import org.quartz.impl.StdSchedulerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author ：ytl
@@ -38,16 +33,6 @@ public class ConnectManager {
 
     private static ConcurrentHashMap<String, ThingsConnectionHandler> CONNECTION_HANDLER_MAP = new ConcurrentHashMap<String, ThingsConnectionHandler>(
             256);
-
-    private static IJobManageService jobManage;
-
-    static {
-        try {
-            jobManage = new JobManageService(StdSchedulerFactory.getDefaultScheduler());
-        }catch (SchedulerException e) {
-            logger.error(e.getMessage());
-        }
-    }
 
     /**
      * 添加数据源连接实例
@@ -166,9 +151,9 @@ public class ConnectManager {
                 corn = connection.getCorn();
             }
             try {
-                SysJob sysJob = new SysJob(handler.getThingsId(), connection.getReadType(), corn, QuartzGroupEnum.READ_PROPERTIES);
-                sysJob.getExtraMap().put("handler", ConnectManager.getHandler(handler.getThingsId()));
-                jobManage.addJob(sysJob);
+                HashMap<String, Object> extraMap = new HashMap<>();
+                extraMap.put("handler",ConnectManager.getHandler(handler.getThingsId()));
+                QuartzManager.addRealTimePropertiesJob(handler.getThingsId(),connection.getReadType(),corn,extraMap);
             }catch (Exception e) {
                 logger.error("添加定时任务失败，连接信息：{}", JSONUtil.toJsonStr(driverContext));
             }
@@ -216,9 +201,5 @@ public class ConnectManager {
             }
 
         }
-    }
-
-    public static IJobManageService getJobManage() {
-        return jobManage;
     }
 }

@@ -1,9 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.service.cmd;
 
-import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
-import com.elco.eeds.agent.sdk.core.connect.scheduler.dynamic.IJobManageService;
+import com.elco.eeds.agent.sdk.core.quartz.QuartzManager;
 import com.elco.eeds.agent.sdk.transfer.beans.message.cmd.CmdResult;
-
 import java.io.Serializable;
 
 /**
@@ -22,8 +20,7 @@ public class CmdResultService implements Serializable {
      * @param result
      */
     public static void sendCmdResult(CmdResult result) {
-        IJobManageService jobManage = ConnectManager.getJobManage();
-        jobManage.removeCmdTimeOutJob(result.getMsgSeqNo());
+        QuartzManager.removeCmdTimeOutJob(result.getThingsId(), result.getMsgSeqNo());
         CmdService.sendResult(result);
     }
 }

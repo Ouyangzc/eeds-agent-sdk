@@ -1,7 +1,6 @@
-package com.elco.eeds.agent.sdk.transfer.quartz;
+package com.elco.eeds.agent.sdk.core.quartz.job;
 
 import com.elco.eeds.agent.sdk.transfer.service.cmd.CmdService;
-import com.elco.eeds.agent.sdk.transfer.service.order.OrderResultMqService;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;

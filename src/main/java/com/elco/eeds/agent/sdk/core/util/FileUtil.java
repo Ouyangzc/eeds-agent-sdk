@@ -4,7 +4,7 @@ import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
-import com.elco.eeds.agent.sdk.transfer.quartz.DataFileJob;
+import com.elco.eeds.agent.sdk.core.quartz.job.DataFileJob;
 
 import java.io.File;
 import java.util.ArrayList;
