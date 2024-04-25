@@ -32,6 +32,8 @@ public class ConstantCommon {
 
     public static final String YAML_AGENT_KEY = "agent";
 
+    public static final String YAML_SERVER_KEY = "server";
+
     public static final String SYMBOL_EXCLAMATION_POINT= "!";
     public static final String SYSTEM_OS_NAME_KEY= "os.name";
 

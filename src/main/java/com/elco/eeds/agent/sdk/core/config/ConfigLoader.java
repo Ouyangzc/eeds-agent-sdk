@@ -107,6 +107,11 @@ public class ConfigLoader {
           ConstantCommon.YAML_AGENT_KEY);
       YamlUtils.propertiesToObject(serverParams, config);
     }
+    if (yamlParams.containsKey(ConstantCommon.YAML_SERVER_KEY)){
+      Map<String, Object> serverParams = (Map<String, Object>)yamlParams.get(ConstantCommon.YAML_SERVER_KEY);
+      YamlUtils.propertiesToObject(serverParams, config);
+    }
+
   }
 
 

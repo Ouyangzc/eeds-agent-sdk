@@ -26,7 +26,9 @@ public class ObjectsUtils {
   public static boolean equal(Object obj1, Object obj2) {
     return Objects.equal(obj1,obj2);
   }
-
+  public static boolean notEqual(Object obj1, Object obj2) {
+    return !equal(obj1,obj2);
+  }
   /**
    * 检查对象是否为null<br>
    * 判断标准为：
