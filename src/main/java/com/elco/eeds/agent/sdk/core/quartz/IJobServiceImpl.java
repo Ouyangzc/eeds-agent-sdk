@@ -4,6 +4,8 @@ import static org.quartz.TriggerBuilder.newTrigger;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import com.elco.eeds.agent.sdk.core.util.ObjectsUtils;
+import com.elco.eeds.core.utils.ObjectUtil;
 import org.jetbrains.annotations.NotNull;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
@@ -37,11 +39,11 @@ public class IJobServiceImpl implements IJobService {
     TriggerKey key = jobTrigger.getKey();
     TriggerKey triggerKey = TriggerKey.triggerKey(key.getName(),key.getGroup());
     Trigger oldTrigger = scheduler.getTrigger(triggerKey);
-    if (null != oldTrigger) {
+    if(ObjectsUtils.isNull(oldTrigger)){
+      scheduler.scheduleJob(jobDetail, jobTrigger);
+    }else if (ObjectsUtils.notEqual(oldTrigger,jobTrigger)){
       //执行修改逻辑
       modifyJob(jobDetail, jobTrigger);
-    } else {
-      scheduler.scheduleJob(jobDetail, jobTrigger);
     }
   }
 
