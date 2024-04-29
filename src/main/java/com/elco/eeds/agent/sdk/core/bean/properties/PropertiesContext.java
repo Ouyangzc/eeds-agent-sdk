@@ -19,6 +19,10 @@ public class PropertiesContext implements Serializable {
      */
     private String thingsId;
     /**
+     * 变量名称
+     */
+    private String name;
+    /**
      * 变量ID
      */
     private String propertiesId;
@@ -156,5 +160,13 @@ public class PropertiesContext implements Serializable {
 
     public void setRelationIds(String relationIds) {
         this.relationIds = relationIds;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
