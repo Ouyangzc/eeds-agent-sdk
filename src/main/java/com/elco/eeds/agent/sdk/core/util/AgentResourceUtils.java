@@ -3,7 +3,6 @@ package com.elco.eeds.agent.sdk.core.util;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentClusterProperties;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentLoggingFileProperties;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
@@ -95,33 +94,48 @@ public class AgentResourceUtils {
 
   public AgentStartProperties loadYaml() {
     Yaml yaml = new Yaml();
-    String jarPath = getPath();
     InputStream inputStream = null;
+    AgentStartProperties properties = new AgentStartProperties();
+
+    String jarPath = getPath();
     try {
+      inputStream = getInnerConfigYaml();
+      loadInputStream(yaml, inputStream, properties);
       if (null != jarPath) {
         // 构建文件路径，将外部文件名与Jar包所在目录进行拼接
         String externalFilePath = jarPath + File.separator + ConstantCommon.CONFIG_FILE_NAME_YAML;
         if (cn.hutool.core.io.FileUtil.exist(externalFilePath)) {
           inputStream = FileUtil.getInputStream(externalFilePath);
-        } else {
-          URL resource = Thread.currentThread().getContextClassLoader()
-              .getResource(ConstantCommon.CONFIG_FILE_NAME_YAML);
-          inputStream = resource.openStream();
+          loadInputStream(yaml, inputStream, properties);
         }
-      } else {
-        URL resource = Thread.currentThread().getContextClassLoader()
-            .getResource(ConstantCommon.CONFIG_FILE_NAME_YAML);
-        inputStream = resource.openStream();
       }
     } catch (IOException e) {
       logger.error("读取本地配置文件错误,e: ", e);
       return new AgentStartProperties();
     }
-    Map<String, Object> yamlParams = yaml.load(inputStream);
-    Object serverParams = yamlParams.get(ConstantCommon.YAML_AGENT_KEY);
-    AgentStartProperties properties = JSONUtil.toBean(JSONUtil.toJsonStr(serverParams),
-        AgentStartProperties.class);
     return properties;
+  }
+
+
+  private void loadInputStream(Yaml yaml, InputStream inputStream,
+      AgentStartProperties properties) {
+    Map<String, Object> yamlParams = yaml.load(inputStream);
+    if (yamlParams.containsKey(ConstantCommon.YAML_AGENT_KEY)) {
+      Map<String, Object> serverParams = (Map<String, Object>) yamlParams.get(
+          ConstantCommon.YAML_AGENT_KEY);
+      YamlUtils.propertiesToObject(serverParams, properties);
+    }
+    if (yamlParams.containsKey(ConstantCommon.YAML_SERVER_KEY)) {
+      Map<String, Object> serverParams = (Map<String, Object>) yamlParams.get(
+          ConstantCommon.YAML_SERVER_KEY);
+      YamlUtils.propertiesToObject(serverParams, properties);
+    }
+  }
+
+  private InputStream getInnerConfigYaml() throws IOException {
+    URL resource = Thread.currentThread().getContextClassLoader()
+        .getResource(ConstantCommon.CONFIG_FILE_NAME_YAML);
+    return resource.openStream();
   }
 
   public String getPath() {
