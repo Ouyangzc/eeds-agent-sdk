@@ -170,7 +170,7 @@ public abstract class AbstractAgentRegisterService implements IAgentRegisterServ
         token = localToken;
       }
     } catch (SdkException e) {
-      logger.warn("获取本地token发生异常,异常信息：{}", e.getMessage());
+      logger.warn("未获取本地token,信息:{}", e.getMessage());
       return null;
     }
     return token;

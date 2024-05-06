@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.transfer.beans.message.things;
 
 import com.elco.eeds.agent.sdk.core.common.enums.MessageMethod;
+import com.elco.eeds.agent.sdk.core.util.InstantUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 
 import java.io.Serializable;
@@ -16,7 +17,7 @@ public class ThingsConnectStatusMessage extends BaseMessage<SubThingsConnectStat
     public static ThingsConnectStatusMessage create(String thingsId,String connectStatus,String message) {
         ThingsConnectStatusMessage msg = new ThingsConnectStatusMessage();
         msg.setMethod(MessageMethod.THINGS_CONNECT_STATUS.getMethod());
-        msg.setTimestamp(Instant.now().toEpochMilli());
+        msg.setTimestamp(InstantUtils.getUniqueTimestamp());
         msg.setData(new SubThingsConnectStatusMessage(thingsId, connectStatus,message));
         return msg;
     }

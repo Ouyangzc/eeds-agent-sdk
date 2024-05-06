@@ -79,39 +79,44 @@ public class ConfigLoader {
 
   private void loadYaml() {
     Yaml yaml = new Yaml();
-    Optional<String> jarPathOptional = getPath();
     InputStream inputStream = null;
+
+    Optional<String> jarPathOptional = getPath();
     try {
+      inputStream = getInnerConfigYaml();
+      loadInputStream(yaml, inputStream);
       if (jarPathOptional.isPresent()) {
         String jarPath = jarPathOptional.get();
         // 构建文件路径，将外部文件名与Jar包所在目录进行拼接
         String externalFilePath = jarPath + File.separator + ConstantCommon.CONFIG_FILE_NAME_YAML;
         if (cn.hutool.core.io.FileUtil.exist(externalFilePath)) {
           inputStream = FileUtil.getInputStream(externalFilePath);
-        } else {
-          URL resource = Thread.currentThread().getContextClassLoader()
-              .getResource(ConstantCommon.CONFIG_FILE_NAME_YAML);
-          inputStream = resource.openStream();
+          loadInputStream(yaml, inputStream);
         }
-      } else {
-        URL resource = Thread.currentThread().getContextClassLoader()
-            .getResource(ConstantCommon.CONFIG_FILE_NAME_YAML);
-        inputStream = resource.openStream();
       }
     } catch (IOException e) {
       logger.error("读取本地配置文件错误,e: ", e);
     }
+  }
+
+  private void loadInputStream(Yaml yaml, InputStream inputStream) {
     Map<String, Object> yamlParams = yaml.load(inputStream);
     if (yamlParams.containsKey(ConstantCommon.YAML_AGENT_KEY)) {
       Map<String, Object> serverParams = (Map<String, Object>) yamlParams.get(
           ConstantCommon.YAML_AGENT_KEY);
       YamlUtils.propertiesToObject(serverParams, config);
     }
-    if (yamlParams.containsKey(ConstantCommon.YAML_SERVER_KEY)){
-      Map<String, Object> serverParams = (Map<String, Object>)yamlParams.get(ConstantCommon.YAML_SERVER_KEY);
+    if (yamlParams.containsKey(ConstantCommon.YAML_SERVER_KEY)) {
+      Map<String, Object> serverParams = (Map<String, Object>) yamlParams.get(
+          ConstantCommon.YAML_SERVER_KEY);
       YamlUtils.propertiesToObject(serverParams, config);
     }
+  }
 
+  private InputStream getInnerConfigYaml() throws IOException {
+    URL resource = Thread.currentThread().getContextClassLoader()
+        .getResource(ConstantCommon.CONFIG_FILE_NAME_YAML);
+    return resource.openStream();
   }
 
 
