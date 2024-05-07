@@ -92,7 +92,7 @@ public class ConstantTopic {
 
     /**
      * 数据源健康状态（心跳）
-     * agent.things.heartBeat.request.{thingsId}
+     * agent.things.heartBeat.request.{agentId}
      */
     public static final String TOPIC_THINGS_HEARTBEAT_REQUEST = "agent.things.heartBeat.request.";
 
@@ -139,6 +139,7 @@ public class ConstantTopic {
 
     /**
      * 下发指令返回结果报文
+     * agent.agent.order.respond.{thingsId}
      */
     public static final String TOPIC_AGENT_AGENT_ORDER_RESPOND = "agent.agent.order.respond.";
 
