@@ -8,6 +8,7 @@ import com.elco.eeds.agent.sdk.core.common.constant.ConstantThings;
 import com.elco.eeds.agent.sdk.core.connect.ThingsConnection;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
+import com.elco.eeds.agent.sdk.core.util.MapstructUtils;
 import com.elco.eeds.agent.sdk.core.util.ThingsFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsThings;
@@ -96,8 +97,7 @@ public class ThingsServiceImpl implements ThingsService {
             ThingsConnection connection = ConnectManager.getConnection(AgentStartProperties.getInstance().getAgentClientType());
             if (connection.checkThingsConnectParams(things)) {
                 //增量新增数据源
-                ThingsDriverContext driverContext = new ThingsDriverContext();
-                BeanUtil.copyProperties(things, driverContext);
+                ThingsDriverContext driverContext =  MapstructUtils.syncThingsToThingsDriver(things);
                 ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
                 ConnectManager.delConnection(thingsId);
                 ConnectManager.create(driverContext, AgentStartProperties.getInstance().getAgentClientType());
@@ -125,8 +125,6 @@ public class ThingsServiceImpl implements ThingsService {
                 if (currentThingsProperties.isEmpty()) {
                     thingsIterators.remove();
                     //增量新增数据源
-                    ThingsDriverContext driverContext = new ThingsDriverContext();
-                    BeanUtil.copyProperties(currentThings, driverContext);
                     if (!checkThingsExist(thingsId)) {
                         //该数据源不存在，则删除数据源
                         ThingsSyncServiceImpl.THINGS_DRIVER_CONTEXT_MAP.remove(thingsId);

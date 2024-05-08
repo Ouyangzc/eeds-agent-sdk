@@ -7,6 +7,7 @@ import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.common.constant.message.ConstantTopic;
 import com.elco.eeds.agent.sdk.core.common.enums.MessageMethod;
 import com.elco.eeds.agent.sdk.core.util.DateUtils;
+import com.elco.eeds.agent.sdk.core.util.MapstructUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.BaseMessage;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,8 +27,7 @@ public class DataSyncPropertiesValueMessage extends BaseMessage<List<SubDataSync
         message.setTimestamp(DateUtils.getTimestamp());
         List<SubDataSyncPropertiesValueMessage> subMsgs = new ArrayList<>();
         for (PropertiesValue pv : datas) {
-            SubDataSyncPropertiesValueMessage valueMessage = new SubDataSyncPropertiesValueMessage();
-            BeanUtil.copyProperties(pv, valueMessage);
+            SubDataSyncPropertiesValueMessage valueMessage = MapstructUtils.pvToSyncMsg(pv);
             subMsgs.add(valueMessage);
         }
         message.setData(subMsgs);

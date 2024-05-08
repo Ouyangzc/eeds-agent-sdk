@@ -146,7 +146,7 @@ public class EedsThings extends BaseThings implements Serializable {
         return this.extendFieldMap;
     }
 
-    public void setExtendFieldMap(String extendFieldMap) throws Exception {
+    public void setExtendFieldMap(String extendFieldMap) {
         this.extendFieldMap = extendFieldMap;
     }
     public Long getTimestamp() {

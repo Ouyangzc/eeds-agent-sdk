@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
+import com.elco.eeds.agent.sdk.core.util.MapstructUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,8 +93,7 @@ public class VirtualPropertiesHandle {
         List<PropertiesContext> virtualList = propertiesContextList.stream().filter(f -> f.getIsVirtual() == VIRTUAL).collect(Collectors.toList());
         if (ObjectUtil.isNotEmpty(virtualList)) {
             virtualList.stream().forEach(virtualPro -> {
-                PropertiesValue propertiesValue = new PropertiesValue();
-                BeanUtil.copyProperties(virtualPro, propertiesValue);
+                PropertiesValue propertiesValue = MapstructUtils.contextToVirtualPV(virtualPro);
                 // 构建虚拟变量值
                 boolean flag = creatValue(virtualPro, propertiesValue, valueList);
                 if (flag) {

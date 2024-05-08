@@ -130,8 +130,7 @@ public class RealTimeDataMessageFileUtils {
                                 dataParsing = handler.getParsing();
                             }
                             if (ObjectUtil.isEmpty(driverContext)) {
-                                driverContext = new ThingsDriverContext();
-                                BeanUtil.copyProperties(request, driverContext);
+                                driverContext = MapstructUtils.requestToThingsContext(request);
                             }
                             List<PropertiesValue> propertiesValueList = dataParsing.parsing(driverContext, propertiesContextList, message);
                             logger.info("数据同步：原始数据文件,file:{},数据源:{},获取数据大小，size:{}，driverContext:{}", key, thingsId, propertiesValueList.size(), driverContext);

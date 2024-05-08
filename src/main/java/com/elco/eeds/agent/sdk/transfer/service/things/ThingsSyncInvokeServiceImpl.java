@@ -14,6 +14,7 @@ import com.elco.eeds.agent.sdk.core.connect.ThingsConnectionHandler;
 import com.elco.eeds.agent.sdk.core.connect.manager.ConnectManager;
 import com.elco.eeds.agent.sdk.core.connect.status.ConnectionStatus;
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
+import com.elco.eeds.agent.sdk.core.util.MapstructUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.message.things.SubThingsSyncIncrMessage;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsThings;
@@ -146,8 +147,7 @@ public class ThingsSyncInvokeServiceImpl implements ThingsSyncService, Serializa
               AgentStartProperties.getInstance().getAgentClientType());
           if (checkThingsConnectParams(connection, syncThings)) {
             //增量新增数据源
-            ThingsDriverContext driverContext = new ThingsDriverContext();
-            BeanUtil.copyProperties(syncThings, driverContext);
+            ThingsDriverContext driverContext =MapstructUtils.syncThingsToThingsDriver(syncThings);
             THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
             ConnectManager.delConnection(thingsId);
             ConnectManager.create(driverContext,
@@ -157,8 +157,7 @@ public class ThingsSyncInvokeServiceImpl implements ThingsSyncService, Serializa
         case ConstantThings.P_OPERATOR_TYPE_EDIT:
           handleEditThings(syncThings, localThingsData);
           //编辑连接
-          ThingsDriverContext driverContext = new ThingsDriverContext();
-          BeanUtil.copyProperties(syncThings, driverContext);
+          ThingsDriverContext driverContext =MapstructUtils.syncThingsToThingsDriver(syncThings);
           THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
           ConnectManager.recreate(driverContext,
               AgentStartProperties.getInstance().getAgentClientType());
@@ -166,8 +165,6 @@ public class ThingsSyncInvokeServiceImpl implements ThingsSyncService, Serializa
         case ConstantThings.P_OPERATOR_TYPE_DEL:
           handleDelThings(syncThings, localThingsData);
           //删除连接
-          ThingsDriverContext thingsDriverContext = new ThingsDriverContext();
-          BeanUtil.copyProperties(syncThings, thingsDriverContext);
           if (!thingsService.checkThingsExist(thingsId)) {
             //该数据源不存在，则删除数据源
             THINGS_DRIVER_CONTEXT_MAP.remove(thingsId);
@@ -212,9 +209,7 @@ public class ThingsSyncInvokeServiceImpl implements ThingsSyncService, Serializa
     List<EedsProperties> syncThingsPropertiesList = syncThings.getProperties();
     for (EedsProperties properties : syncThingsPropertiesList) {
       String operatorType = properties.getOperatorType();
-      PropertiesEvent propertiesEvent = new PropertiesEvent();
-      propertiesEvent.setThingsId(thingsId);
-      BeanUtil.copyProperties(properties, propertiesEvent);
+      PropertiesEvent propertiesEvent = MapstructUtils.syncPropToEvent(properties,thingsId);
       ConnectManager.sendPropertiesEventNotify(thingsId, propertiesEvent);
       if (ConstantThings.P_OPERATOR_TYPE_ADD.equals(operatorType)) {
         thingsService.addProperties(thingsId, properties);
@@ -244,8 +239,7 @@ public class ThingsSyncInvokeServiceImpl implements ThingsSyncService, Serializa
           AgentStartProperties.getInstance().getAgentClientType());
       if (checkThingsConnectParams(connection, syncThings)) {
         //增量新增数据源
-        ThingsDriverContext driverContext = new ThingsDriverContext();
-        BeanUtil.copyProperties(syncThings, driverContext);
+        ThingsDriverContext driverContext =MapstructUtils.syncThingsToThingsDriver(syncThings);
         THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
         ConnectManager.delConnection(thingsId);
         ConnectManager.create(driverContext,
@@ -283,18 +277,14 @@ public class ThingsSyncInvokeServiceImpl implements ThingsSyncService, Serializa
           ThingsConnection connection = ConnectManager.getConnection(
               AgentStartProperties.getInstance().getAgentClientType());
           if (checkThingsConnectParams(connection, things)) {
-            ThingsDriverContext driverContext = new ThingsDriverContext();
-            BeanUtil.copyProperties(things, driverContext);
+            ThingsDriverContext driverContext =MapstructUtils.syncThingsToThingsDriver(things);
             String agentId = things.getAgentId();
             String thingsId = things.getThingsId();
             THINGS_DRIVER_CONTEXT_MAP.put(things.getThingsId(), driverContext);
             List<EedsProperties> properties = things.getProperties();
             for (EedsProperties p : properties) {
-              PropertiesContext propertiesContext = new PropertiesContext();
-              BeanUtil.copyProperties(p, propertiesContext);
-              propertiesContext.setAgentId(agentId);
-              propertiesContext.setThingsId(thingsId);
-              propertiesContext.setThingsType(things.getThingsType());
+              PropertiesContext propertiesContext = MapstructUtils.syncPropToContext(p, agentId,
+                  thingsId, things.getThingsType());
               PROPERTIES_CONTEXT_MAP.put(p.getPropertiesId(), propertiesContext);
             }
             ConnectManager.create(driverContext,
@@ -314,11 +304,8 @@ public class ThingsSyncInvokeServiceImpl implements ThingsSyncService, Serializa
       String thingsId = edgeThings.getThingsId();
       List<EedsProperties> properties = edgeThings.getProperties();
       for (EedsProperties p : properties) {
-        PropertiesContext propertiesContext = new PropertiesContext();
-        BeanUtil.copyProperties(p, propertiesContext);
-        propertiesContext.setAgentId(agentId);
-        propertiesContext.setThingsId(thingsId);
-        propertiesContext.setThingsType(edgeThings.getThingsType());
+        PropertiesContext propertiesContext = MapstructUtils.syncPropToContext(p, agentId,
+            thingsId, edgeThings.getThingsType());
         propertiesContextList.add(propertiesContext);
         PROPERTIES_CONTEXT_MAP.put(p.getPropertiesId(), propertiesContext);
       }

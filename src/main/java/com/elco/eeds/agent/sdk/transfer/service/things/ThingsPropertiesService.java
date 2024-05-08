@@ -7,6 +7,7 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
+import com.elco.eeds.agent.sdk.core.util.MapstructUtils;
 import com.elco.eeds.agent.sdk.core.util.ThingsFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsProperties;
 import com.elco.eeds.agent.sdk.transfer.beans.things.EedsThings;
@@ -63,8 +64,7 @@ public class ThingsPropertiesService {
         Optional<EedsThings> first = currentThingsList.stream().filter(things -> things.getThingsId().equals(editThings.getThingsId())).findFirst();
         if (first.isPresent()) {
             EedsThings sourceThings = first.get();
-            EedsThings eedsThings = new EedsThings();
-            BeanUtil.copyProperties(editThings, eedsThings);
+            EedsThings eedsThings = MapstructUtils.thingsToThings(editThings);
             //原有点位
             List<EedsProperties> sourceProperties = sourceThings.getProperties();
             eedsThings.setProperties(sourceProperties);
@@ -77,10 +77,9 @@ public class ThingsPropertiesService {
         for (EedsThings currentThings : currentThingsList) {
             if (thingsId.equals(currentThings.getThingsId())) {
                 List<EedsProperties> properties = currentThings.getProperties();
-                PropertiesContext propertiesContext = new PropertiesContext();
-                BeanUtil.copyProperties(addProperties, propertiesContext);
-                propertiesContext.setAgentId(Agent.getInstance().getAgentBaseInfo().getAgentId());
-                propertiesContext.setThingsId(thingsId);
+                String agentId = Agent.getInstance().getAgentBaseInfo().getAgentId();
+                String thingsType = currentThings.getThingsType();
+                PropertiesContext propertiesContext =MapstructUtils.syncPropToContext(addProperties,agentId,thingsId,thingsType);
                 ThingsSyncNewServiceImpl.PROPERTIES_CONTEXT_MAP.put(addProperties.getPropertiesId(), propertiesContext);
                 if (ObjectUtil.isEmpty(properties)) {
                     ArrayList<EedsProperties> eedsProperties = new ArrayList<>();

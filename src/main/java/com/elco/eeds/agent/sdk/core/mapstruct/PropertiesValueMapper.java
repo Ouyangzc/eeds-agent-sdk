@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.mapstruct;
 
+import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.storage.domain.PropertiesData;
 import java.util.List;
@@ -20,4 +21,6 @@ public interface PropertiesValueMapper {
   PropertiesData valueToData(PropertiesValue propertiesValue);
 
   List<PropertiesData> valuesToDatas(List<PropertiesValue> pvs);
+
+  PropertiesValue contextToVirtualPV(PropertiesContext context);
 }
