@@ -61,9 +61,8 @@ public abstract class AbstractRealTimeService implements RealTimeService {
     }
     if (runningModel) {
       pushDataToLocally(propertiesValueList);
-    }else {
-      pushDataToMQ(agentId, thingsId, propertiesValueList, collectTime);
     }
+    pushDataToMQ(agentId, thingsId, propertiesValueList, collectTime);
   }
 
   /**

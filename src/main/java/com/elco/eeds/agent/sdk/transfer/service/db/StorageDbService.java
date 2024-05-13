@@ -39,7 +39,7 @@ public class StorageDbService {
         String data = optional.get();
         if (StrUtils.isNotEmpty(data)) {
           StorageDBInfoBean bean = JSONUtils.toBean(data, StorageDBInfoBean.class);
-          if (bean.getStatus().equals(ConstantCommon.ONE)) {
+          if (ObjectsUtils.isNotNull(bean) && bean.getStatus().equals(ConstantCommon.ONE)) {
             ChangeResult changeResult = storageService.changeStorageDb(bean.getTcpUrl(),
                 bean.getUserName(), bean.getPassword(), bean.getCertStr(), bean.getDbTypeEnum(),
                 bean.getSecurityTypeEnum(), bean.getCluster());
