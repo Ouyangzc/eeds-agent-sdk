@@ -162,7 +162,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> implemen
           propertiesContextList);
       long time = System.currentTimeMillis() - startTime;
       num++;
-      logger.info("数据处理耗时，time:{},推送数据量:{}", time, num);
+      logger.debug("数据处理耗时，time:{},推送数据量:{}", time, num);
     }
   }
 

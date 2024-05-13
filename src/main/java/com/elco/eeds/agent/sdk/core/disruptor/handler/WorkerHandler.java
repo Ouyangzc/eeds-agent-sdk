@@ -31,7 +31,7 @@ public class WorkerHandler implements WorkHandler<DataEvent> {
   @Override
   public void onEvent(DataEvent dataEvent) throws Exception {
     if (logger.isDebugEnabled()) {
-      logger.info("接受到数据更新请求  >>>" + dataEvent);
+      logger.debug("接受到数据更新请求  >>>" + dataEvent);
     }
     executor.execute(() -> {
       disruptorService.execute(dataEvent.getData());

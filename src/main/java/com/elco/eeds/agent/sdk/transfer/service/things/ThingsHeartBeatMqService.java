@@ -27,7 +27,7 @@ public class ThingsHeartBeatMqService {
         String topic = ConstantTopic.TOPIC_THINGS_HEARTBEAT_REQUEST + Agent.getInstance()
             .getAgentBaseInfo().getAgentId();
         MqPluginUtils.sendThingsHeartBeatMsg(topic, message);
-        logger.info("发送数据源心跳报文：{}", message);
+//        logger.debug("发送数据源心跳报文：{}", message);
       }
     });
   }
