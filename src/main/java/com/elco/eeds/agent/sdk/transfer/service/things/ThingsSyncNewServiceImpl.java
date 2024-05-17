@@ -1,6 +1,5 @@
 package com.elco.eeds.agent.sdk.transfer.service.things;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
@@ -207,14 +206,26 @@ public class ThingsSyncNewServiceImpl implements ThingsSyncService, Serializable
     List<EedsProperties> syncThingsPropertiesList = syncThings.getProperties();
     for (EedsProperties properties : syncThingsPropertiesList) {
       String operatorType = properties.getOperatorType();
-      PropertiesEvent propertiesEvent = MapstructUtils.syncPropToEvent(properties, thingsId);
-      ConnectManager.sendPropertiesEventNotify(thingsId, propertiesEvent);
       if (ConstantThings.P_OPERATOR_TYPE_ADD.equals(operatorType)) {
         thingsService.addProperties(thingsId, properties);
       } else if (ConstantThings.P_OPERATOR_TYPE_DEL.equals(operatorType)) {
         thingsService.delProperties(thingsId, properties);
         PROPERTIES_CONTEXT_MAP.remove(properties.getPropertiesId());
       }
+    }
+    handlePropertiesEvent(thingsId,syncThingsPropertiesList);
+  }
+
+  /**
+   * 同步点位，按照修改时间倒叙排列,同步应按正序发送
+   *
+   * @param propertiesList
+   */
+  private void handlePropertiesEvent(String thingsId,List<EedsProperties> propertiesList) {
+    for (int i = propertiesList.size() - 1; i >= 0; i--) {
+      EedsProperties properties = propertiesList.get(i);
+      PropertiesEvent propertiesEvent = MapstructUtils.syncPropToEvent(properties, thingsId);
+      ConnectManager.sendPropertiesEventNotify(thingsId, propertiesEvent);
     }
 
   }
@@ -237,7 +248,7 @@ public class ThingsSyncNewServiceImpl implements ThingsSyncService, Serializable
           AgentStartProperties.getInstance().getAgentClientType());
       if (checkThingsConnectParams(connection, syncThings)) {
         //增量新增数据源
-         ThingsDriverContext driverContext = MapstructUtils.syncThingsToThingsDriver(
+        ThingsDriverContext driverContext = MapstructUtils.syncThingsToThingsDriver(
             syncThings);
         THINGS_DRIVER_CONTEXT_MAP.put(thingsId, driverContext);
         ConnectManager.delConnection(thingsId);
@@ -276,7 +287,7 @@ public class ThingsSyncNewServiceImpl implements ThingsSyncService, Serializable
           ThingsConnection connection = ConnectManager.getConnection(
               AgentStartProperties.getInstance().getAgentClientType());
           if (checkThingsConnectParams(connection, things)) {
-             ThingsDriverContext driverContext = MapstructUtils.syncThingsToThingsDriver(
+            ThingsDriverContext driverContext = MapstructUtils.syncThingsToThingsDriver(
                 things);
             String agentId = things.getAgentId();
             String thingsId = things.getThingsId();

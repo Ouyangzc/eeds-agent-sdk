@@ -210,13 +210,28 @@ public class ThingsSyncInvokeServiceImpl implements ThingsSyncService, Serializa
     for (EedsProperties properties : syncThingsPropertiesList) {
       String operatorType = properties.getOperatorType();
       PropertiesEvent propertiesEvent = MapstructUtils.syncPropToEvent(properties,thingsId);
-      ConnectManager.sendPropertiesEventNotify(thingsId, propertiesEvent);
+
       if (ConstantThings.P_OPERATOR_TYPE_ADD.equals(operatorType)) {
         thingsService.addProperties(thingsId, properties);
       } else if (ConstantThings.P_OPERATOR_TYPE_DEL.equals(operatorType)) {
         thingsService.delProperties(thingsId, properties);
         PROPERTIES_CONTEXT_MAP.remove(properties.getPropertiesId());
       }
+    }
+    handlePropertiesEvent(thingsId,syncThingsPropertiesList);
+
+  }
+
+  /**
+   * 同步点位，按照修改时间倒叙排列,同步应按正序发送
+   *
+   * @param propertiesList
+   */
+  private void handlePropertiesEvent(String thingsId,List<EedsProperties> propertiesList) {
+    for (int i = propertiesList.size() - 1; i >= 0; i--) {
+      EedsProperties properties = propertiesList.get(i);
+      PropertiesEvent propertiesEvent = MapstructUtils.syncPropToEvent(properties, thingsId);
+      ConnectManager.sendPropertiesEventNotify(thingsId, propertiesEvent);
     }
 
   }
