@@ -44,9 +44,12 @@ public class StorageDbService {
                 bean.getUserName(), bean.getPassword(), bean.getCertStr(), bean.getDbTypeEnum(),
                 bean.getSecurityTypeEnum(), bean.getCluster());
             logger.info("切换数据库结果:{}", changeResult);
+            return;
           }
         }
       }
+      //默认初始化
+      storageService.initStorageDbByConfig();
     } catch (Exception e) {
       logger.error("获取服务端存储配置并加载异常，异常信息:{},堆栈:", e.getMessage(), e);
     }
