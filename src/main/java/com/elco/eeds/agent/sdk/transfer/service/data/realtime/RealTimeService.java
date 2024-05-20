@@ -18,22 +18,4 @@ public interface RealTimeService {
    * @return
    */
   boolean checkCollectTimeValid(Long collectTime);
-  /**
-   * 存储原始报文
-   * @param thingsId
-   * @param msg
-   * @param collectTime
-   * @throws Exception
-   */
-  void storageOriginalMsg(String thingsId, String msg, Long collectTime) throws Exception;
-
-  /**
-   * 统计数据
-   * @param thingsId
-   * @param valueList
-   * @param collectTime
-   * @throws Exception
-   */
-  void countRealTimeValueData(String thingsId, List<PropertiesValue> valueList, Long collectTime)
-      throws Exception;
 }

@@ -63,7 +63,6 @@ public class AgentStarter {
 
       // 加载文件
       quartzManager.load();
-      DataCountServiceImpl.createCountMapSection(null);
       DataCountServiceImpl.setUp();
       logger.info(Logo.logo);
       agent.setAgentStatus(AgentStatus.RUNNING);

@@ -7,10 +7,9 @@ import com.elco.eeds.agent.sdk.core.disruptor.RealTimeDataDisruptorServer;
 import com.elco.eeds.agent.sdk.core.util.MqPluginUtils;
 import com.elco.eeds.agent.sdk.core.util.RealTimeDataMessageFileUtils;
 import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessage;
-import com.elco.eeds.agent.sdk.transfer.beans.data.count.ThingsDataCount;
 import com.elco.eeds.agent.sdk.transfer.beans.message.data.realTime.DataRealTimePropertiesMessage;
 import com.elco.eeds.agent.sdk.transfer.handler.properties.VirtualPropertiesHandle;
-import com.elco.eeds.agent.sdk.transfer.service.data.count.DataCountServiceImpl;
+import com.elco.eeds.agent.sdk.transfer.service.data.count.RealTimeDataStatisticsDeque;
 import com.elco.eeds.agent.sdk.transfer.service.data.realtime.AbstractRealTimeService;
 import java.util.List;
 import org.slf4j.Logger;
@@ -51,7 +50,7 @@ public class RealTimePropertiesValueService extends AbstractRealTimeService {
     //MQ推送数据
     String postMsg = DataRealTimePropertiesMessage.getMessage(propertiesValueList);
     String topic = DataRealTimePropertiesMessage.getTopic(agentId, thingsId);
-    logger.debug("实时数据推送：采集时间:{} topic:{}, msg:{}", collectTime, topic, postMsg);
+    logger.info("实时数据推送：采集时间:{} topic:{}, msg:{}", collectTime, topic, postMsg);
     MqPluginUtils.sendRealTimeValueMsg(topic, postMsg);
   }
 
@@ -79,12 +78,6 @@ public class RealTimePropertiesValueService extends AbstractRealTimeService {
         collectTime);
 
     //调用统计接口
-    ThingsDataCount dataCount = new ThingsDataCount();
-    dataCount.setThingsId(thingsId);
-    dataCount.setSize(propertiesValueList.size());
-    dataCount.setCollectTime(collectTime);
-    dataCount.setStartTime(collectTime);
-    dataCount.setEndTime(collectTime);
-    DataCountServiceImpl.recRealTimeData(agentId, collectTime, dataCount);
+    propertiesValueList.forEach(pv-> RealTimeDataStatisticsDeque.getInstance().addRealTimeData(collectTime,pv));
   }
 }
