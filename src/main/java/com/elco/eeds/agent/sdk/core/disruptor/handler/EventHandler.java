@@ -1,8 +1,12 @@
 package com.elco.eeds.agent.sdk.core.disruptor.handler;
 
+import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.disruptor.DisruptorProcessorService;
 import com.elco.eeds.agent.sdk.core.disruptor.event.DataEvent;
+import com.elco.eeds.agent.sdk.core.util.MapstructUtils;
+import com.elco.storage.domain.PropertiesData;
 import com.lmax.disruptor.LifecycleAware;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import org.slf4j.Logger;
@@ -34,8 +38,10 @@ public class EventHandler implements com.lmax.disruptor.EventHandler<DataEvent>,
     if (logger.isDebugEnabled()) {
       logger.info("接受到数据更新请求  >>>" + dataEvent);
     }
+    List<PropertiesValue> propertiesValues = dataEvent.getData();
+    List<PropertiesData> data = MapstructUtils.valueToData(propertiesValues);
     executor.execute(() -> {
-      disruptorService.execute(dataEvent.getData());
+      disruptorService.execute(data);
     });
   }
 

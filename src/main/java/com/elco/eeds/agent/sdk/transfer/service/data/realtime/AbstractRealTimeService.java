@@ -1,17 +1,11 @@
 package com.elco.eeds.agent.sdk.transfer.service.data.realtime;
 
-import cn.hutool.json.JSONUtil;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.util.AgentResourceUtils;
-import com.elco.eeds.agent.sdk.core.util.RealTimeDataMessageFileUtils;
-import com.elco.eeds.agent.sdk.transfer.beans.data.OriginalPropertiesValueMessage;
-import com.elco.eeds.agent.sdk.transfer.beans.data.count.ThingsDataCount;
-import com.elco.eeds.agent.sdk.transfer.beans.data.count.ThingsDataCount.ThingsDataCountBuilder;
-import com.elco.eeds.agent.sdk.transfer.service.data.count.DataCountServiceImpl;
+import com.elco.eeds.agent.sdk.transfer.service.data.count.RealTimeDataStatisticsDeque;
 import java.util.List;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +39,7 @@ public abstract class AbstractRealTimeService implements RealTimeService {
    * @param propertiesValueList   解析数据
    * @param propertiesContextList 变量信息
    */
-  public void process(String message, String thingsId, Long collectTime,
+  public void proccess(String message, String thingsId, Long collectTime,
       List<PropertiesValue> propertiesValueList, List<PropertiesContext> propertiesContextList) {
     if (propertiesValueList.isEmpty()) {
       return;
@@ -110,15 +104,14 @@ public abstract class AbstractRealTimeService implements RealTimeService {
 
   @Override
   public boolean checkCollectTimeValid(Long collectTime) {
-    Optional<Long> minOptional = DataCountServiceImpl.thingsDataCountMap.keySet().stream()
-        .min(Long::compareTo);
-    if (minOptional.isPresent()) {
-      if (collectTime < minOptional.get()) {
-        logger.debug("丢弃该消息,时间戳：{},统计开始时间:{}", collectTime, minOptional.get());
-        return false;
-      }
-      return true;
+    long startCollectTime = RealTimeDataStatisticsDeque.collectionStartTime.get();
+    if (0==startCollectTime){
+      return false;
     }
-    return false;
+    if (collectTime<startCollectTime){
+      logger.debug("丢弃该消息,时间戳：{},统计开始时间:{}", collectTime, startCollectTime);
+      return false;
+    }
+    return true;
   }
 }

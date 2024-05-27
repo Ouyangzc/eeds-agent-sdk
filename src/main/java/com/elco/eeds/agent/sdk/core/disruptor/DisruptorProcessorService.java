@@ -1,6 +1,7 @@
 package com.elco.eeds.agent.sdk.core.disruptor;
 
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
+import com.elco.storage.domain.PropertiesData;
 import java.util.List;
 
 /**
@@ -16,5 +17,5 @@ public interface DisruptorProcessorService {
    * 异步处理服务
    * @param data 数据
    */
-  void execute(List<PropertiesValue> data);
+  void execute(List<PropertiesData> data);
 }
