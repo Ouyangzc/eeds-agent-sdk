@@ -28,6 +28,7 @@ public class RealTimeDataDisruptorServer extends AbstractDisruptorServer {
   private DisruptorProcessorService disruptorService;
 
   private static RealTimeDataDisruptorServer instance;
+  private static RealTimeValueStorageServiceImpl storageService = new RealTimeValueStorageServiceImpl();
 
   public RealTimeDataDisruptorServer(DisruptorProcessorService disruptorService) {
     this(new DisruptorConfig(), disruptorService);
@@ -40,7 +41,7 @@ public class RealTimeDataDisruptorServer extends AbstractDisruptorServer {
   }
 
   public static RealTimeDataDisruptorServer getInstance() {
-    return getInstance(new RealTimeValueStorageServiceImpl());
+    return getInstance(storageService);
   }
 
   public static RealTimeDataDisruptorServer getInstance(
