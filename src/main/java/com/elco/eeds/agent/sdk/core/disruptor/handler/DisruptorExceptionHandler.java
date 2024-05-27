@@ -1,8 +1,12 @@
 package com.elco.eeds.agent.sdk.core.disruptor.handler;
 
+import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.disruptor.DisruptorProcessorService;
 import com.elco.eeds.agent.sdk.core.disruptor.event.DataEvent;
+import com.elco.eeds.agent.sdk.core.util.MapstructUtils;
+import com.elco.storage.domain.PropertiesData;
 import com.lmax.disruptor.ExceptionHandler;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +30,9 @@ public class DisruptorExceptionHandler implements ExceptionHandler<DataEvent> {
   @Override
   public void handleEventException(Throwable throwable, long sequence, DataEvent dataEvent) {
     //事件处理异常里面进行补偿执行
-    disruptorService.execute(dataEvent.getData());
+//    List<PropertiesValue> propertiesValues = dataEvent.getData();
+//    List<PropertiesData> data = MapstructUtils.valueToData(propertiesValues);
+//    disruptorService.execute(data);
     logger.error(">>> Disruptor事件处理异常，进行立即执行补偿操作..........");
     logger.error(">>> 异常信息如下：", throwable.getMessage());
   }

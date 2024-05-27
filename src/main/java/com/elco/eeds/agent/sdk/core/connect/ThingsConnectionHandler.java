@@ -158,7 +158,7 @@ public abstract class ThingsConnectionHandler<T, M extends DataParsing> implemen
         pv.setIsVirtual(REAL);
       });
       RealTimePropertiesValueService realTimePropertiesValueService = RealTimePropertiesValueService.getInstance();
-      realTimePropertiesValueService.process(msg, thingsId, collectTime, valueList,
+      realTimePropertiesValueService.proccess(msg, thingsId, collectTime, valueList,
           propertiesContextList);
       long time = System.currentTimeMillis() - startTime;
       num++;

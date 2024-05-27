@@ -57,9 +57,9 @@ public abstract class AbstractDisruptorServer {
     //设置消费者Handler
     createConsumer();
     ringBuffer = disruptor.start();
-    this.isStart = true;
     //创建生产者
-   disruptorProducer =  createProducer(ringBuffer,this.producerExecutor);
+    disruptorProducer =  createProducer(ringBuffer,this.producerExecutor);
+    this.isStart = true;
   }
 
   /**

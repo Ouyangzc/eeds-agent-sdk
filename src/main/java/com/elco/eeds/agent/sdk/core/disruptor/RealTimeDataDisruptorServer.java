@@ -72,7 +72,7 @@ public class RealTimeDataDisruptorServer extends AbstractDisruptorServer {
     int threads = config.getThreads();
     WorkerHandler[] disruptorConsumers = new WorkerHandler[threads];
     for (int i = 0; i < threads; i++) {
-      disruptorConsumers[i] = new WorkerHandler(disruptorService, consumerExecutor);
+      disruptorConsumers[i] = new WorkerHandler(disruptorService);
     }
     //设置消费组
     disruptor.handleEventsWithWorkerPool(disruptorConsumers).then(new ClearingEventHandler());

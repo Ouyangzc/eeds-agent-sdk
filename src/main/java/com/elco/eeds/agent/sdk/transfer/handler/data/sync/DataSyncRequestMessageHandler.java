@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
+import com.elco.eeds.agent.sdk.core.disruptor.RealTimeDataDisruptorServer;
+import com.elco.eeds.agent.sdk.core.util.AgentResourceUtils;
 import com.elco.eeds.agent.sdk.core.util.FileUtil;
 import com.elco.eeds.agent.sdk.core.util.MqPluginUtils;
 import com.elco.eeds.agent.sdk.core.util.RealTimeDataMessageFileUtils;
@@ -100,8 +102,12 @@ public class DataSyncRequestMessageHandler extends IReceiverMessageHandler {
       String thingsId) {
     String message = DataSyncPropertiesValueMessage.getMessage(propertiesValues);
     String topic = DataSyncPropertiesValueMessage.getTopic(agentId, thingsId);
-    logger.debug("数据同步,推送数据,topic:{},msg:{}", topic, message);
+    if (AgentResourceUtils.isSlimModle()){
+      RealTimeDataDisruptorServer disruptorServer = RealTimeDataDisruptorServer.getInstance();
+      disruptorServer.sendData(propertiesValues);
+    }
     MqPluginUtils.sendDataSyncPropertiesValueMsg(topic, message);
+    logger.debug("数据同步,推送数据,topic:{},msg:{}", topic, message);
   }
 
   private void postDataSyncFinishMessage(String agentId, String queueId, Boolean syncFlag,
