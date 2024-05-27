@@ -4,6 +4,7 @@ import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.disruptor.DisruptorProcessorService;
 import com.elco.eeds.agent.sdk.core.disruptor.event.DataEvent;
 import com.elco.eeds.agent.sdk.core.util.MapstructUtils;
+import com.elco.eeds.core.json.JsonUtils;
 import com.elco.storage.domain.PropertiesData;
 import com.lmax.disruptor.WorkHandler;
 import java.util.List;
@@ -35,7 +36,7 @@ public class WorkerHandler implements WorkHandler<DataEvent> {
   @Override
   public void onEvent(DataEvent dataEvent) throws Exception {
     if (logger.isDebugEnabled()) {
-      logger.debug("接受到数据更新请求  >>>" + dataEvent.getData().size());
+      logger.debug("【Disruptor】消费：" + JsonUtils.toJsonString(dataEvent.getData()));
     }
     List<PropertiesValue> data = dataEvent.getData();
     List<PropertiesData> datas = MapstructUtils.valueToData(data);
