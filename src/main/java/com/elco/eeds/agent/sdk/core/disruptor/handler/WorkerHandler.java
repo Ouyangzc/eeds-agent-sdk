@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.disruptor.handler;
 
+import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.disruptor.DisruptorProcessorService;
 import com.elco.eeds.agent.sdk.core.disruptor.event.DataEvent;
 import com.elco.eeds.agent.sdk.core.util.MapstructUtils;

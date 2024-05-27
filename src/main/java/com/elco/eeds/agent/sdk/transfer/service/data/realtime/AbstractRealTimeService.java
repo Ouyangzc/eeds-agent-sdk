@@ -121,39 +121,4 @@ public abstract class AbstractRealTimeService implements RealTimeService {
     }
     return false;
   }
-
-  @Override
-  public void storageOriginalMsg(String thingsId, String message, Long collectTime)
-      throws Exception {
-    try {
-      if (isLocalCache) {
-        //存储原始数据
-        OriginalPropertiesValueMessage originalPropertiesValueMessage = new OriginalPropertiesValueMessage();
-        originalPropertiesValueMessage.setCollectTime(collectTime);
-        originalPropertiesValueMessage.setMessage(message);
-        RealTimeDataMessageFileUtils.writeAppend(thingsId,
-            JSONUtil.toJsonStr(originalPropertiesValueMessage), collectTime);
-      }
-    } catch (Exception e) {
-      logger.error("存储原始报文异常,message:{},exp:", message, e);
-    }
-  }
-
-  @Override
-  public void countRealTimeValueData(String thingsId, List<PropertiesValue> valueList,
-      Long collectTime) throws Exception {
-    try {
-      //调用统计接口
-      ThingsDataCount dataCount = ThingsDataCountBuilder.create()
-          .thingsId(thingsId)
-          .size(valueList.size())
-          .collectTime(collectTime)
-          .startTime(collectTime)
-          .endTime(collectTime)
-          .build();
-      DataCountServiceImpl.recRealTimeData(agentId, collectTime, dataCount);
-    } catch (Exception e) {
-      logger.error("统计实时数据异常,message:{},exp:", valueList, e);
-    }
-  }
 }
