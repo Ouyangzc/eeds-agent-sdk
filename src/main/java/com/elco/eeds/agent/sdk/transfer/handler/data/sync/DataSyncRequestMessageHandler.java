@@ -103,7 +103,7 @@ public class DataSyncRequestMessageHandler extends IReceiverMessageHandler {
     String message = DataSyncPropertiesValueMessage.getMessage(propertiesValues);
     String topic = DataSyncPropertiesValueMessage.getTopic(agentId, thingsId);
     if (AgentResourceUtils.isSlimModle()){
-      RealTimeDataDisruptorServer disruptorServer = RealTimeDataDisruptorServer.getInstance();
+      RealTimeDataDisruptorServer disruptorServer = RealTimeDataDisruptorServer.getInstance2();
       disruptorServer.sendData(propertiesValues);
     }
     MqPluginUtils.sendDataSyncPropertiesValueMsg(topic, message);

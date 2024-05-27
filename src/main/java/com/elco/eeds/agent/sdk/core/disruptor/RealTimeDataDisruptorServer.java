@@ -28,6 +28,11 @@ public class RealTimeDataDisruptorServer extends AbstractDisruptorServer {
   private DisruptorProcessorService disruptorService;
 
   private static RealTimeDataDisruptorServer instance;
+  static {
+    DisruptorConfig config = new DisruptorConfig();
+    RealTimeValueStorageServiceImpl disruptorService = new RealTimeValueStorageServiceImpl();
+    instance = new RealTimeDataDisruptorServer(config, disruptorService);
+  }
   private static RealTimeValueStorageServiceImpl storageService = new RealTimeValueStorageServiceImpl();
 
   public RealTimeDataDisruptorServer(DisruptorProcessorService disruptorService) {
@@ -62,6 +67,11 @@ public class RealTimeDataDisruptorServer extends AbstractDisruptorServer {
     return instance;
   }
 
+
+
+  public static RealTimeDataDisruptorServer getInstance2() {
+    return instance;
+  }
   @Override
   protected DisruptorProducer createProducer(RingBuffer<DataEvent> ringBuffer,
       ExecutorService executor) {
