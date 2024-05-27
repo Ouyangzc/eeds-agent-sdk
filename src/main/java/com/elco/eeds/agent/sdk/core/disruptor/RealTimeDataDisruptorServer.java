@@ -92,7 +92,7 @@ public class RealTimeDataDisruptorServer extends AbstractDisruptorServer {
   }
 
   public void sendData(List<PropertiesValue> data) {
-    checkAndStart();
+//    checkAndStart();
     disruptorProducer.send(data);
   }
 
