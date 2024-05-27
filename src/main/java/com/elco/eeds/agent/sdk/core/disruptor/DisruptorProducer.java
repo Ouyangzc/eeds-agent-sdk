@@ -34,9 +34,7 @@ public class DisruptorProducer {
       logger.debug("发送数据给消费者");
     }
     if (null != data) {
-      executor.execute(() -> {
-        translator(data);
-      });
+      translator(data);
     }
   }
 
