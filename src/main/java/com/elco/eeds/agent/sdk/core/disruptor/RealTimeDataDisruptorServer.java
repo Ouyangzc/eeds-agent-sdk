@@ -88,7 +88,7 @@ public class RealTimeDataDisruptorServer extends AbstractDisruptorServer {
     //设置消费组
     disruptor.handleEventsWithWorkerPool(disruptorConsumers).then(new ClearingEventHandler());
     //设置异常处理
-//    disruptor.setDefaultExceptionHandler(new DisruptorExceptionHandler(disruptorService));
+    disruptor.setDefaultExceptionHandler(new DisruptorExceptionHandler(disruptorService));
   }
 
   public void sendData(List<PropertiesValue> data) {
