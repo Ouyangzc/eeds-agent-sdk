@@ -17,7 +17,7 @@ public class DisruptorConfig implements Serializable {
   /**
    * RingBuffer 大小，必须是 2 的 N 次方；
    */
-  private int ringBufferSize = 1024 * 1024;
+  private int ringBufferSize = 128;
   /**
    * 生产者类型
    */
@@ -32,7 +32,7 @@ public class DisruptorConfig implements Serializable {
   /**
    * 线程数
    */
-  private int threads = Runtime.getRuntime().availableProcessors();
+  private int threads = Runtime.getRuntime().availableProcessors() * 2;
 
   public int getRingBufferSize() {
     return ringBufferSize;

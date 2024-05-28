@@ -41,5 +41,6 @@ public class WorkerHandler implements WorkHandler<DataEvent> {
     List<PropertiesValue> data = dataEvent.getData();
     List<PropertiesData> datas = MapstructUtils.valueToData(data);
     disruptorService.execute(datas);
+    dataEvent.clear();
   }
 }
