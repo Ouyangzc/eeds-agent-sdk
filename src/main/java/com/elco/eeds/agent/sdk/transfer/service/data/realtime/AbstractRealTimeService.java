@@ -3,6 +3,7 @@ package com.elco.eeds.agent.sdk.transfer.service.data.realtime;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesContext;
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
+import com.elco.eeds.agent.sdk.core.disruptor.RealTimeDataDisruptorServer;
 import com.elco.eeds.agent.sdk.core.util.AgentResourceUtils;
 import com.elco.eeds.agent.sdk.transfer.service.data.count.RealTimeDataStatisticsDeque;
 import java.util.List;
@@ -30,6 +31,10 @@ public abstract class AbstractRealTimeService implements RealTimeService {
     this.isLocalCache = AgentResourceUtils.getAgentConfigLocalCache();
     this.runningModel = AgentResourceUtils.isSlimModle();
     this.agentId = Agent.getInstance().getAgentBaseInfo().getAgentId();
+    if(this.runningModel){
+      RealTimeDataDisruptorServer disruptorServer = RealTimeDataDisruptorServer.getInstance2();
+      disruptorServer.doStart();
+    }
   }
 
   /**

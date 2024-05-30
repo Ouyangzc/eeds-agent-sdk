@@ -29,6 +29,13 @@ public class RealTimeDataDisruptorServer extends AbstractDisruptorServer {
 
   private static RealTimeDataDisruptorServer instance;
   private static RealTimeValueStorageServiceImpl storageService = new RealTimeValueStorageServiceImpl();
+  static {
+    DisruptorConfig config = new DisruptorConfig();
+    RealTimeValueStorageServiceImpl disruptorService = new RealTimeValueStorageServiceImpl();
+    instance = new RealTimeDataDisruptorServer(config, disruptorService);
+  }
+  private static RealTimeValueStorageServiceImpl storageService = new RealTimeValueStorageServiceImpl();
+
   public RealTimeDataDisruptorServer(DisruptorProcessorService disruptorService) {
     this(new DisruptorConfig(), disruptorService);
   }
@@ -61,6 +68,11 @@ public class RealTimeDataDisruptorServer extends AbstractDisruptorServer {
     return instance;
   }
 
+
+
+  public static RealTimeDataDisruptorServer getInstance2() {
+    return instance;
+  }
   @Override
   protected DisruptorProducer createProducer(RingBuffer<DataEvent> ringBuffer,
       ExecutorService executor) {
@@ -75,13 +87,13 @@ public class RealTimeDataDisruptorServer extends AbstractDisruptorServer {
       disruptorConsumers[i] = new WorkerHandler(disruptorService);
     }
     //设置消费组
-    disruptor.handleEventsWithWorkerPool(disruptorConsumers).then(new ClearingEventHandler());
+    disruptor.handleEventsWithWorkerPool(disruptorConsumers);
     //设置异常处理
-    disruptor.setDefaultExceptionHandler(new DisruptorExceptionHandler(disruptorService));
+//    disruptor.setDefaultExceptionHandler(new DisruptorExceptionHandler(disruptorService));
   }
 
   public void sendData(List<PropertiesValue> data) {
-    checkAndStart();
+//    checkAndStart();
     disruptorProducer.send(data);
   }
 

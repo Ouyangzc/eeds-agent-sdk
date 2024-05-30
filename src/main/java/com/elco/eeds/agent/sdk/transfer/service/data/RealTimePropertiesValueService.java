@@ -11,9 +11,10 @@ import com.elco.eeds.agent.sdk.transfer.beans.message.data.realTime.DataRealTime
 import com.elco.eeds.agent.sdk.transfer.handler.properties.VirtualPropertiesHandle;
 import com.elco.eeds.agent.sdk.transfer.service.data.count.RealTimeDataStatisticsDeque;
 import com.elco.eeds.agent.sdk.transfer.service.data.realtime.AbstractRealTimeService;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * @ClassName RealTimePropertiesValueService
@@ -40,7 +41,7 @@ public class RealTimePropertiesValueService extends AbstractRealTimeService {
 
   @Override
   protected void pushDataToLocally(List<PropertiesValue> propertiesValueList) {
-    RealTimeDataDisruptorServer disruptorServer = RealTimeDataDisruptorServer.getInstance();
+    RealTimeDataDisruptorServer disruptorServer = RealTimeDataDisruptorServer.getInstance2();
     disruptorServer.sendData(propertiesValueList);
   }
 

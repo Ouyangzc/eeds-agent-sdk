@@ -1,5 +1,6 @@
 package com.elco.eeds.agent.sdk.core.quartz.job;
 
+import cn.hutool.core.util.StrUtil;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentBaseInfo;
 import com.elco.eeds.agent.sdk.transfer.service.data.count.DataCountServiceImpl;
@@ -36,7 +37,11 @@ public class CountJob implements Job {
 		}
 		AgentBaseInfo agentBaseInfo = Agent.getInstance().getAgentBaseInfo();
 		if (ObjectUtil.isNotEmpty(agentBaseInfo)){
-			Long period = Long.valueOf(agentBaseInfo.getSyncPeriod());
+			String syncPeriod = agentBaseInfo.getSyncPeriod();
+			if(StrUtil.isEmpty(syncPeriod)){
+				return;
+			}
+			Long period = Long.valueOf(syncPeriod);
 			long countTime = CountJob.countTime.get();
 			long countStartTime;
 			long countEndTime;

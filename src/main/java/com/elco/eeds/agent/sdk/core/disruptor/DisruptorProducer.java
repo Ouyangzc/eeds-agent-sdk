@@ -2,6 +2,7 @@ package com.elco.eeds.agent.sdk.core.disruptor;
 
 import com.elco.eeds.agent.sdk.core.bean.properties.PropertiesValue;
 import com.elco.eeds.agent.sdk.core.disruptor.event.DataEvent;
+import com.elco.eeds.core.json.JsonUtils;
 import com.lmax.disruptor.EventTranslatorOneArg;
 import com.lmax.disruptor.RingBuffer;
 import java.util.List;
@@ -33,9 +34,7 @@ public class DisruptorProducer {
       logger.debug("发送数据给消费者");
     }
     if (null != data) {
-      executor.execute(() -> {
-        translator(data);
-      });
+      translator(data);
     }
   }
 
@@ -48,6 +47,9 @@ public class DisruptorProducer {
 
 
   private void translator(List<PropertiesValue> data) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("【Disruptor】推送：" + JsonUtils.toJsonString(data));
+    }
     ringBuffer.publishEvent(TRANSLATOR, data);
   }
 }
