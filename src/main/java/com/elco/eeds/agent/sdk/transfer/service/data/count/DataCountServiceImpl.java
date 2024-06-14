@@ -135,8 +135,7 @@ public class DataCountServiceImpl implements DataCountService {
         countDataHolder.overrideCountDataToFile(doPostData);
       }
     } catch (Exception e) {
-      logger.error("统计记录--发送--状态变更存储文件异常，信息:", e);
-      e.printStackTrace();
+      logger.error("统计记录--发送--状态变更存储文件异常，信息:{},统计数据：{}", e,doPostData);
     }
     if (null != doPostData) {
       String agentId = Agent.getInstance().getAgentBaseInfo().getAgentId();

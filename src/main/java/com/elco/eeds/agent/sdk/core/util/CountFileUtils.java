@@ -1,20 +1,27 @@
 package com.elco.eeds.agent.sdk.core.util;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.elco.eeds.agent.sdk.core.bean.agent.Agent;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantFilePath;
 import com.elco.eeds.agent.sdk.transfer.beans.data.count.PostDataCount;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @ClassName CountFileUtils
@@ -24,6 +31,16 @@ import java.util.List;
  */
 public class CountFileUtils {
 	public static final Logger logger = LoggerFactory.getLogger(CountFileUtils.class);
+
+	private static final ConcurrentLinkedQueue<PostDataCount> queue = new ConcurrentLinkedQueue<>();
+
+	private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+	static {
+		// 启动处理队列的线程
+		executor.submit(CountFileUtils::processQueue);
+	}
+
+
 
 	/**
 	 * 获取当前统计文件中所有的统计数据
@@ -40,8 +57,14 @@ public class CountFileUtils {
 		}
 		List<String> readLines = FileUtils.readLines(file, StandardCharsets.UTF_8);
 		for (String line : readLines) {
-			PostDataCount dataCount = JSON.parseObject(line, PostDataCount.class);
-			dataCounts.add(dataCount);
+			try {
+				if (StrUtil.isNotEmpty(line)){
+					PostDataCount dataCount = JSON.parseObject(line, PostDataCount.class);
+					dataCounts.add(dataCount);
+				}
+			}catch (Exception e){
+				logger.error("数据统计--未发送,解析数据异常 ",e);
+			}
 		}
 		return dataCounts;
 	}
@@ -106,6 +129,32 @@ public class CountFileUtils {
 
 	}
 
+//	/**
+//	 * 更新一条数据
+//	 *
+//	 * @param dataCount
+//	 * @throws IOException
+//	 */
+//	public static void writeAppendForOverride(PostDataCount dataCount) throws IOException {
+//		List<PostDataCount> dataCounts = new ArrayList<>();
+//		String path = getDataCountFilePath();
+//		File file = FileUtils.getFile(path);
+//		LineIterator lineIterator = FileUtils.lineIterator(file);
+//		String countId = dataCount.getCountId();
+//		while (lineIterator.hasNext()) {
+//			String line = lineIterator.next();
+//			logger.info("writeAppendForOverride,line data:{}", line);
+//			PostDataCount dataCountRecord = JSON.parseObject(line, PostDataCount.class);
+//			if (dataCountRecord.getCountId().equals(countId)) {
+//				//覆盖
+//				dataCounts.add(dataCount);
+//			} else {
+//				dataCounts.add(dataCountRecord);
+//			}
+//		}
+//		FileUtils.writeLines(file, dataCounts, false);
+//	}
+
 	/**
 	 * 更新一条数据
 	 *
@@ -113,23 +162,70 @@ public class CountFileUtils {
 	 * @throws IOException
 	 */
 	public static void writeAppendForOverride(PostDataCount dataCount) throws IOException {
-		List<PostDataCount> dataCounts = new ArrayList<>();
-		String path = getDataCountFilePath();
-		File file = FileUtils.getFile(path);
-		LineIterator lineIterator = FileUtils.lineIterator(file);
-		String countId = dataCount.getCountId();
-		while (lineIterator.hasNext()) {
-			String line = lineIterator.next();
-			logger.info("writeAppendForOverride,line data:{}", line);
-			PostDataCount dataCountRecord = JSON.parseObject(line, PostDataCount.class);
-			if (dataCountRecord.getCountId().equals(countId)) {
-				//覆盖
-				dataCounts.add(dataCount);
+		queue.offer(dataCount);
+	}
+
+	private static void processQueue() {
+		while (true) {
+			PostDataCount dataCount = queue.poll();
+			if (dataCount != null) {
+				try {
+					processWrite(dataCount);
+				} catch (IOException e) {
+					logger.error("Failed to process write for dataCount: {}", dataCount, e);
+				}
 			} else {
-				dataCounts.add(dataCountRecord);
+				try {
+					// 防止CPU空转
+					TimeUnit.MILLISECONDS.sleep(500);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+					break;
+				}
 			}
 		}
-		FileUtils.writeLines(file, dataCounts, false);
+	}
+
+	private static void processWrite(PostDataCount dataCount) throws IOException {
+		String path = getDataCountFilePath();
+		File file = FileUtils.getFile(path);
+		File tempFile = FileUtils.getFile(path + ".tmp");
+		List<PostDataCount> dataCounts = new ArrayList<>();
+
+		LineIterator lineIterator = null;
+		try (FileChannel fileChannel = new FileOutputStream(file, true).getChannel()) {
+			try (FileLock lock = fileChannel.lock()) {
+				lineIterator = FileUtils.lineIterator(file);
+				String countId = dataCount.getCountId();
+				while (lineIterator.hasNext()) {
+					String line = lineIterator.next();
+					logger.info("writeAppendForOverride, line data: {}", line);
+					try {
+						PostDataCount dataCountRecord = JSON.parseObject(line, PostDataCount.class);
+						if (dataCountRecord.getCountId().equals(countId)) {
+							// 覆盖
+							dataCounts.add(dataCount);
+						} else {
+							dataCounts.add(dataCountRecord);
+						}
+					} catch (Exception e) {
+						logger.error("Failed to parse line: {}", line, e);
+					}
+				}
+			} finally {
+				if (lineIterator != null) {
+					lineIterator.close();
+				}
+			}
+
+			// 写入临时文件
+			FileUtils.writeLines(tempFile, dataCounts, false);
+
+			// 原子性地替换原始文件
+			if (!tempFile.renameTo(file)) {
+				throw new IOException("Failed to replace original file with temporary file.");
+			}
+		}
 	}
 
 	/**

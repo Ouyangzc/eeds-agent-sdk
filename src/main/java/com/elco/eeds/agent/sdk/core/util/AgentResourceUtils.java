@@ -7,6 +7,8 @@ import com.elco.eeds.agent.sdk.core.bean.agent.AgentClusterProperties;
 import com.elco.eeds.agent.sdk.core.bean.agent.AgentLoggingFileProperties;
 import com.elco.eeds.agent.sdk.core.common.constant.ConstantCommon;
 import com.elco.eeds.agent.sdk.core.common.enums.AgentRunningModelEnum;
+import com.elco.eeds.agent.sdk.core.config.Config;
+import com.elco.eeds.agent.sdk.core.config.ConfigLoader;
 import com.elco.eeds.agent.sdk.core.start.AgentStartProperties;
 import java.io.File;
 import java.io.IOException;
@@ -62,15 +64,15 @@ public class AgentResourceUtils {
   }
 
   public static AgentClusterProperties getAgentConfigCluster() {
-    AgentResourceUtils instance = getInstance();
-    AgentClusterProperties cluster = instance.getAgentStartProperties().getCluster();
+    Config config = ConfigLoader.getConfig();
+    AgentClusterProperties cluster = config.getCluster();
     if (ObjectUtil.isEmpty(cluster)) {
       AgentClusterProperties clusterProperties = new AgentClusterProperties();
-      clusterProperties.setServerUrls(instance.getAgentStartProperties().getServerUrl());
+      clusterProperties.setServerUrls(config.getServerUrl());
       clusterProperties.setEnable(false);
       return clusterProperties;
     } else {
-      cluster.setServerUrls(instance.getAgentStartProperties().getServerUrl());
+      cluster.setServerUrls(config.getServerUrl());
       return cluster;
     }
   }
@@ -87,7 +89,6 @@ public class AgentResourceUtils {
   public static String getAgentRunningModle() {
     AgentResourceUtils instance = getInstance();
     String runningModel = instance.getAgentStartProperties().getRunningModel();
-
     return StrUtil.isEmpty(runningModel) ? AgentRunningModelEnum.SINGLE.getRunningModel()
         : runningModel.toUpperCase();
   }
