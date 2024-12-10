@@ -129,85 +129,85 @@
     </distributionManagement>
     <build>
         <plugins>
-            <plugin>
-                <groupId>com.github.wvengen</groupId>
-                <artifactId>proguard-maven-plugin</artifactId>
-                <version>2.5.3</version>
-                <executions>
-                    <execution>
-                        <!--打包的时候开始混淆-->
-                        <phase>package</phase>
-                        <goals>
-                            <goal>proguard</goal>
-                        </goals>
-                    </execution>
-                </executions>
+<!--            <plugin>-->
+<!--                <groupId>com.github.wvengen</groupId>-->
+<!--                <artifactId>proguard-maven-plugin</artifactId>-->
+<!--                <version>2.5.3</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        &lt;!&ndash;打包的时候开始混淆&ndash;&gt;-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>proguard</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
 
-                <configuration>
-                    <proguardVersion>7.2.1</proguardVersion>
-                    <injar>${project.build.finalName}.jar</injar>
-                    <!--输出的jar-->
-                    <outjar>${project.build.finalName}.jar</outjar>
-                    <!--是否混淆-->
-                    <obfuscate>true</obfuscate>
-                    <proguardInclude>${basedir}/proguard.cfg</proguardInclude>
+<!--                <configuration>-->
+<!--                    <proguardVersion>7.2.1</proguardVersion>-->
+<!--                    <injar>${project.build.finalName}.jar</injar>-->
+<!--                    &lt;!&ndash;输出的jar&ndash;&gt;-->
+<!--                    <outjar>${project.build.finalName}.jar</outjar>-->
+<!--                    &lt;!&ndash;是否混淆&ndash;&gt;-->
+<!--                    <obfuscate>true</obfuscate>-->
+<!--                    <proguardInclude>${basedir}/proguard.cfg</proguardInclude>-->
 
-                    <options>
-                        <!--默认开启，不做收缩（删除注释、未被引用代码）-->
-                        <option>-dontshrink</option>
-                        <!--默认是开启的，这里关闭字节码级别的优化-->
-                        <option>-dontoptimize</option>
-                        <!--对于类成员的命名的混淆采取唯一策略-->
-                        <option>-useuniqueclassmembernames</option>
-                        <!--混淆时不生成大小写混合的类名，默认是可以大小写混合-->
-                        <option>-dontusemixedcaseclassnames</option>
-                        <!--混淆类名之后，对使用Class.forName('className')之类的地方进行相应替代-->
-                        <option>-adaptclassstrings</option>
+<!--                    <options>-->
+<!--                        &lt;!&ndash;默认开启，不做收缩（删除注释、未被引用代码）&ndash;&gt;-->
+<!--                        <option>-dontshrink</option>-->
+<!--                        &lt;!&ndash;默认是开启的，这里关闭字节码级别的优化&ndash;&gt;-->
+<!--                        <option>-dontoptimize</option>-->
+<!--                        &lt;!&ndash;对于类成员的命名的混淆采取唯一策略&ndash;&gt;-->
+<!--                        <option>-useuniqueclassmembernames</option>-->
+<!--                        &lt;!&ndash;混淆时不生成大小写混合的类名，默认是可以大小写混合&ndash;&gt;-->
+<!--                        <option>-dontusemixedcaseclassnames</option>-->
+<!--                        &lt;!&ndash;混淆类名之后，对使用Class.forName('className')之类的地方进行相应替代&ndash;&gt;-->
+<!--                        <option>-adaptclassstrings</option>-->
 
-                        <!--对异常、注解信息在runtime予以保留，不然影响springboot启动-->
-                        <option>-keepattributes
-                            Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod
-                        </option>
+<!--                        &lt;!&ndash;对异常、注解信息在runtime予以保留，不然影响springboot启动&ndash;&gt;-->
+<!--                        <option>-keepattributes-->
+<!--                            Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod-->
+<!--                        </option>-->
 
-                        <!--此选项将保存接口中的所有原始名称（不混淆）-->
-                        <option>-keepnames interface ** { *; }</option>
-                        <!--此选项将保存所有软件包中的所有原始接口文件（不进行混淆）-->
-                        <!--<option>-keep interface * extends * { *; }</option>-->
+<!--                        &lt;!&ndash;此选项将保存接口中的所有原始名称（不混淆）&ndash;&gt;-->
+<!--                        <option>-keepnames interface ** { *; }</option>-->
+<!--                        &lt;!&ndash;此选项将保存所有软件包中的所有原始接口文件（不进行混淆）&ndash;&gt;-->
+<!--                        &lt;!&ndash;<option>-keep interface * extends * { *; }</option>&ndash;&gt;-->
 
-                        <!--此选项将保留所有原始方法参数,controller如果参数也混淆会导致传参映射不上  -->
-                        <option>-keepparameternames</option>
+<!--                        &lt;!&ndash;此选项将保留所有原始方法参数,controller如果参数也混淆会导致传参映射不上  &ndash;&gt;-->
+<!--                        <option>-keepparameternames</option>-->
 
-                        <!--保留枚举成员及方法-->
-                        <option>-keepclassmembers enum * { *; }</option>
+<!--                        &lt;!&ndash;保留枚举成员及方法&ndash;&gt;-->
+<!--                        <option>-keepclassmembers enum * { *; }</option>-->
 
-                        <!--不混淆所有类,保存原始定义的注释-->
-                        <!--<option>-keepclassmembers class * {
-                            @org.springframework.context.annotation.Bean *;
-                            @org.springframework.beans.factory.annotation.Autowired *;
-                            @org.springframework.beans.factory.annotation.Value *;
-                            @org.springframework.stereotype.Service *;
-                            @org.springframework.stereotype.Component *;
-                            }
-                        </option>-->
+<!--                        &lt;!&ndash;不混淆所有类,保存原始定义的注释&ndash;&gt;-->
+<!--                        &lt;!&ndash;<option>-keepclassmembers class * {-->
+<!--                            @org.springframework.context.annotation.Bean *;-->
+<!--                            @org.springframework.beans.factory.annotation.Autowired *;-->
+<!--                            @org.springframework.beans.factory.annotation.Value *;-->
+<!--                            @org.springframework.stereotype.Service *;-->
+<!--                            @org.springframework.stereotype.Component *;-->
+<!--                            }-->
+<!--                        </option>&ndash;&gt;-->
 
-                        <!--忽略warn消息-->
-                        <option>-ignorewarnings</option>
-                        <!--忽略note消息-->
-                        <option>-dontnote</option>
-                    </options>
-                    <libs>
-                        <lib>${java.home}/lib/rt.jar</lib>
-                        <lib>${java.home}/lib/jsse.jar</lib>
-                    </libs>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.guardsquare</groupId>
-                        <artifactId>proguard-base</artifactId>
-                        <version>7.2.1</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
+<!--                        &lt;!&ndash;忽略warn消息&ndash;&gt;-->
+<!--                        <option>-ignorewarnings</option>-->
+<!--                        &lt;!&ndash;忽略note消息&ndash;&gt;-->
+<!--                        <option>-dontnote</option>-->
+<!--                    </options>-->
+<!--                    <libs>-->
+<!--                        <lib>${java.home}/lib/rt.jar</lib>-->
+<!--                        <lib>${java.home}/lib/jsse.jar</lib>-->
+<!--                    </libs>-->
+<!--                </configuration>-->
+<!--                <dependencies>-->
+<!--                    <dependency>-->
+<!--                        <groupId>com.guardsquare</groupId>-->
+<!--                        <artifactId>proguard-base</artifactId>-->
+<!--                        <version>7.2.1</version>-->
+<!--                    </dependency>-->
+<!--                </dependencies>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

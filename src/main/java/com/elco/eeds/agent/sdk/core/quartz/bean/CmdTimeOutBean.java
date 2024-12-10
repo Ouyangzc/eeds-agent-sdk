@@ -96,9 +96,8 @@ public class CmdTimeOutBean extends JobBeanBase implements Serializable {
 
     public CmdTimeOutBean build() {
       CmdTimeOutBean cmdTimeOutBean = new CmdTimeOutBean(msgSeqNo, thingsId, timeout);
-      cmdTimeOutBean.setJobName(jobName);
-      cmdTimeOutBean.setJobGroup(jobGroup);
-      cmdTimeOutBean.setExtraMap(extraMap);
+      cmdTimeOutBean.setJobGroup(QuartzEnum.CMD_TIME_OUT_GROUP.getValue());
+      cmdTimeOutBean.setJobName(QuartzEnum.CMD_TIME_OUT_JOB.getValue()+msgSeqNo);
       return cmdTimeOutBean;
     }
   }
