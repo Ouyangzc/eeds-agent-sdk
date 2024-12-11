@@ -37,6 +37,7 @@ public class OrderRequestMessageHandler extends IReceiverMessageHandler {
         if (ObjectUtil.isEmpty(handler)) {
             logger.error("变量下发失败,数据源已断开:{}", data.getThingsId());
             OrderResultMqService.sendFail(data.getThingsId(), data.getMsgSeqNo(), ErrorEnum.THINGS_CONNECT_NOT_EXIST.message());
+            return;
         }
         // 发送成功：true; 发送失败：false;
         // 失败需要发送--下发报文结果报文
